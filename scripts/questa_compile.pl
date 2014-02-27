@@ -9,7 +9,7 @@ my $verbose=0;
 my $vlogargs="";
 my $vcomargs="";
 my $default_lib="";
-
+my $library_home="questa_libs";
 sub infomsg{
     my $s = pop;
     print color 'bold dark blue';
@@ -17,40 +17,70 @@ sub infomsg{
     print color 'reset';
 }
 
+
+
+
+
 sub compile_file{
     my $lib=pop;
     my $file = pop;
     my $args="";
-    my $f;
+    my @f;
     my $cmd;
+    my $type="";
+    my $tmp;
+    
+
     if ($file =~ /:/) {
 	my @line=split ":",$file;
-	$f = $line[0];
+	@f = split",",$line[0];
 	$args = $line[1];
     } else {
-	$f = $file;    
+	@f = split ",",$file;    
     }
 
+    # ###############################################################
     # This is only valid if we have a library:
     # Check if this is a VHDL file
-    if ($f =~ /\.vhd$/) {
-	$cmd = "vcom -work $lib $f $args $vcomargs";
-	&infomsg("$cmd");
-    } elsif (($f =~ /\.sv$/)|($f =~ /\.v$/)|($f =~ /\.svh$/)) {
-	$cmd = "vlog -work $lib $f $args $vlogargs";
-	&infomsg("$cmd");
-    } elsif (($f =~ /\.c$/)|($f =~ /\.cpp$/)) {
-	$cmd = "vlog -work $lib $f $args -ccflags $cflags";
-	&infomsg("$cmd");
+    # First of all. We will use the first file to decide file type
+    # Then we will check if we have conflicting types
+    # ###############################################################
+    if (($f[0] =~ /\.vhd$/)|($f[0] =~ /\.vhdl$/)) {
+	    $type="vhdl";
+    } elsif (($f[0] =~ /\.sv$/)|($f[0] =~ /\.v$/)|($f[0] =~ /\.svh$/)) {
+	$type="verilog";
+
+    } elsif (($f[0] =~ /\.c$/)|($f[0] =~ /\.cpp$/)) {
+	$type="c"; 
     } else {
-	&infomsg("Unknown filetype:$f");
+	&infomsg("Unknown filetype:$f[0]");
+	exit(1);
     }
+
+    # Next step is to compile the code
+    $tmp = join " ",@f;
+    if ($type eq "vhdl") {
+	$cmd = "vcom -work $lib $tmp $args $vcomargs";
+	&system_cmd($cmd);
+#	&infomsg("Trying to compile $type: $cmd");
+    } elsif ($type eq "verilog") {
+	$cmd = "vlog -work $lib $tmp $args $vlogargs";
+#	&infomsg("Trying to compile $type: $cmd");
+	&system_cmd($cmd);
+    } elsif ($type eq "c") {
+	$cmd = "vlog -work $lib $tmp $args $cflags";
+#	&infomsg("Trying to compile $type: $cmd");
+	&system_cmd($cmd);
+    } else {
+	&infomsg("Unknown filetype:$type");
+	exit(1);
+
+    }
+
+
+
 } 
  
-
-
-
-
 
 GetOptions ("cflags=s" => \$cflags,    # numeric
 	    "file=s"   => \$fltfile,      # string
@@ -78,12 +108,35 @@ foreach my $l (@indata) {
 
 @indata=@tmp;
 my $lib=$default_lib;
+
+
 foreach my $f (@indata) {
     if ($f =~ /^\@library/ ) {
 	my @line=split "=",$f;
 	$lib=pop @line;
-	&infomsg("Found library $lib");
+	&infomsg("Trying to create library $lib");
+	my $cmd="test -e $library_home||mkdir $library_home";
+	&system_cmd($cmd);
+	my $cmd="vlib $library_home/$lib";
+	&system_cmd($cmd);
+	my $cmd="vmap $lib $ENV{'PWD'}/$library_home/$lib";
+	&system_cmd($cmd);
     } else {
+
+
+
+
 	&compile_file($f,$lib);
+    }
+}
+
+
+
+sub system_cmd{
+    my $cmd = pop;
+    my $status;
+    $status=system($cmd);
+    if ($status > 0) {
+	&infomsg("$cmd failed, exiting...");
     }
 }
