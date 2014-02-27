@@ -1,0 +1,7 @@
+# Syntax
+#@library <library name>
+#<file>:arguments 
+# or
+# <file1> <file2>....: arguments (Must be same type)
+
+@library design_lib
