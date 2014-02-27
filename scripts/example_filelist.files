@@ -1,0 +1,20 @@
+# Syntax
+#@library=<library name>
+#<file>:arguments 
+# or
+# <file1>,<file2>....: arguments (Must be same type)
+# or
+# <file1>,
+# <file2>: arguments (Must be same type)
+#
+# First version will only work on files in one line only:
+
+
+@library=design_lib
+$QME_HOME/examples/ieee1500/er_tap_1500/example/rtl/tap_1500_beh_model.sv
+@library=vip_lib
+$QME_HOME/examples/ieee1500/er_tap_1500/example/er_simple_clk_reset/sv/er_simple_clk_reset_if.sv,$QME_HOME/examples/ieee1500/er_tap_1500/example/er_simple_clk_reset/sv/er_simple_clk_reset_pkg.sv :+incdir+$QME_HOME/examples/ieee1500/er_tap_1500/example/er_simple_clk_reset/sv/
+
+
+#@library=work
+#$QME_HOME/examples/ieee1500/er_tap_1500/example/
