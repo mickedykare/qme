@@ -1,0 +1,319 @@
+###################################################################
+# Please don't change this file.  Use overrides instead!!!
+###################################################################
+# This file contains all the base variables.
+
+QME_VERSION=0.1
+###################################################################
+# Default Scripts
+###################################################################
+RMDBFILE=${QME_HOME}/templates/questa_regression.rmdb
+RECOMPILE_ANALYZE_SCRIPT=
+###################################################################
+# Default versions
+###################################################################
+UVM_VERSION=uvm-1.1d
+QUESTA_UVM_DEBUG=questa_uvm_pkg-1.2
+QUESTA_GCC_VERSION=4.5.0
+###################################################################
+# Tool pointers  
+#################################################################
+QUESTA_HOME=${MODEL_TECH}
+UVM_HOME=${QUESTA_HOME}/verilog_src/${UVM_VERSION}
+UVM_INC_DIR=+incdir+${UVM_HOME}/src
+###################################################################
+# Naming
+#################################################################
+PROJECT=PROJECTNAME
+BLOCKNAME=PLEASE_OVERRIDE_BLOCKNAME
+WORKLIB=work
+DESIGNLIB=${BLOCKNAME}_lib
+
+LIBRARY_HOME=questa_libs
+AC_RESULTS=autocheck_output_results
+CDC_RESULTS=cdc_output_results
+COVERCHECK_RESULTS=covercheck_output_results
+FORMAL_RESULTS=formal_output_results
+UCDB_STORAGE=ucdbfiles
+HTML_HOME=html_reports
+LIBLIST=libs.list
+PROJECT_NAME="QME($QME_VERSION)"
+ORIGIN_MODELSIM_INI=${QUESTA_HOME}/modelsim.ini
+QME_BLOCK_OVERRIDES=Makefile.block.defaults
+QUESTALIBS_DIR=questalibs
+###################################################################
+# Common Settings
+###################################################################
+CHIP=0
+FAST=0
+x32=1
+BITS=32
+ARCH=-32	
+UVMC=0     # Use UVM Connect
+RANKING=0
+VLOG_TIMESCALE=
+
+
+###################################################################
+# Regression default parameters
+###################################################################
+MAX_EXECUTION_TIME=600
+MAX_QUE_TIME=600
+NOTIMEOUT=0
+
+###################################################################
+# Default visibility settings
+###################################################################
+VOPTSWITCHES_FAST_CHIP=+acc=rn
+VOPTSWITCHES_CHIP=+acc=npr 
+VOPTSWITCHES_BLOCK=+acc
+CODECOVERAGE=+cover=fbecst
+###################################################################
+# SCRIPTS and Executables
+###################################################################
+COMPILE_SCRIPT=${QME_HOME}/scripts/questa_compile.pl
+VLOG=vlog
+VCOM=vcom
+VOPT=vopt
+###################################################################
+# Enable Questa VIPs to be compiled
+###################################################################
+# Override like this:
+# QVIP_TARGETS=axi apb ahb spi i2c
+QVIP_TARGETS=qvip_default
+
+
+ifneq ($(QUESTAMVC_HOME),) # If QUESTAMVC_HOME is set use this!
+QUESTA_VIP_SIM_ARGS=-mvchome $(QUESTAMVC_HOME)
+QVIP_COMMON=mvc_base
+else
+QUESTA_VIP_SIM_ARGS=
+QVIP_COMMON=mvc_base
+endif
+ # Used for checking compilation
+allqvips: mvc_base apb3 ace acelite ahb axi axi4 axi4lite axi4stream axi_lp \
+cec csi2 ddr ddr2 ddr3 digrf dsi eth_1g ethernet hdmi i2c i2s jtag lli mphy ocp pcie smartcard spi spi4 uart USB2_0\
+USB3_0_SS
+
+qvip_default:
+	@tput setaf 6;
+	@echo "NOTE! To compile Questa VIPs, override QVIP_TARGETS"
+	@echo "      e.g. QVIP_TARGETS=\"axi apb3 i2c\""
+	@tput setaf 9;
+
+mvc_base:
+	@echo "Compiling infrastructure files"
+	@test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
+	@test -d ${QUESTALIBS_DIR}/qvip_lib||vlib ${QUESTALIBS_DIR}/qvip_lib
+	@vmap qvip_lib ${PWD}/${QUESTALIBS_DIR}/qvip_lib
+	${VLOG} -work qvip_lib -sv ${QUESTA_MVC_HOME}/include/questa_mvc_svapi.svh 
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${QUESTA_MVC_HOME}/questa_mvc_src/sv/mvc_pkg.sv ${UVM_INC_DIR}
+
+apb3:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_apb3_v1_0_pkg.sv
+ace:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_ace_v1_0_pkg.sv
+
+acelite:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_acelite_v1_0_pkg.sv
+
+ahb:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_ahb_v2_0_pkg.sv
+
+axi:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi_v1_0_pkg.sv
+
+axi4:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi4_v1_0_pkg.sv
+
+axi4lite:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi4lite_v1_0_pkg.sv
+
+
+axi4stream:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi4stream_v1_0_pkg.sv
+
+axi_lp:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi_lp_v1_0_pkg.sv
+
+cec:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_pkg.sv
+
+csi2:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_01_pkg.sv
+
+ddr:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_pkg.sv
+
+ddr2:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
+
+ddr3:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
+
+digrf:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@v4_1_2_pkg.sv
+
+dsi:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_02_pkg.sv
+eth_1g:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
+
+ethernet:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
+
+hdmi:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_pkg.sv
+
+i2c:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v2_1_pkg.sv
+
+i2s:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
+
+jtag:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v2_0_pkg.sv
+
+lli:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_00_pkg.sv
+
+mphy:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_4_pkg.sv
+
+ocp:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v2_2_pkg.sv
+
+pcie:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v2_0_pkg.sv
+
+smartcard:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_pkg.sv
+
+spi:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
+
+spi4:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_2_pkg.sv
+
+uart:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
+USB2_0:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_usb_v2_0_pkg.sv
+
+USB3_0_SS:
+	@echo "Compiling protocol package $@"
+	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_usb_ss_v3_0_pkg.sv
+
+###################################################################
+# Color printouts
+###################################################################
+green_on:
+	@tput setaf 2;
+	@echo "#############################################################"
+
+blue_on:
+	@tput setaf 6;
+	@echo "#############################################################"
+
+
+color_reset:
+	@echo "#############################################################"
+	@tput setaf 9;
+
+printvars: green_on
+	@$(foreach V,$(sort $(.VARIABLES)), \
+	$(if $(filter-out environment% default automatic, $(origin $V)),$(warning $V=$($V) ($(value $V)))))
+
+info: green_on printvars color_reset
+
+
+
+###################################################################
+# Some defaults target , meant to be extended
+###################################################################
+prepare_filelist_dut::
+	@tput setaf 6;
+	@echo "Preparing file list for dut (optional)"
+	@tput setaf 9;
+prepare_filelist_tb::
+	@tput setaf 6;
+	@echo "Preparing file list for tb (optional)"
+	@tput setaf 9;
+presim::
+	@tput setaf 6;
+	@echo "Running script before simulation"
+	@tput setaf 9;
+postsim::
+	@tput setaf 6;
+	@echo "Running script after simulation"
+	@tput setaf 9;
+
+print-%:
+	@tput setaf 2;
+	@echo '$*=$($*)'
+	@tput setaf 9;
+
+

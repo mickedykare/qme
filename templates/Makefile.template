@@ -1,0 +1,83 @@
+################################################################
+# Base settings
+################################################################
+include ${QME_HOME}/templates/Makefile.base
+
+################################################################
+# Site Overrides
+# Using this is optional. But allowes for common site settings
+################################################################
+-include ${QME_SITE_SETTINGS}/Makefile.site.defaults
+################################################################
+# Project Overrides, optional
+################################################################
+-include ${QME_PROJECT_HOME}/qme_setup/Makefile.project.defaults
+
+################################################################
+# Block Overrides,optional
+################################################################
+
+-include ${QME_BLOCK_OVERRIDES}
+
+################################################################
+# Calculate Variables. Done here to catch overrides
+################################################################
+
+# Enable 64 bit mode
+ifeq ($(x32),0)
+  ARCH=-64
+  BITS=64
+endif
+
+# Regression timeouts
+ifeq ($(NOTIMEOUT),1)
+  TIMEOUTARGS=-notimeout
+else
+  TIMEOUTARGS=-mintimeout ${MAX_QUE_TIME}:${MAX_EXECUTION_TIME}  
+endif
+################################################################
+# Targets
+################################################################
+
+# clean out
+default::help
+
+compile: clean prepare_filelist compile_uvm compile_qvips compile_dut compile_tb 
+
+
+clean::
+	rm -rf ${LIBRARY_HOME}
+	rm -rf ${TESTCASE_DIR}
+	rm -f *.wlf
+	rm -f transcript
+	rm -f *.dbg
+
+
+# Recompile UVM to catch timescale problem
+compile_uvm::
+	@echo "Recompiling uvm library UVM_VERSION ${UVM_VERSION} with timescale VLOG_TIMESCALE=${VLOG_TIMESCALE}";
+	@test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
+	@test -d ${QUESTALIBS_DIR}/${UVM_VERSION}||vlib ${QUESTALIBS_DIR}/${UVM_VERSION}
+	@vmap mtiUvm ${PWD}/${QUESTALIBS_DIR}/${UVM_VERSION}
+	${VLOG} -work mtiUvm ${UVM_HOME}/src/uvm_pkg.sv ${UVM_HOME}/src/dpi/uvm_dpi.cc  \
+	${UVM_INC_DIR} ${VLOG_TIMESCALE}  +define+UVM_DEBUGGER ${QUESTA_HOME}/verilog_src/${QUESTA_UVM_DEBUG}/src/questa_uvm_pkg.sv \
+	+incdir+${QUESTA_HOME}/verilog_src/${QUESTA_UVM_DEBUG}/src/
+	${VLOG} -work mtiUvm ${QUESTA_HOME}/verilog_src/${UVM_VERSION}/src/dpi/uvm_dpi.cc -${BITS} ${DPI_GCC_VERSION}
+
+compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
+
+
+compile_dut::prepare_filelist_dut
+	${COMPILE_SCRIPT} ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS}
+
+compile_tb::prepare_filelist_tb
+	${COMPILE_SCRIPT} ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS}
+
+
+
+
+
+
+
+
+
