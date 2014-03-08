@@ -35,6 +35,10 @@ ifeq ($(NOTIMEOUT),1)
 else
   TIMEOUTARGS=-mintimeout ${MAX_QUE_TIME}:${MAX_EXECUTION_TIME}  
 endif
+
+UVM_INC_DIR=+incdir+${UVM_HOME}/src
+DPI_GCC_VERSION=-dpicppinstall ${QUESTA_GCC_VERSION}  
+
 ################################################################
 # Targets
 ################################################################

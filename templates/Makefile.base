@@ -20,7 +20,7 @@ QUESTA_GCC_VERSION=4.5.0
 #################################################################
 QUESTA_HOME=${MODEL_TECH}
 UVM_HOME=${QUESTA_HOME}/verilog_src/${UVM_VERSION}
-UVM_INC_DIR=+incdir+${UVM_HOME}/src
+
 ###################################################################
 # Naming
 #################################################################
@@ -41,6 +41,7 @@ PROJECT_NAME="QME($QME_VERSION)"
 ORIGIN_MODELSIM_INI=${QUESTA_HOME}/modelsim.ini
 QME_BLOCK_OVERRIDES=Makefile.block.defaults
 QUESTALIBS_DIR=questalibs
+QVIP_LIB=qvip_lib
 ###################################################################
 # Common Settings
 ###################################################################
@@ -49,11 +50,8 @@ FAST=0
 x32=1
 BITS=32
 ARCH=-32	
-UVMC=0     # Use UVM Connect
 RANKING=0
 VLOG_TIMESCALE=
-
-
 ###################################################################
 # Regression default parameters
 ###################################################################
@@ -104,167 +102,167 @@ qvip_default:
 mvc_base:
 	@echo "Compiling infrastructure files"
 	@test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
-	@test -d ${QUESTALIBS_DIR}/qvip_lib||vlib ${QUESTALIBS_DIR}/qvip_lib
-	@vmap qvip_lib ${PWD}/${QUESTALIBS_DIR}/qvip_lib
-	${VLOG} -work qvip_lib -sv ${QUESTA_MVC_HOME}/include/questa_mvc_svapi.svh 
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${QUESTA_MVC_HOME}/questa_mvc_src/sv/mvc_pkg.sv ${UVM_INC_DIR}
+	@test -d ${QUESTALIBS_DIR}/${QVIP_LIB}||vlib ${QUESTALIBS_DIR}/${QVIP_LIB}
+	@vmap ${QVIP_LIB} ${PWD}/${QUESTALIBS_DIR}/${QVIP_LIB}
+	${VLOG} -work ${QVIP_LIB} -sv ${QUESTA_MVC_HOME}/include/questa_mvc_svapi.svh 
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${QUESTA_MVC_HOME}/questa_mvc_src/sv/mvc_pkg.sv ${UVM_INC_DIR}
 
 apb3:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_apb3_v1_0_pkg.sv
 ace:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_ace_v1_0_pkg.sv
 
 acelite:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_acelite_v1_0_pkg.sv
 
 ahb:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_ahb_v2_0_pkg.sv
 
 axi:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi_v1_0_pkg.sv
 
 axi4:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi4_v1_0_pkg.sv
 
 axi4lite:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi4lite_v1_0_pkg.sv
 
 
 axi4stream:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi4stream_v1_0_pkg.sv
 
 axi_lp:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi_lp_v1_0_pkg.sv
 
 cec:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_pkg.sv
 
 csi2:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_01_pkg.sv
 
 ddr:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_pkg.sv
 
 ddr2:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 
 ddr3:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 
 digrf:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@v4_1_2_pkg.sv
 
 dsi:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_02_pkg.sv
 eth_1g:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 
 ethernet:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 
 hdmi:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_pkg.sv
 
 i2c:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v2_1_pkg.sv
 
 i2s:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 
 jtag:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v2_0_pkg.sv
 
 lli:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_00_pkg.sv
 
 mphy:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_4_pkg.sv
 
 ocp:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v2_2_pkg.sv
 
 pcie:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v2_0_pkg.sv
 
 smartcard:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_pkg.sv
 
 spi:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 
 spi4:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_2_pkg.sv
 
 uart:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 USB2_0:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_usb_v2_0_pkg.sv
 
 USB3_0_SS:
 	@echo "Compiling protocol package $@"
-	${VLOG} -work qvip_lib +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_usb_ss_v3_0_pkg.sv
 
 ###################################################################
