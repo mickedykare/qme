@@ -70,16 +70,26 @@ compile_uvm::
 
 compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 
-
 compile_dut::prepare_filelist_dut
 	${COMPILE_SCRIPT} ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS}
 
 compile_tb::prepare_filelist_tb
 	${COMPILE_SCRIPT} ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS}
 
+############  Simulation targets ########################
 
+############# Regression Targets ########################
 
+############# Formal tools ##############################
+get_generics:: compile 
+	@echo TBD
 
+autocheck_only::
+	@echo TBD
+
+autocheck::clean compile_dut autocheck_only
+
+##########################################################
 
 
 
