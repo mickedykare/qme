@@ -1,0 +1,32 @@
+# This is the format that this environment use. 
+# Please notice that all files to a library is compiled together
+# I.e adding one option for a file, means that it will be used for all files in
+# that library. It is possible to select a file centric view as well.
+#
+# The script also will check that all files for a library is compiled together
+# This will make library based recompile work as intended and 
+# make code structure cleaner. This will be possible to disable
+# Last library compiled will be considered to be the work library
+
+# Supported file formats:
+# 	    systemverilog:.v,.vh.vp,.sv,.svh
+#	    vhdl:.vhd,.vhdl
+#	    C/C++ DPI code: .c,.cpp
+
+# Syntax is:
+# @library <library name>
+# <path to file>:Options
+
+@library=design_lib
+$QME_HOME/examples/ieee1500/er_tap_1500/example/rtl/tap_1500_beh_model.sv
+
+@library=vip_lib
+$QME_HOME/examples/ieee1500/examples/er_simple_clk_reset/sv/er_simple_clk_reset_pkg.sv:+incdir+$QME_HOME/examples/ieee1500/examples/er_simple_clk_reset/sv/
+$QME_HOME/examples/ieee1500/examples/er_simple_clk_reset/sv/er_simple_clk_reset_if.sv
+$QME_HOME/examples/ieee1500/sv/er_tap_1500_if.sv
+$QME_HOME/examples/ieee1500/sv/er_tap_1500_agent_pkg.sv:+incdir+$QME_HOME/examples/ieee1500/sv/
+
+@library=work
+$QME_HOME/examples/ieee1500/examples/tb/tap_1500_tb_pkg.sv:+incdir+$QME_HOME/examples/ieee1500/examples/tb/ +incdir+$QME_HOME/examples/ieee1500/examples/tc
+$QME_HOME/examples/ieee1500/examples/tb/top.sv
+
