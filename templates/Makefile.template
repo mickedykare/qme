@@ -1,3 +1,8 @@
+# These variables will be updated by the create simdir script
+BLOCKNAME=___REPLACE_THIS_BLOCKNAME
+BLOCK_OVERRIDES=___REPLACE_THIS_BLOCK_OVERRIDES
+SRCHOME=___REPLACE_THIS_SRCHOME
+
 ################################################################
 # Base settings
 ################################################################
@@ -14,20 +19,19 @@ include ${QME_HOME}/templates/Makefile.base
 -include ${QME_PROJECT_HOME}/qme_setup/Makefile.project.defaults
 
 ################################################################
-# Block Overrides,optional
+# Block Overrides (Required)
 ################################################################
-
--include ${QME_BLOCK_OVERRIDES}
+include ${BLOCK_OVERRIDES}
 
 ################################################################
 # Calculate Variables. Done here to catch overrides
 ################################################################
+DUT_FILELIST=${SRCHOME}/${BLOCKNAME}/${RTLDIR}/rtl.files
+TB_FILELIST=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/tb.files
 
-# Enable 64 bit mode
-ifeq ($(x32),0)
-  ARCH=-64
-  BITS=64
-endif
+
+
+
 
 # Regression timeouts
 ifeq ($(NOTIMEOUT),1)
@@ -46,7 +50,8 @@ DPI_GCC_VERSION=-dpicppinstall ${QUESTA_GCC_VERSION}
 # clean out
 default::help
 
-compile: clean prepare_filelist compile_uvm compile_qvips compile_dut compile_tb 
+
+compile: clean compile_uvm compile_qvips compile_dut compile_tb liblist
 
 
 clean::
@@ -55,6 +60,7 @@ clean::
 	rm -f *.wlf
 	rm -f transcript
 	rm -f *.dbg
+	rm -f modelsim.ini
 
 
 # Recompile UVM to catch timescale problem
@@ -71,12 +77,66 @@ compile_uvm::
 compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 
 compile_dut::prepare_filelist_dut
-	${COMPILE_SCRIPT} ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS}
+	${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS}
 
 compile_tb::prepare_filelist_tb
-	${COMPILE_SCRIPT} ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS}
+	${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR}
 
 ############  Simulation targets ########################
+# Flow is different for chip level or block level
+#########################################################
+gui:${GUI_TARGET}
+
+
+ifeq (${CHIP},0)
+# targets and switches used when you run on block level.
+GUI_TARGET=gui_block
+BATCH_TARGET=gui_block
+# If we want to enable code coverage in simulation
+ifeq ($(COVER),1)
+ CC_OPT_ARGS=${CODECOVERAGE}+${DUT_NAME}. 
+ CC_COLLECT=-coverage
+endif  
+
+VOPTSWITCHES= ${COMMON_VOPT_SWITCHES} ${VOPTSWITCHES_BLOCK} ${DEBUG} ${CC_OPT_ARGS}
+VOPTSWITCHES_FAST= ${COMMON_VOPT_SWITCHES} ${VOPTSWITCHES_FAST_BLOCK} ${CC_OPT_ARGS}
+ifeq ($(FAST),1)
+    VOPTARGS=${VOPTSWITCHES_FAST}
+  else
+    VOPTARGS=${VOPTSWITCHES}
+endif
+
+
+
+
+
+else
+GUI_TARGET=gui_chip
+BATCH_TARGET=gui_chip
+
+
+
+endif
+
+
+clean_rundir:
+	@echo "Preparing ${RUNDIR} for simulation"
+	@test -d ${RUNDIR}||mkdir -p ${RUNDIR}
+	@cd ${RUNDIR};rm -f *.ucdb transcript *.wlf wlft* ${QUESTALIBS_DIR} modelsim.ini ${LIBLIST}
+	@if test -e ${QUESTALIBS_DIR} ;then cd ${RUNDIR};ln -s ../${QUESTALIBS_DIR};fi
+	@if test -e ${MODELSIM_INI} ;then cd ${RUNDIR};ln -s ../modelsim.ini;fi
+	@if test -e ${LIBLIST} ;then cd ${RUNDIR};ln -s ../${LIBLIST};fi
+
+
+
+
+
+gui_block: liblist clean_rundir
+	@echo "Launching GUI in directory called ${RUNDIR}"
+	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
+	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME) -$(ARCH) ${VSIMSWITCHES} ${UVMCONTROL} ${CLASSDEBUG} ${VSIMARGS} ${VSIMVOPTARGS} ${GUI_DO} \
+	-gui ${EXTRA_VSIM_ARGS}  ${ASSERTION_DBG} ${SOLVEFAIL_ARGS}  ${POSTSIMDEBUG} ${DEBUG} 
+
 
 ############# Regression Targets ########################
 

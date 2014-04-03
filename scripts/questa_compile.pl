@@ -10,14 +10,13 @@ my $vlogargs="";
 my $vcomargs="";
 my $default_lib="";
 my $library_home="questa_libs";
+my $arch="32";
 sub infomsg{
     my $s = pop;
     print color 'bold dark blue';
     print "Note: $s\n";
     print color 'reset';
 }
-
-
 
 
 
@@ -29,7 +28,10 @@ sub compile_file{
     my $cmd;
     my $type="";
     my $tmp;
-    
+
+    my @vmap=`vmap|grep "maps to"|grep -v $ENV{QUESTA_HOME}|cut -d" " -f1|sed s/\\"/-L\\ /|sed s/\\"//g`;
+    chomp @vmap;
+    my $mapped_libs=join " ",@vmap;
 
     if ($file =~ /:/) {
 	my @line=split ":",$file;
@@ -60,15 +62,15 @@ sub compile_file{
     # Next step is to compile the code
     $tmp = join " ",@f;
     if ($type eq "vhdl") {
-	$cmd = "vcom -work $lib $tmp $args $vcomargs";
+	$cmd = "vcom -$arch -work $lib $tmp $args $vcomargs";
 	&system_cmd($cmd);
 #	&infomsg("Trying to compile $type: $cmd");
     } elsif ($type eq "verilog") {
-	$cmd = "vlog -work $lib $tmp $args $vlogargs";
+	$cmd = "vlog -$arch -work $lib $tmp $args $vlogargs $mapped_libs";
 #	&infomsg("Trying to compile $type: $cmd");
 	&system_cmd($cmd);
     } elsif ($type eq "c") {
-	$cmd = "vlog -work $lib $tmp $args $cflags";
+	$cmd = "vlog -$arch -work $lib $tmp $args $cflags";
 #	&infomsg("Trying to compile $type: $cmd");
 	&system_cmd($cmd);
     } else {
@@ -87,8 +89,12 @@ GetOptions ("cflags=s" => \$cflags,    # numeric
 	    "vlogargs=s" => \$vlogargs,
 	    "vcomargs=s" => \$vcomargs,
 	    "default_lib=s" => \$default_lib,
+	    "arch=s"  => \$arch,
 	    "verbose"  => \$verbose)   # flag
     or die("Error in command line arguments\n");
+
+
+
 
 &infomsg("Parsing $fltfile");
 open(FHIN, "<", $fltfile) 
@@ -125,7 +131,6 @@ foreach my $f (@indata) {
 
 
 
-
 	&compile_file($f,$lib);
     }
 }
@@ -137,6 +142,17 @@ sub system_cmd{
     my $status;
     $status=system($cmd);
     if ($status > 0) {
-	&infomsg("$cmd failed, exiting...");
+	die("$cmd failed, exiting...");
     }
 }
+
+#sub system_cmd_hl{
+#    my $cmd = pop;
+#    my $status;
+#    my $tmp = "bash -o pipefail -c '$cmd|keyword_highlight.pl 0";'
+#    $status=system($cmd);
+#    if ($status > 0) {
+#	die("$cmd failed, exiting...");
+#    }
+#}
+
