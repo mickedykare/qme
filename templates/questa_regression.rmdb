@@ -1,20 +1,10 @@
 <?xml version="1.0"?>
 <rmdb loadtcl="mytcl" >
-  <!-- @(#) ClearCase ID: /vobs/asic/warp4/setup/scripts/mksimdir_files/warp4_top.rmdb /main/76 12-10-10 17:46 qmikand # -->
-
-  <!-- ========================================================== -->
-  <!-- This RMDB file is intended to be generic for a project,  
-       You need to override some of the settings by using 
-       vrun -GTREND=true etc                                      -->
-  <!-- ========================================================== -->
-
-
   <!-- ========================================================== -->
   <!-- BASE RUNNABLES- PLEASE EDIT or OVERRIDE -->
   <!-- ========================================================== -->
   <runnable name="projectsetup" type="base">
     <parameters>
-      <parameter name="PROJECT">warp4</parameter>
       <parameter name="BLOCKNAME">replace_with_blockname</parameter>
       <parameter name="VSIM_DO">(%VRUNDIR%)/vsim.do</parameter>
       <parameter name="CLIBLIST">(%CLIBLIST%)</parameter>
@@ -35,6 +25,7 @@
       <parameter name="REQUIRE_VPLAN">0</parameter>
       <parameter name="RERUN_FAILING_TESTS">1</parameter>
       <parameter name="TIMESTAMP">0</parameter>
+      
       <parameter name="LSFMSW">-m</parameter>
       <parameter name="LSF_GROUP">asic</parameter>
       <parameter name="LSFARGS">-q (%LSFQUEUE%) -I (%LSFMSW%) (%LSF_GROUP%)</parameter>

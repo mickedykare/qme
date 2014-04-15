@@ -1,9 +1,6 @@
 ###################################################################
 # Please don't change this file.  Use overrides instead!!!
 ###################################################################
-# This file contains all the base variables.
-
-QME_VERSION=0.1
 ###################################################################
 # Default Scripts
 ###################################################################
@@ -12,6 +9,7 @@ RECOMPILE_ANALYZE_SCRIPT=
 ###################################################################
 # Default settings
 ###################################################################
+GRIDENGINE=LOCAL # Supports SGE or LSF or LOCAL
 UVM_VERSION=uvm-1.1d
 QUESTA_UVM_DEBUG=questa_uvm_pkg-1.2
 QUESTA_GCC_VERSION=4.5.0
