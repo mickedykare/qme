@@ -72,7 +72,7 @@ compile_uvm::
 	${VLOG} -work mtiUvm ${UVM_HOME}/src/uvm_pkg.sv ${UVM_HOME}/src/dpi/uvm_dpi.cc  \
 	${UVM_INC_DIR} ${VLOG_TIMESCALE}  +define+UVM_DEBUGGER ${QUESTA_HOME}/verilog_src/${QUESTA_UVM_DEBUG}/src/questa_uvm_pkg.sv \
 	+incdir+${QUESTA_HOME}/verilog_src/${QUESTA_UVM_DEBUG}/src/
-	${VLOG} -work mtiUvm ${QUESTA_HOME}/verilog_src/${UVM_VERSION}/src/dpi/uvm_dpi.cc -${BITS} ${DPI_GCC_VERSION}
+	${VLOG} -work mtiUvm ${QUESTA_HOME}/verilog_src/${UVM_VERSION}/src/dpi/uvm_dpi.cc -${ARCH} ${DPI_GCC_VERSION}
 
 compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 
@@ -85,7 +85,7 @@ compile_tb::prepare_filelist_tb
 ############  Simulation targets ########################
 # Flow is different for chip level or block level
 #########################################################
-gui:${GUI_TARGET}
+
 
 
 ifeq (${CHIP},0)
@@ -110,6 +110,7 @@ endif
 
 
 
+
 else
 GUI_TARGET=gui_chip
 BATCH_TARGET=gui_chip
@@ -118,6 +119,7 @@ BATCH_TARGET=gui_chip
 
 endif
 
+gui::${GUI_TARGET}
 
 clean_rundir:
 	@echo "Preparing ${RUNDIR} for simulation"
@@ -131,11 +133,11 @@ clean_rundir:
 
 
 
-gui_block: liblist clean_rundir
+gui_block:: liblist clean_rundir
 	@echo "Launching GUI in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME) -$(ARCH) ${VSIMSWITCHES} ${UVMCONTROL} ${CLASSDEBUG} ${VSIMARGS} ${VSIMVOPTARGS} ${GUI_DO} \
-	-gui ${EXTRA_VSIM_ARGS}  ${ASSERTION_DBG} ${SOLVEFAIL_ARGS}  ${POSTSIMDEBUG} ${DEBUG} 
+	-gui ${EXTRA_VSIM_ARGS}  ${ASSERTION_DBG} ${SOLVEFAIL_ARGS}  ${POSTSIMDEBUG} ${DEBUG} +UVM_TESTNAME=${TEST}
 
 
 ############# Regression Targets ########################
