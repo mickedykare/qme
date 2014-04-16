@@ -1,0 +1,20 @@
+QVIP_TARGETS=i2c
+
+
+
+
+prepare_filelist_tb::ra
+
+
+ra:
+	${MODEL_TECH}/RUVM_4.4/vreguvm -csvin /mnt/hgfs/Documents/presentations/2014/OSVVM_VS_SV/regs.csv \
+	-autoinstance -block default_top_block -uvmout ${QME_PROJECT_HOME}/i2c/uvm/registers/i2c_master_uvm_reg.sv 
+
+
+# Testing of Register Assistant
+ra_tmp:
+	${MODEL_TECH}/RUVM_4.4/vreguvm -csvin /mnt/hgfs/Documents/presentations/2014/OSVVM_VS_SV/regs.csv \
+	/mnt/hgfs/Documents/presentations/2014/OSVVM_VS_SV/blocks.csv \
+	/mnt/hgfs/Documents/presentations/2014/OSVVM_VS_SV/maps.csv \
+	-uvmout tmp.sv -block my_chip_top_block
+

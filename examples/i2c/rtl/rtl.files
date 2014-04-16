@@ -1,0 +1,16 @@
+# Syntax
+#@library=<library name>
+#<file>:arguments 
+# or
+# <file1>,<file2>....: arguments (Must be same type)
+# or
+# <file1>,
+# <file2>: arguments (Must be same type)
+#
+# First version will only work on files in one line only:
+
+
+@library i2c_master_lib
+$QME_PROJECT_HOME/i2c/rtl/verilog/i2c_master_bit_ctrl.v
+$QME_PROJECT_HOME/i2c/rtl/verilog/i2c_master_byte_ctrl.v
+$QME_PROJECT_HOME/i2c/rtl/verilog/i2c_master_top.fixed_registers.v

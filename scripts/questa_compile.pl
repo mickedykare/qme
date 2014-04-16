@@ -79,13 +79,13 @@ sub compile_file{
     if ($type eq "vhdl") {
 	$cmd = "vcom -$arch -work $lib $tmp $args $vcomargs";
 	&infomsg("Launching: $cmd");
-	&system_cmd($cmd);
+	&system_cmd_hl($cmd);
 
     } elsif ($type eq "verilog") {
 	$cmd = "vlog -$arch -work $lib $tmp $args $vlogargs $mapped_libs";
 
 	&infomsg("Launching: $cmd");
-	&system_cmd($cmd);
+	&system_cmd_hl($cmd);
     } elsif ($type eq "c") {
 	if ($usegcc) {
 	    my @x=split "/",$tmp;
@@ -106,7 +106,7 @@ sub compile_file{
 	} else {
 	$cmd = "vlog -$arch -work $lib $tmp -ccflags \"$args $cflags\" -dpicppinstall $gcc_version -";
 	&infomsg("Launching: $cmd");
-	&system_cmd($cmd);
+	&system_cmd_hl($cmd);
 	}
 
 
@@ -164,9 +164,9 @@ foreach my $f (@indata) {
 	my $cmd="test -e $library_home||mkdir $library_home";
 	&system_cmd($cmd);
 	my $cmd="vlib $library_home/$lib";
-	&system_cmd($cmd);
+	&system_cmd_hl($cmd);
 	my $cmd="vmap $lib $ENV{'PWD'}/$library_home/$lib";
-	&system_cmd($cmd);
+	&system_cmd_hl($cmd);
     } else {
 	 
 
@@ -186,13 +186,13 @@ sub system_cmd{
     }
 }
 
-#sub system_cmd_hl{
-#    my $cmd = pop;
-#    my $status;
-#    my $tmp = "bash -o pipefail -c '$cmd|keyword_highlight.pl 0";'
-#    $status=system($cmd);
-#    if ($status > 0) {
-#	die("$cmd failed, exiting...");
-#    }
-#}
+sub system_cmd_hl{
+    my $cmd = pop;
+    my $status;
+    my $tmp = "bash -o pipefail -c '$cmd|keyword_highlight.pl 0";
+    $status=system($cmd);
+    if ($status > 0) {
+	die("$cmd failed, exiting...");
+    }
+}
 

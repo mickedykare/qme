@@ -1,0 +1,25 @@
+# Syntax
+#@library=<library name>
+#<file>:arguments 
+# or
+# <file1>,<file2>....: arguments (Must be same type)
+# or
+# <file1>,
+# <file2>: arguments (Must be same type)
+#
+# First version will only work on files in one line only:
+
+
+@library vip_lib
+# wb agent
+$QME_PROJECT_HOME/vips/wb_agent/wb_if.sv
+$QME_PROJECT_HOME/vips/wb_agent/wb_pkg.sv:+incdir+$QME_PROJECT_HOME/i2c/uvm/vips/wb_agent/
+# simple irq agent
+$QME_PROJECT_HOME/vips/simple_irq_agent/sv/simple_irq_if.sv
+$QME_PROJECT_HOME/vips/simple_irq_agent/sv/simple_irq_pkg.sv:+incdir+$QME_PROJECT_HOME/i2c/uvm/vips/simple_irq_agent/sv/
+
+# Actual test bench
+@library work
+$QME_PROJECT_HOME/i2c/uvm/registers/i2c_master_uvm_reg.sv
+$QME_PROJECT_HOME/i2c/uvm/tb/i2c_tb_pkg.sv:+incdir+$QME_PROJECT_HOME/i2c/uvm/tb +incdir+$QME_PROJECT_HOME/i2c/uvm/tc
+$QME_PROJECT_HOME/i2c/uvm/tb/top.sv
