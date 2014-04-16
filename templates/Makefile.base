@@ -16,18 +16,15 @@ QUESTA_GCC_VERSION=4.5.0
 VSIM_TIMERES=-t ps
 TIMINGCHECKS=+notimingchecks
 UVM_SIM_ARGS=+UVM_NO_RELNOTES
-UVMCONTROL=-uvmcontrol=all
 UVMCONTROL_REGR=-uvmcontrol=msglog
-CLASSDEBUG=-classdebug
-ASSERTION_DBG=-assertdebug
 VSIM_GCC_VERSION=-cppinstall ${QUESTA_GCC_VERSION}
-DEBUG=-debugdb 
-POSTSIMDEBUG=-postsimdataflow
-GUI_DO=-do "coverage save ${UCDBFILE} -testname ${TEST} -onexit;do ${VSIM_COMMON_DO} ${TEST} ${DUT_NAME}; ${QUESTA_USER_DO}; ${QUESTA_SCRATCH_USER_DO}"
+DEBUGLEVEL=MEDIUM
+
+GUI_DO=-do "coverage save ${UCDBFILE} -testname ${TEST} -onexit;do ${VSIM_COMMON_DO} ${TEST} ${BLOCKNAME}; ${QUESTA_USER_DO}; ${QUESTA_SCRATCH_USER_DO}"
 #BATCH_DO=-do "coverage save ${UCDBFILE} -testname ${TEST} -onexit;do ${VSIM_COMMON_DO} ${TEST} ${DUT_NAME}; ${QUESTA_USER_DO}; ${QUESTA_SCRATCH_USER_DO}"
 
 # Don't add swithes that differ between batch/gui/chip/block:
-VSIMSWITCHES= ${VSIM_TIMERES} -f ${LIBLIST} -lib $(TB_LIB_NAME) ${TIMINGCHECKS} -printsimstats \
+VSIMSWITCHES= ${VSIM_TIMERES} -f ${LIBLIST} -lib $(TB_LIB_NAME) ${TIMINGCHECKS} -printsimstats ${FSMDEBUG} \
 -sv_seed ${SEED} -msgmode both -onfinish stop  ${UVM_SIM_ARGS} ${VSIM_GCC_VERSION} ${DPI_GCC_VERSION} ${QUESTA_VIP_SIM_ARGS} ${SOLVEFAIL_ARGS} 
 VSIMVOPTARGS=-voptargs="${VOPTSWITCHES}"
 ###################################################################
@@ -50,7 +47,7 @@ FORMAL_RESULTS=formal_output_results
 UCDB_STORAGE=ucdbfiles
 HTML_HOME=html_reports
 LIBLIST=libs.list
-PROJECT_NAME="QME($QME_VERSION)"
+PROJECT_NAME="SET PROJECT_NAME"
 ORIGIN_MODELSIM_INI=${QUESTA_HOME}/modelsim.ini
 QUESTALIBS_DIR=questa_libs
 QVIP_LIB=qvip_lib
@@ -66,13 +63,11 @@ TB_TOP_NAME=top
 ###################################################################
 CHIP=0
 FAST=0
-x32=1
 ARCH=32
 RANKING=0
 VLOG_TIMESCALE=-timescale 1ns/1ps
 COVERCHECK=0
 FORMAL=0
-SOLVEFAILDEBUG=0
 
 
 
@@ -112,6 +107,73 @@ VOPT=vopt
 VSIM=vsim
 # Using PLIOBJS will affect performance
 DISABLE_VERDI_PLI=unset PLIOBJS
+
+
+# ADDING POSSIBILITY to set different debug levels
+###################################################################
+# DEBUGLEVEL=LOW
+###################################################################
+# Visibility: As set by VOPT_ARGS
+# class debug: No
+# schematic debug:No 
+# UVM debug: Limited
+# Constraint debug;No
+# Postsim dataflow debug:No
+# Assertion debug: No
+# FSM DEBUG: No
+ifeq ($(DEBUGLEVEL),LOW)
+DEBUG=
+POSTSIMDEBUG=
+CLASSDEBUG=
+SOLVEFAILDEBUG=0
+UVMCONTROL=-uvmcontrol=all
+ASSERTION_DBG=-assertcover
+FSMDEBUG=
+endif
+###################################################################
+# DEBUGLEVEL=MEDIUM
+###################################################################
+# Visibility: As set by VOPT_ARGS
+# class debug: yes
+# schematic debug:No 
+# UVM debug: yes
+# Constraint debug;No
+# Postsim dataflow debug:No
+# Assertion debug: Yes
+# FSM DEBUG: Yes
+ifeq ($(DEBUGLEVEL),MEDIUM)
+DEBUG=
+POSTSIMDEBUG=
+CLASSDEBUG=-classdebug
+SOLVEFAILDEBUG=0
+UVMCONTROL=-uvmcontrol=all
+ASSERTION_DBG=-assertdebug
+FSMDEBUG=-fsmdebug
+endif
+###################################################################
+# DEBUGLEVEL=FULL
+###################################################################
+# Visibility: As set by VOPT_ARGS
+# class debug: yes
+# schematic debug:yes 
+# UVM debug: yes
+# Constraint debug;yes
+# Postsim dataflow debug:Yes
+# Assertion debug: Yes
+# FSM DEBUG: Yes
+ifeq ($(DEBUGLEVEL),FULL)
+DEBUG=-debugdb 
+POSTSIMDEBUG=-postsimdataflow
+CLASSDEBUG=-classdebug
+SOLVEFAILDEBUG=1
+UVMCONTROL=-uvmcontrol=all
+ASSERTION_DBG=-assertdebug
+FSMDEBUG=-fsmdebug
+endif
+
+
+
+
 ###################################################################
 # Enable Questa VIPs to be compiled
 ###################################################################
@@ -363,9 +425,6 @@ print-%:
 
 # Enable 64 bit mode
 
-ifeq ($(x32),0)
-  ARCH=64
-endif
 
 ifeq ($(SOLVEFAILDEBUG),1)
   SOLVEFAIL_ARGS=-solvefaildebug
