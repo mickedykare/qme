@@ -20,6 +20,6 @@ $QME_PROJECT_HOME/vips/simple_irq_agent/sv/simple_irq_pkg.sv:+incdir+$QME_PROJEC
 
 # Actual test bench
 @library work
-$QME_PROJECT_HOME/i2c/tb/registers/i2c_master_uvm_reg.sv
-$QME_PROJECT_HOME/i2c/tb/src/i2c_tb_pkg.sv:+incdir+$QME_PROJECT_HOME/i2c/tb/src +incdir+$QME_PROJECT_HOME/i2c/tb/tc
-$QME_PROJECT_HOME/i2c/tb/src/top.sv
+$QME_PROJECT_HOME/i2c_master_top/tb/registers/i2c_master_uvm_reg.sv
+$QME_PROJECT_HOME/i2c_master_top/tb/src/i2c_tb_pkg.sv:+incdir+$QME_PROJECT_HOME/i2c_master_top/tb/src +incdir+$QME_PROJECT_HOME/i2c_master_top/tb/tc
+$QME_PROJECT_HOME/i2c_master_top/tb/src/top.sv

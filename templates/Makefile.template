@@ -22,6 +22,10 @@ include ${QME_HOME}/templates/Makefile.base
 # Block Overrides (Required)
 ################################################################
 include ${BLOCK_OVERRIDES}
+##############################################################
+# Include all relations that are calculated
+##############################################################
+include ${QME_HOME}/templates/Makefile.relations
 
 ################################################################
 # Calculate Variables. Done here to catch overrides
@@ -29,8 +33,11 @@ include ${BLOCK_OVERRIDES}
 DUT_FILELIST=${SRCHOME}/${BLOCKNAME}/${RTLDIR}/rtl.files
 TB_FILELIST=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/tb.files
 
-
-
+ifeq ($(SETUP),____DEFAULT_SETUP)
+SETUPARGS=
+else
+SETUPARGS=-vlogargs=+define+${SETUP}
+endif
 
 
 # Regression timeouts
@@ -80,7 +87,21 @@ compile_dut::prepare_filelist_dut
 	${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS}
 
 compile_tb::prepare_filelist_tb
-	${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR}
+	${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS}
+
+opt:opt_fast opt_dbg
+
+opt_fast:
+	${DISABLE_VERDI_PLI};${VOPT} -work $(TB_LIB_NAME) $(TB_TOP_NAME) -l vopt_fast.log \
+	-o $(TB_TOP_NAME)_opt -$(ARCH) $(VOPTSWITCHES) ${CC_OPT_ARGS} ${X_OPT_ARGS} -f ${LIBLIST} -time
+
+opt_dbg:
+	${DISABLE_VERDI_PLI};${VOPT} -work $(TB_LIB_NAME) $(TB_TOP_NAME) -l vopt_dbg.log \
+	-o $(TB_TOP_NAME)_dbg -$(ARCH) $(VOPTSWITCHES_BLOCK) ${CC_OPT_ARGS} ${X_OPT_ARGS} -f ${LIBLIST} -time ${DEBUG}
+
+
+
+
 
 ############  Simulation targets ########################
 # Flow is different for chip level or block level
@@ -88,37 +109,16 @@ compile_tb::prepare_filelist_tb
 
 
 
-ifeq (${CHIP},0)
+ifeq (${VERIFICATION_LEVEL},BLOCK)
 # targets and switches used when you run on block level.
 GUI_TARGET=gui_block
-BATCH_TARGET=gui_block
-# If we want to enable code coverage in simulation
-ifeq ($(COVER),1)
- CC_OPT_ARGS=${CODECOVERAGE}+${DUT_NAME}. 
- CC_COLLECT=-coverage
-endif  
-
-VOPTSWITCHES= ${COMMON_VOPT_SWITCHES} ${VOPTSWITCHES_BLOCK} ${DEBUG} ${CC_OPT_ARGS}
-VOPTSWITCHES_FAST= ${COMMON_VOPT_SWITCHES} ${VOPTSWITCHES_FAST_BLOCK} ${CC_OPT_ARGS}
-ifeq ($(FAST),1)
-    VOPTARGS=${VOPTSWITCHES_FAST}
-  else
-    VOPTARGS=${VOPTSWITCHES}
-endif
-
-
-
-
-
-
+BATCH_TARGET=batch_block
 else
 GUI_TARGET=gui_chip
-BATCH_TARGET=gui_chip
-
-
-
+BATCH_TARGET=batch_chip
 endif
 
+batch::${BATCH_TARGET}
 gui::${GUI_TARGET}
 
 clean_rundir:
@@ -136,8 +136,116 @@ clean_rundir:
 gui_block:: liblist clean_rundir
 	@echo "Launching GUI in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
-	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME) -$(ARCH) ${VSIMSWITCHES} ${UVMCONTROL} ${CLASSDEBUG} ${VSIMARGS} ${VSIMVOPTARGS} ${GUI_DO} \
-	-gui ${EXTRA_VSIM_ARGS}  ${ASSERTION_DBG} ${SOLVEFAIL_ARGS}  ${POSTSIMDEBUG} ${DEBUG} +UVM_TESTNAME=${TEST}
+	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME) -$(ARCH) \
+	${VSIM_TIMERES} \
+	-f ${LIBLIST} \
+	-lib $(TB_LIB_NAME) \
+	${TIMINGCHECKS} \
+	-printsimstats \
+	-sv_seed ${SEED} \
+	-msgmode both -onfinish stop  \
+	${UVM_SIM_ARGS} \
+	${VSIM_GCC_VERSION} \
+	${DPI_GCC_VERSION} \
+	${QUESTA_VIP_SIM_ARGS} \
+	${UVMCONTROL} \
+	${CLASSDEBUG} \
+	${VSIMARGS} \
+	${VSIMVOPTARGS} \
+	${GUI_DO} \
+	-gui \
+	${EXTRA_VSIM_ARGS}  \
+	${ASSERTION_DBG} \
+	${SOLVEFAIL_ARGS}  \
+	${POSTSIMDEBUG} \
+	${DEBUG} \
+	+UVM_TESTNAME=${TEST} \
+	${FSMDEBUG}
+
+gui_chip:: liblist clean_rundir opt_dbg
+	@echo "Launching GUI in directory called ${RUNDIR}"
+	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
+	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_dbg -$(ARCH) \
+	${VSIM_TIMERES} \
+	-f ${LIBLIST} \
+	-lib $(TB_LIB_NAME) \
+	${TIMINGCHECKS} \
+	-printsimstats \
+	-sv_seed ${SEED} \
+	-msgmode both -onfinish stop  \
+	${UVM_SIM_ARGS} \
+	${VSIM_GCC_VERSION} \
+	${DPI_GCC_VERSION} \
+	${QUESTA_VIP_SIM_ARGS} \
+	${UVMCONTROL} \
+	${CLASSDEBUG} \
+	${VSIMARGS} \
+	${GUI_DO} \
+	-gui \
+	${EXTRA_VSIM_ARGS}  \
+	${ASSERTION_DBG} \
+	${SOLVEFAIL_ARGS}  \
+	${POSTSIMDEBUG} \
+	${DEBUG} \
+	+UVM_TESTNAME=${TEST} \
+	${FSMDEBUG}
+
+batch_block:: liblist clean_rundir
+	@echo "Launching batch in directory called ${RUNDIR}"
+	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
+	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME) -$(ARCH) \
+	${VSIM_TIMERES} \
+	-f ${LIBLIST} \
+	-lib $(TB_LIB_NAME) \
+	${TIMINGCHECKS} \
+	-printsimstats \
+	-sv_seed ${SEED} \
+	-msgmode both -onfinish stop  \
+	${UVM_SIM_ARGS} \
+	${VSIM_GCC_VERSION} \
+	${DPI_GCC_VERSION} \
+	${QUESTA_VIP_SIM_ARGS} \
+	${UVMCONTROL} \
+	${CLASSDEBUG} \
+	${VSIMARGS} \
+	${VSIMVOPTARGS} \
+	${REGRESSION_DO} \
+	-c \
+	${EXTRA_VSIM_ARGS}  \
+	${ASSERTION_DBG} \
+	${SOLVEFAIL_ARGS}  \
+	${POSTSIMDEBUG} \
+	${DEBUG} \
+	+UVM_TESTNAME=${TEST} \
+	${FSMDEBUG}
+
+batch_chip:: liblist clean_rundir opt_dbg
+	@echo "Launching batch in directory called ${RUNDIR}"
+	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
+	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_dbg -$(ARCH) \
+	${VSIM_TIMERES} \
+	-f ${LIBLIST} \
+	-lib $(TB_LIB_NAME) \
+	${TIMINGCHECKS} \
+	-printsimstats \
+	-sv_seed ${SEED} \
+	-msgmode both -onfinish stop  \
+	${UVM_SIM_ARGS} \
+	${VSIM_GCC_VERSION} \
+	${DPI_GCC_VERSION} \
+	${QUESTA_VIP_SIM_ARGS} \
+	${UVMCONTROL} \
+	${CLASSDEBUG} \
+	${VSIMARGS} \
+	${REGRESSION_DO} \
+	-c \
+	${EXTRA_VSIM_ARGS}  \
+	${ASSERTION_DBG} \
+	${SOLVEFAIL_ARGS}  \
+	${POSTSIMDEBUG} \
+	${DEBUG} \
+	+UVM_TESTNAME=${TEST} \
+	${FSMDEBUG}
 
 
 ############# Regression Targets ########################

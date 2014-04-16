@@ -1,0 +1,116 @@
+# This file contains all the calculated relations that we use.
+# It will be read 
+VSIM_GCC_VERSION=-cppinstall ${QUESTA_GCC_VERSION}
+GUI_DO=-do "coverage save ${UCDBFILE} -testname ${TEST} -onexit;do ${VSIM_COMMON_DO} ${TEST} ${BLOCKNAME}; ${QUESTA_USER_DO}; ${QUESTA_SCRATCH_USER_DO}"
+REGRESSION_DO=-do "do ${VSIM_COMMON_DO} ${TEST} ${BLOCKNAME}; ${QUESTA_USER_DO} run -a;coverage save ${UCDBFILE} -testname ${TEST};exit -f"
+DESIGNLIB=${BLOCKNAME}_lib
+VSIM_USER_DO=${QME_PROJECT_HOME}/${BLOCKNAME}/sim/vsim_user.do
+###################################################################
+# Select VOPT Switches depending on 
+# CHIP=1
+# or
+# FAST=1
+# or
+# COVER=1
+###################################################################
+# CHIP & NOT FAST:
+# Use VOPTSWITCHES_CHIP
+# CHIP & FAST:
+# Use VOPTSWITCHES_FAST_CHIP
+###################################################################
+ifeq ($(VERIFICATION_LEVEL),CHIP) 
+VOPTSWITCHES=${VOPTSWITCHES_CHIP}
+CC_OPT_ARGS=
+CC_COLLECT=
+ifeq ($(FAST),1)
+VOPTSWITCHES=${VOPTSWITCHES_FAST_CHIP}
+endif
+ifeq ($(COVER),1)
+CC_OPT_ARGS=${CODECOVERAGE}+${BLOCKNAME}. 
+CC_COLLECT=-coverage
+endif
+endif
+
+###################################################################
+# BLOCK & NOT FAST:
+# Use VOPTSWITCHES_BLOCK
+# BLOCK & FAST:
+# Use VOPTSWITCHES_FAST_BLOCK
+###################################################################
+
+ifeq ($(VERIFICATION_LEVEL),BLOCK) 
+CC_OPT_ARGS=${CODECOVERAGE}+${BLOCKNAME}. 
+CC_COLLECT=-coverage
+VOPTSWITCHES=${VOPTSWITCHES_BLOCK}
+ifeq ($(FAST),1)
+VOPTSWITCHES=${VOPTSWITCHES_FAST_BLOCK}
+endif
+endif
+VSIMVOPTARGS=-voptargs="${VOPTSWITCHES}"
+
+
+# ADDING POSSIBILITY to set different debug levels
+###################################################################
+# DEBUGLEVEL=LOW
+###################################################################
+# Visibility: As set by VOPT_ARGS
+# class debug: No
+# schematic debug:No 
+# UVM debug: Limited
+# Constraint debug;No
+# Postsim dataflow debug:No
+# Assertion debug: No
+# FSM DEBUG: No
+###################################################################
+ifeq ($(DEBUGLEVEL),LOW)
+DEBUG=
+POSTSIMDEBUG=
+CLASSDEBUG=
+SOLVEFAILDEBUG=0
+UVMCONTROL=-uvmcontrol=all
+ASSERTION_DBG=-assertcover
+FSMDEBUG=
+endif
+###################################################################
+# DEBUGLEVEL=MEDIUM
+###################################################################
+# Visibility: As set by VOPT_ARGS
+# class debug: yes
+# schematic debug:No 
+# UVM debug: yes
+# Constraint debug;No
+# Postsim dataflow debug:No
+# Assertion debug: Yes
+# FSM DEBUG: Yes
+###################################################################
+ifeq ($(DEBUGLEVEL),MEDIUM)
+DEBUG=
+POSTSIMDEBUG=
+CLASSDEBUG=-classdebug
+SOLVEFAILDEBUG=0
+UVMCONTROL=-uvmcontrol=all
+ASSERTION_DBG=-assertdebug
+FSMDEBUG=-fsmdebug
+endif
+###################################################################
+# DEBUGLEVEL=FULL
+###################################################################
+# Visibility: As set by VOPT_ARGS
+# class debug: yes
+# schematic debug:yes 
+# UVM debug: yes
+# Constraint debug;yes
+# Postsim dataflow debug:Yes
+# Assertion debug: Yes
+# FSM DEBUG: Yes
+###################################################################
+ifeq ($(DEBUGLEVEL),FULL)
+DEBUG=-debugdb 
+POSTSIMDEBUG=-postsimdataflow
+CLASSDEBUG=-classdebug
+SOLVEFAILDEBUG=1
+UVMCONTROL=-uvmcontrol=all
+ASSERTION_DBG=-assertdebug
+FSMDEBUG=-fsmdebug
+endif
+

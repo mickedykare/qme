@@ -17,16 +17,14 @@ VSIM_TIMERES=-t ps
 TIMINGCHECKS=+notimingchecks
 UVM_SIM_ARGS=+UVM_NO_RELNOTES
 UVMCONTROL_REGR=-uvmcontrol=msglog
-VSIM_GCC_VERSION=-cppinstall ${QUESTA_GCC_VERSION}
+
+# LOW,FULL, MEDIUM
 DEBUGLEVEL=MEDIUM
 
-GUI_DO=-do "coverage save ${UCDBFILE} -testname ${TEST} -onexit;do ${VSIM_COMMON_DO} ${TEST} ${BLOCKNAME}; ${QUESTA_USER_DO}; ${QUESTA_SCRATCH_USER_DO}"
-#BATCH_DO=-do "coverage save ${UCDBFILE} -testname ${TEST} -onexit;do ${VSIM_COMMON_DO} ${TEST} ${DUT_NAME}; ${QUESTA_USER_DO}; ${QUESTA_SCRATCH_USER_DO}"
 
-# Don't add swithes that differ between batch/gui/chip/block:
-VSIMSWITCHES= ${VSIM_TIMERES} -f ${LIBLIST} -lib $(TB_LIB_NAME) ${TIMINGCHECKS} -printsimstats ${FSMDEBUG} \
--sv_seed ${SEED} -msgmode both -onfinish stop  ${UVM_SIM_ARGS} ${VSIM_GCC_VERSION} ${DPI_GCC_VERSION} ${QUESTA_VIP_SIM_ARGS} ${SOLVEFAIL_ARGS} 
-VSIMVOPTARGS=-voptargs="${VOPTSWITCHES}"
+# BLOCK,CHIP 
+VERIFICATION_LEVEL=BLOCK
+
 ###################################################################
 # Tool pointers  
 #################################################################
@@ -38,7 +36,6 @@ UVM_HOME=${QUESTA_HOME}/verilog_src/${UVM_VERSION}
 #################################################################
 RTLDIR=rtl
 WORKLIB=work
-DESIGNLIB=${BLOCKNAME}_lib
 LIBRARY_HOME=questa_libs
 AC_RESULTS=autocheck_output_results
 CDC_RESULTS=cdc_output_results
@@ -53,7 +50,6 @@ QUESTALIBS_DIR=questa_libs
 QVIP_LIB=qvip_lib
 VSIM_COMMON_DO=${QME_HOME}/dofiles/vsim.do 
 VSIM_SCRATCH_USER_DO=./vsim_scratch.do
-VSIM_USER_DO=${QME_PROJECT_HOME}/${BLOCKNAME}/sim/vsim_user.do
 UCDBFILE=${TEST}.ucdb
 RUNDIR=${TEST}
 TB_LIB_NAME=work
@@ -61,15 +57,14 @@ TB_TOP_NAME=top
 ###################################################################
 # Common default Settings
 ###################################################################
-CHIP=0
 FAST=0
+COVER=0
 ARCH=32
 RANKING=0
 VLOG_TIMESCALE=-timescale 1ns/1ps
 COVERCHECK=0
 FORMAL=0
-
-
+SETUP=____DEFAULT_SETUP
 
 ###################################################################
 # Test specific overrides
@@ -95,6 +90,7 @@ NOTIMEOUT=0
 VOPTSWITCHES_FAST_CHIP=+acc=rn
 VOPTSWITCHES_CHIP=+acc=npr 
 VOPTSWITCHES_BLOCK=+acc
+VOPTSWITCHES_FAST_BLOCK=+acc=rn +acc+mgc_*
 CODECOVERAGE=+cover=fbecst
 
 ###################################################################
@@ -108,68 +104,6 @@ VSIM=vsim
 # Using PLIOBJS will affect performance
 DISABLE_VERDI_PLI=unset PLIOBJS
 
-
-# ADDING POSSIBILITY to set different debug levels
-###################################################################
-# DEBUGLEVEL=LOW
-###################################################################
-# Visibility: As set by VOPT_ARGS
-# class debug: No
-# schematic debug:No 
-# UVM debug: Limited
-# Constraint debug;No
-# Postsim dataflow debug:No
-# Assertion debug: No
-# FSM DEBUG: No
-ifeq ($(DEBUGLEVEL),LOW)
-DEBUG=
-POSTSIMDEBUG=
-CLASSDEBUG=
-SOLVEFAILDEBUG=0
-UVMCONTROL=-uvmcontrol=all
-ASSERTION_DBG=-assertcover
-FSMDEBUG=
-endif
-###################################################################
-# DEBUGLEVEL=MEDIUM
-###################################################################
-# Visibility: As set by VOPT_ARGS
-# class debug: yes
-# schematic debug:No 
-# UVM debug: yes
-# Constraint debug;No
-# Postsim dataflow debug:No
-# Assertion debug: Yes
-# FSM DEBUG: Yes
-ifeq ($(DEBUGLEVEL),MEDIUM)
-DEBUG=
-POSTSIMDEBUG=
-CLASSDEBUG=-classdebug
-SOLVEFAILDEBUG=0
-UVMCONTROL=-uvmcontrol=all
-ASSERTION_DBG=-assertdebug
-FSMDEBUG=-fsmdebug
-endif
-###################################################################
-# DEBUGLEVEL=FULL
-###################################################################
-# Visibility: As set by VOPT_ARGS
-# class debug: yes
-# schematic debug:yes 
-# UVM debug: yes
-# Constraint debug;yes
-# Postsim dataflow debug:Yes
-# Assertion debug: Yes
-# FSM DEBUG: Yes
-ifeq ($(DEBUGLEVEL),FULL)
-DEBUG=-debugdb 
-POSTSIMDEBUG=-postsimdataflow
-CLASSDEBUG=-classdebug
-SOLVEFAILDEBUG=1
-UVMCONTROL=-uvmcontrol=all
-ASSERTION_DBG=-assertdebug
-FSMDEBUG=-fsmdebug
-endif
 
 
 

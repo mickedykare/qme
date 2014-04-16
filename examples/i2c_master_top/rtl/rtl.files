@@ -11,6 +11,6 @@
 
 
 @library i2c_master_lib
-$QME_PROJECT_HOME/i2c/rtl/verilog/i2c_master_bit_ctrl.v
-$QME_PROJECT_HOME/i2c/rtl/verilog/i2c_master_byte_ctrl.v
-$QME_PROJECT_HOME/i2c/rtl/verilog/i2c_master_top.fixed_registers.v
+$QME_PROJECT_HOME/i2c_master_top/rtl/verilog/i2c_master_bit_ctrl.v
+$QME_PROJECT_HOME/i2c_master_top/rtl/verilog/i2c_master_byte_ctrl.v
+$QME_PROJECT_HOME/i2c_master_top/rtl/verilog/i2c_master_top.fixed_registers.v
