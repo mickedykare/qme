@@ -1,14 +1,14 @@
 QVIP_TARGETS=i2c
-#DEBUG_LEVEL=FULL
+XLSFILE=${QME_PROJECT_HOME}/i2c_master_top/tb/registers/i2c_master_core_register_test.xls
 
 
+prepare_filelist_tb::convert2csv generate_rm
 
-prepare_filelist_tb::ra
+convert2csv:
+	ruvm_xls2csv.pl ${XLSFILE}
 
-
-ra:
-	${QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin /mnt/hgfs/Documents/presentations/2014/OSVVM_VS_SV/regs.csv \
-	-autoinstance -block default_top_block -uvmout ${QME_PROJECT_HOME}/i2c/uvm/registers/i2c_master_uvm_reg.sv 
+generate_rm:
+	${QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin regs.csv -autoinstance -block default_top_block -uvmout i2c_master_uvm_reg.sv
 
 
 # Testing of Register Assistant
