@@ -2,8 +2,8 @@
 # It will be read 
 VSIM_GCC_VERSION=-cppinstall ${QUESTA_GCC_VERSION}
 GUI_DO=-do "coverage save ${UCDBFILE} -testname ${TEST} -onexit;do ${VSIM_COMMON_DO} ${TEST} ${BLOCKNAME}; ${QUESTA_USER_DO}; ${QUESTA_SCRATCH_USER_DO}"
-REGRESSION_DO=-do "do ${VSIM_COMMON_DO} ${TEST} ${BLOCKNAME}; ${QUESTA_USER_DO} run -a;coverage save ${UCDBFILE} -testname ${TEST};exit -f"
-REGRESSION_DBG_DO=-do "do ${VSIM_COMMON_DO} ${TEST} ${BLOCKNAME}; ${QUESTA_USER_DO};log /* -r; run -a;coverage save ${UCDBFILE} -testname ${TEST};exit -f"
+REGRESSION_DO=-do "do ${VSIM_COMMON_DO} ${TEST} ${BLOCKNAME}; ${QUESTA_USER_DO} run -a;coverage save ${UCDBFILE};exit -f"
+REGRESSION_DBG_DO=-do "do ${VSIM_COMMON_DO} ${TEST} ${BLOCKNAME}; ${QUESTA_USER_DO};log /* -r; run -a;coverage save ${UCDBFILE};exit -f"
 DESIGNLIB=${BLOCKNAME}_lib
 VSIM_USER_DO=${QME_PROJECT_HOME}/${BLOCKNAME}/sim/vsim_user.do
 ###################################################################

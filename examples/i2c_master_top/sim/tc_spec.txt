@@ -1,0 +1,2 @@
+DEFAULT_SETUP i2c_base_test 2 random
+DEFAULT_SETUP i2c_orig_test 2 random

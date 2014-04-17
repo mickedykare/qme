@@ -261,6 +261,7 @@ batch_regression:: liblist
 	-f ${LIBLIST} \
 	-lib $(TB_LIB_NAME) \
 	${TIMINGCHECKS} \
+	-quiet \
 	-printsimstats \
 	-sv_seed ${SEED} \
 	-msgmode both -onfinish stop  \
@@ -344,6 +345,7 @@ create_project_file::
 	@mv default.vrm.tmp  default.vrm
 
 check_prereq::
+	@test -d transformrule.txt||touch transformrule.txt
 	@test -d ${MERGED_UCDB_HOME}||mkdir -p ${MERGED_UCDB_HOME}	
 	@test -d ${HTML_REPORTS_HOME}||mkdir -p ${HTML_REPORTS_HOME}	
 	@if [ -f $(TC_SPEC) ]; then \
