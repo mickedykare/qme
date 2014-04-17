@@ -21,6 +21,13 @@ my $default_lib="";
 my $library_home="questa_libs";
 my $arch="32";
 my $gcc_version="4.3.3";
+
+# Let's find out the path to vmap
+# Since we can use any variable for questa we do the following
+
+my $model_tech_path=$ENV{"QUESTASIM_HOME"};
+
+
 sub infomsg{
     my $s = pop;
     print color 'bold dark blue';
@@ -39,7 +46,7 @@ sub compile_file{
     my $type="";
     my $tmp;
 
-    my @vmap=`vmap|grep "maps to"|grep -v $ENV{MODEL_TECH}|cut -d" " -f1|sed s/\\"/-L\\ /|sed s/\\"//g`;
+    my @vmap=`vmap|grep "maps to"|grep -v $model_tech_path|cut -d" " -f1|sed s/\\"/-L\\ /|sed s/\\"//g`;
     chomp @vmap;
     my $mapped_libs=join " ",@vmap;
 

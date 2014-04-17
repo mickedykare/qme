@@ -9,7 +9,7 @@ RECOMPILE_ANALYZE_SCRIPT=
 ###################################################################
 # Default settings
 ###################################################################
-GRIDENGINE=LOCAL # Supports SGE or LSF or LOCAL
+
 UVM_VERSION=uvm-1.1d
 QUESTA_UVM_DEBUG=questa_uvm_pkg-1.2
 QUESTA_GCC_VERSION=4.5.0
@@ -17,9 +17,10 @@ VSIM_TIMERES=-t ps
 TIMINGCHECKS=+notimingchecks
 UVM_SIM_ARGS=+UVM_NO_RELNOTES
 UVMCONTROL_REGR=-uvmcontrol=msglog
-
+UVM_VERBOSITY=UVM_MEDIUM
+UVM_VERBOSITY_REGR=UVM_NONE
 # LOW,FULL, MEDIUM
-DEBUGLEVEL=MEDIUM
+DEBUG_LEVEL=MEDIUM
 
 
 # BLOCK,CHIP 
@@ -28,7 +29,8 @@ VERIFICATION_LEVEL=BLOCK
 ###################################################################
 # Tool pointers  
 #################################################################
-QUESTA_HOME=${MODEL_TECH}
+QUESTA_HOME=${QUESTASIM_HOME}
+
 UVM_HOME=${QUESTA_HOME}/verilog_src/${UVM_VERSION}
 
 ###################################################################
@@ -64,6 +66,8 @@ RANKING=0
 VLOG_TIMESCALE=-timescale 1ns/1ps
 COVERCHECK=0
 FORMAL=0
+AUTOCHECK=0
+CDC_STATIC=0
 SETUP=____DEFAULT_SETUP
 
 ###################################################################
@@ -77,12 +81,28 @@ EXTRA_VLOG_ARGS=
 EXTRA_VCOM_ARGS=
 EXTRA_VOPT_ARGS=
 EXTRA_VSIM_ARGS=
+
 ###################################################################
 # Regression default parameters
 ###################################################################
+GRID_ENGINE=LOCAL # Supports SGE or LSF or LOCAL
+MAX_PARALLEL_JOBS=20
 MAX_EXECUTION_TIME=600
 MAX_QUE_TIME=600
 NOTIMEOUT=0
+TIMESTAMP=$(shell date +%G_%m_%d_%H.%M.%S)
+REQUIRE_VPLAN=1
+SEND_EMAIL=1
+XML2UCDB_DATAFIELDS=-datafields "Section, Title, Description, Link, Type, Weight, Goal"
+NOREUSESEEDS=-noreuseseeds 
+
+#LSF STANDARD SETTINGS
+LSFARGS="-q asic -I" 
+
+# SGE STANDARD SETTINGS
+#SGEARGS="-V -cwd -b yes -e /dev/null -o /dev/null"
+SGEARGS=
+SCRATCHDIR=regression_data
 
 ###################################################################
 # Default visibility settings
@@ -103,10 +123,6 @@ VOPT=vopt
 VSIM=vsim
 # Using PLIOBJS will affect performance
 DISABLE_VERDI_PLI=unset PLIOBJS
-
-
-
-
 
 ###################################################################
 # Enable Questa VIPs to be compiled

@@ -27,28 +27,6 @@ include ${BLOCK_OVERRIDES}
 ##############################################################
 include ${QME_HOME}/templates/Makefile.relations
 
-################################################################
-# Calculate Variables. Done here to catch overrides
-################################################################
-DUT_FILELIST=${SRCHOME}/${BLOCKNAME}/${RTLDIR}/rtl.files
-TB_FILELIST=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/tb.files
-
-ifeq ($(SETUP),____DEFAULT_SETUP)
-SETUPARGS=
-else
-SETUPARGS=-vlogargs=+define+${SETUP}
-endif
-
-
-# Regression timeouts
-ifeq ($(NOTIMEOUT),1)
-  TIMEOUTARGS=-notimeout
-else
-  TIMEOUTARGS=-mintimeout ${MAX_QUE_TIME}:${MAX_EXECUTION_TIME}  
-endif
-
-UVM_INC_DIR=+incdir+${UVM_HOME}/src
-DPI_GCC_VERSION=-dpicppinstall ${QUESTA_GCC_VERSION}  
 
 ################################################################
 # Targets
@@ -84,11 +62,15 @@ compile_uvm::
 compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 
 compile_dut::prepare_filelist_dut
-	${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS}
+	${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 
 compile_tb::prepare_filelist_tb
-	${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS}
+	${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 
+
+#########################################################
+# Optimize tb ,used in chip level and regressions
+#########################################################
 opt:opt_fast opt_dbg
 
 opt_fast:
@@ -100,14 +82,9 @@ opt_dbg:
 	-o $(TB_TOP_NAME)_dbg -$(ARCH) $(VOPTSWITCHES_BLOCK) ${CC_OPT_ARGS} ${X_OPT_ARGS} -f ${LIBLIST} -time ${DEBUG}
 
 
-
-
-
 ############  Simulation targets ########################
 # Flow is different for chip level or block level
 #########################################################
-
-
 
 ifeq (${VERIFICATION_LEVEL},BLOCK)
 # targets and switches used when you run on block level.
@@ -121,6 +98,11 @@ endif
 batch::${BATCH_TARGET}
 gui::${GUI_TARGET}
 
+#########################################################
+# Clean and prepare the run directory before starting the 
+# new simulation
+#########################################################
+
 clean_rundir:
 	@echo "Preparing ${RUNDIR} for simulation"
 	@test -d ${RUNDIR}||mkdir -p ${RUNDIR}
@@ -128,10 +110,12 @@ clean_rundir:
 	@if test -e ${QUESTALIBS_DIR} ;then cd ${RUNDIR};ln -s ../${QUESTALIBS_DIR};fi
 	@if test -e ${MODELSIM_INI} ;then cd ${RUNDIR};ln -s ../modelsim.ini;fi
 	@if test -e ${LIBLIST} ;then cd ${RUNDIR};ln -s ../${LIBLIST};fi
+	@if test -e ${VSIM_SCRATCH_USER} ;then cd ${RUNDIR};ln -s ../${VSIM_SCRATCH_USER};fi
 
 
-
-
+#########################################################
+# Start a block level simulation, using built in vopt
+#########################################################
 
 gui_block:: liblist clean_rundir
 	@echo "Launching GUI in directory called ${RUNDIR}"
@@ -160,7 +144,12 @@ gui_block:: liblist clean_rundir
 	${POSTSIMDEBUG} \
 	${DEBUG} \
 	+UVM_TESTNAME=${TEST} \
-	${FSMDEBUG}
+	${FSMDEBUG} \
+	+UVM_VERBOSITY=${UVM_VERBOSITY}
+
+#########################################################
+# Start a chip level simulation, using vopt separately
+#########################################################
 
 gui_chip:: liblist clean_rundir opt_dbg
 	@echo "Launching GUI in directory called ${RUNDIR}"
@@ -188,7 +177,12 @@ gui_chip:: liblist clean_rundir opt_dbg
 	${POSTSIMDEBUG} \
 	${DEBUG} \
 	+UVM_TESTNAME=${TEST} \
-	${FSMDEBUG}
+	${FSMDEBUG} \
+	+UVM_VERBOSITY=${UVM_VERBOSITY}
+
+#########################################################
+# Start a block level simulation, using built in vopt
+#########################################################
 
 batch_block:: liblist clean_rundir
 	@echo "Launching batch in directory called ${RUNDIR}"
@@ -217,7 +211,12 @@ batch_block:: liblist clean_rundir
 	${POSTSIMDEBUG} \
 	${DEBUG} \
 	+UVM_TESTNAME=${TEST} \
-	${FSMDEBUG}
+	${FSMDEBUG} \
+	+UVM_VERBOSITY=${UVM_VERBOSITY}
+
+#########################################################
+# Start a chip level simulation, using vopt separately
+#########################################################
 
 batch_chip:: liblist clean_rundir opt_dbg
 	@echo "Launching batch in directory called ${RUNDIR}"
@@ -245,10 +244,125 @@ batch_chip:: liblist clean_rundir opt_dbg
 	${POSTSIMDEBUG} \
 	${DEBUG} \
 	+UVM_TESTNAME=${TEST} \
-	${FSMDEBUG}
+	${FSMDEBUG} \
+	+UVM_VERBOSITY=${UVM_VERBOSITY}
 
 
 ############# Regression Targets ########################
+# Used as first target when running regression
+#########################################################
+# Start a simulation in regression, vopt is done before
+#########################################################
+
+batch_regression:: liblist 
+	${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
+	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_opt -$(ARCH) \
+	${VSIM_TIMERES} \
+	-f ${LIBLIST} \
+	-lib $(TB_LIB_NAME) \
+	${TIMINGCHECKS} \
+	-printsimstats \
+	-sv_seed ${SEED} \
+	-msgmode both -onfinish stop  \
+	${UVM_SIM_ARGS} \
+	${VSIM_GCC_VERSION} \
+	${DPI_GCC_VERSION} \
+	${QUESTA_VIP_SIM_ARGS} \
+	${UVMCONTROL_REGR} \
+	${VSIMARGS} \
+	${REGRESSION_DO} \
+	-c \
+	${EXTRA_VSIM_ARGS}  \
+	${CC_COLLECT} \
+	-assertdebug \
+	+UVM_TESTNAME=${TEST} \
+	+UVM_VERBOSITY=${UVM_VERBOSITY_REGR}
+#########################################################
+# When rerunning a simulation due to failure
+#########################################################
+# Start a simulation in regression with debug, vopt is done before
+#########################################################
+
+batch_regression_dbg:: liblist
+	${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
+	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_dbg -$(ARCH) \
+	${VSIM_TIMERES} \
+	-f ${LIBLIST} \
+	-lib $(TB_LIB_NAME) \
+	${TIMINGCHECKS} \
+	-printsimstats \
+	-sv_seed ${SEED} \
+	-msgmode both -onfinish stop  \
+	${UVM_SIM_ARGS} \
+	${VSIM_GCC_VERSION} \
+	${DPI_GCC_VERSION} \
+	${QUESTA_VIP_SIM_ARGS} \
+	${UVMCONTROL} \
+	${CLASSDEBUG} \
+	${VSIMARGS} \
+	${REGRESSION_DBG_DO} \
+	-c \
+	${EXTRA_VSIM_ARGS}  \
+	${ASSERTION_DBG} \
+	${SOLVEFAIL_ARGS}  \
+	${POSTSIMDEBUG} \
+	${DEBUG} \
+	+UVM_TESTNAME=${TEST} \
+	${FSMDEBUG} \
+	+UVM_VERBOSITY=${UVM_VERBOSITY}
+
+#########################################################
+# Preparing a project file containing all the switches
+# Note. Makes it easier to pick upp a regression
+#########################################################
+create_project_file::
+	@echo "Starting to execute target $@";
+	@rm -f default.vrm
+	@test -e default.vrm||echo "VRMSTART">default.vrm;\
+	        echo "VRM::Version 1">>default.vrm; \
+	        echo "VRM::AddRmdb ${RMDBFILE}" >> default.vrm; \
+	        echo "VRMEND" >> default.vrm;
+	@sed s/VRMEND//g default.vrm > default.vrm.tmp
+	@echo "VRM::AddConfiguration ${RMDBFILE} {${BLOCKNAME}_regression} {{I my_run}} {-clean -GBLOCKNAME=${BLOCKNAME} \
+	${TIMEOUTARGS} ${NOREUSESEEDS} \
+	-GTCSPEC=${TC_SPEC} \
+	-GMERGE_HOME=${MERGED_UCDB_HOME} \
+	-GREPORTS_HOME=${HTML_REPORTS_HOME} \
+	-GHTML_REPORTDIR=${HTML_REPORTS_HOME} \
+	-GGRID=${GRID_ENGINE} \
+	-GMAX_PARALLEL_JOBS=${MAX_PARALLEL_JOBS} \
+	-GRANKING=${RANKING} \
+	-GCOVERCHECK=${COVERCHECK} \
+	-GAUTOCHECK=${AUTOCHECK} \
+	-GFORMAL=${FORMAL} \
+	-GCDC_STATIC=${CDC_STATIC} \
+	-GTIMESTAMP=${TIMESTAMP} \
+	-GREQUIRE_VPLAN=${REQUIRE_VPLAN} \
+	-GSEND_EMAIL=${SEND_EMAIL} \
+	-vrmdata ${SCRATCHDIR}}" >> default.vrm.tmp 
+	@echo "VRMEND" >> default.vrm.tmp;
+	@mv default.vrm.tmp  default.vrm
+
+check_prereq::
+	@test -d ${MERGED_UCDB_HOME}||mkdir -p ${MERGED_UCDB_HOME}	
+	@test -d ${HTML_REPORTS_HOME}||mkdir -p ${HTML_REPORTS_HOME}	
+	@if [ -f $(TC_SPEC) ]; then \
+	  echo "INFO: Found ${TC_SPEC} - (OK)"; \
+	else \
+	  echo ""; \
+	  echo "**************************************************"; \
+	  echo "REGRESSION_SETUP_ERROR: Did not find ${TC_SPEC}, creating one!"; \
+	  echo "Do not forget that you need to update ${TC_SPEC}"; \
+	  echo "with tests to run"; \
+	  echo "**************************************************"; \
+	  echo ""; \
+	  echo "DEFAULT_SETUP my_test 10 random" > ${TC_SPEC}; \
+	fi;
+
+
+regression:: check_prereq create_project_file
+	vrun -gui -verbose -project default.vrm -rmdb ${RMDBFILE} ${REGRESSION_ARGS}
+
 
 ############# Formal tools ##############################
 get_generics:: compile 

@@ -7,7 +7,6 @@
     <parameters>
       
       <parameter name="BLOCKNAME">replace_with_blockname</parameter>
-      <parameter name="VSIM_DO">(%VRUNDIR%)/vsim.do</parameter>
       <parameter name="MAKEFILE"> (%VRUNDIR%)/Makefile</parameter>
 
       <parameter name="MERGE_HOME">(%SCRATCH%)/../merged_ucdbfiles</parameter>
@@ -16,9 +15,10 @@
       <!-- BEHAVIOUR CONTROL -->
       <!-- GRID can be LOCAL,LSF or SGE -->
       <parameter name="GRID">LOCAL</parameter>
-      <parameter name="CHIP">0</parameter>
+      <parameter name="VERIFICATION_LEVEL">BLOCK</parameter>
+      <parameter name="DEBUG_LEVEL">LOW</parameter>
       <parameter name="SEND_EMAIL">1</parameter>
-      <parameter name="VCOVER_OPTIONS">-64</parameter>
+      <parameter name="VCOVER_OPTIONS">-32</parameter>
       <parameter name="MODE">batch</parameter>
       <parameter name="RANKING">0</parameter>
       <parameter name="COVERCHECK">0</parameter>
@@ -41,16 +41,12 @@
 
       <!--parameter name="DEBUG">0</parameter-->      
       <!-- LSF PARAMETERS Suitable to override -->
-      <parameter name="LSFQUEUE">hw_reg</parameter>
-      <parameter name="LSFMAXJOBS">10</parameter>
-      <parameter name="LSFMSW">-m</parameter>
-      <parameter name="LSF_GROUP">asic</parameter>
-      <parameter name="LSFARGS">-q (%LSFQUEUE%) -I (%LSFMSW%) (%LSF_GROUP%)</parameter>
+      <parameter name="LSFARGS">-I</parameter>
       <!-- Sun Grid PARAMETERS Suitable to override -->
- 
+       <parameter name="SGEARGS"></parameter>
       <!-- Path do different SW -->
       <parameter name="SENDMAIL">/usr/lib/sendmail</parameter>
-      <parameter name="LIBREOFFICE">libreoffice</parameter>
+      <parameter name="SOFFICE">soffice</parameter>
       <!-- Extracted parameters -->
       <parameter name="DUT_SETUPS" type = "tcl">[get_all_setups (%TCSPEC%)]</parameter>
    </parameters>
@@ -74,13 +70,13 @@
     <!-- GRID settings-->
     <!-- ========================================================== -->
 
-    <method name="grid" gridtype="lsf" mintimeout="600000" maxrunning="(%LSFMAXJOBS%)" if="{(%GRID%)} eq {LSF}">
+    <method name="grid" gridtype="lsf" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LSF}">
       <command>bsub  -J (%RUNNABLE%) -oo (%TASKDIR%)/(%SCRIPT%).bat.o%J -eo (%TASKDIR%)/(%SCRIPT%).bat.e%J (%LSFARGS%) (%WRAPPER%) </command>
     </method>   
     
     <!-- NOTE! Not tested -->
-    <method name="grid" gridtype="sge" action="execScript" mintimeout="600000" if="{(%GRID%)} eq {SGE}">
-      <command>qsub -V -cwd -b yes -e /dev/null -o /dev/null -N (%INSTANCE%) (%WRAPPER%)</command> 
+    <method name="grid" gridtype="sge" action="execScript" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {SGE}">
+      <command>qsub (%SGEARGS%) -N (%INSTANCE%) (%WRAPPER%)</command> 
     </method>
   </runnable>
 
@@ -176,7 +172,7 @@
 
       <command>  if (-e $vplan_excel) then </command>
       <command>    echo "Found $vplan_excel - starting soffice"</command> 
-      <command>    soffice --headless --convert-to xml:"MS Excel 2003 XML" $vplan_excel </command>
+      <command>    (%SOFFICE%) --headless --convert-to xml:"MS Excel 2003 XML" $vplan_excel </command>
       <command>    if ($status != 0) then </command>    
       <command>  echo " soffice conversion failed"</command>    
       <command>  exit 1          </command>    
@@ -282,13 +278,13 @@
        <command>echo "Starting to optimize" </command>
 
        <!-- In chip mode, we have less visibility and no coverage-->
-       <command>if ((%CHIP%) == 1) then</command>
-       <command>   make opt_fast -f (%MAKEFILE%) CHIP=true X_OPT_ARGS=(%EXTRA_OPT_ARGS%)</command>
+       <command>if ((%VERIFICATION_LEVEL%) == "CHIP") then</command>
+       <command>   make opt_fast -f (%MAKEFILE%) CHIP=1 X_OPT_ARGS=(%EXTRA_OPT_ARGS%)</command>
        <command>   if ($status != 0) exit 1 </command>
 
        <!-- If we want to automatically rerun failing tests,we create a dbg opt with more vis. -->       
        <command>   if ((%RERUN_FAILING_TESTS%) == 1) then</command>
-       <command>     make opt_dbg -f (%MAKEFILE%) CHIP=true X_OPT_ARGS=(%EXTRA_OPT_ARGS%)</command>
+       <command>     make opt_dbg -f (%MAKEFILE%) CHIP=1 X_OPT_ARGS=(%EXTRA_OPT_ARGS%)</command>
        <command>     if ($status != 0) exit 1 </command>
        <command>   endif </command>
 
@@ -342,7 +338,6 @@
       <parameter name="UCDBFILE" export="yes">(%ucdbfile%)</parameter>
     </parameters>
     <localfile type="link" src="(%TASKDIR%)/../../compile_all/modelsim.ini"/>
-    <localfile type="copy" src="(%VSIM_DO%)"/>
     <execScript launch="/bin/csh -f">
       <command>echo mergelist=(%mergelist%) </command>
       <command>unsetenv MODELSIM </command>

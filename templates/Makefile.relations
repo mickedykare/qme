@@ -3,6 +3,7 @@
 VSIM_GCC_VERSION=-cppinstall ${QUESTA_GCC_VERSION}
 GUI_DO=-do "coverage save ${UCDBFILE} -testname ${TEST} -onexit;do ${VSIM_COMMON_DO} ${TEST} ${BLOCKNAME}; ${QUESTA_USER_DO}; ${QUESTA_SCRATCH_USER_DO}"
 REGRESSION_DO=-do "do ${VSIM_COMMON_DO} ${TEST} ${BLOCKNAME}; ${QUESTA_USER_DO} run -a;coverage save ${UCDBFILE} -testname ${TEST};exit -f"
+REGRESSION_DBG_DO=-do "do ${VSIM_COMMON_DO} ${TEST} ${BLOCKNAME}; ${QUESTA_USER_DO};log /* -r; run -a;coverage save ${UCDBFILE} -testname ${TEST};exit -f"
 DESIGNLIB=${BLOCKNAME}_lib
 VSIM_USER_DO=${QME_PROJECT_HOME}/${BLOCKNAME}/sim/vsim_user.do
 ###################################################################
@@ -51,7 +52,7 @@ VSIMVOPTARGS=-voptargs="${VOPTSWITCHES}"
 
 # ADDING POSSIBILITY to set different debug levels
 ###################################################################
-# DEBUGLEVEL=LOW
+# DEBUG_LEVEL=LOW
 ###################################################################
 # Visibility: As set by VOPT_ARGS
 # class debug: No
@@ -62,7 +63,7 @@ VSIMVOPTARGS=-voptargs="${VOPTSWITCHES}"
 # Assertion debug: No
 # FSM DEBUG: No
 ###################################################################
-ifeq ($(DEBUGLEVEL),LOW)
+ifeq ($(DEBUG_LEVEL),LOW)
 DEBUG=
 POSTSIMDEBUG=
 CLASSDEBUG=
@@ -72,7 +73,7 @@ ASSERTION_DBG=-assertcover
 FSMDEBUG=
 endif
 ###################################################################
-# DEBUGLEVEL=MEDIUM
+# DEBUG_LEVEL=MEDIUM
 ###################################################################
 # Visibility: As set by VOPT_ARGS
 # class debug: yes
@@ -83,7 +84,7 @@ endif
 # Assertion debug: Yes
 # FSM DEBUG: Yes
 ###################################################################
-ifeq ($(DEBUGLEVEL),MEDIUM)
+ifeq ($(DEBUG_LEVEL),MEDIUM)
 DEBUG=
 POSTSIMDEBUG=
 CLASSDEBUG=-classdebug
@@ -93,7 +94,7 @@ ASSERTION_DBG=-assertdebug
 FSMDEBUG=-fsmdebug
 endif
 ###################################################################
-# DEBUGLEVEL=FULL
+# DEBUG_LEVEL=FULL
 ###################################################################
 # Visibility: As set by VOPT_ARGS
 # class debug: yes
@@ -104,7 +105,7 @@ endif
 # Assertion debug: Yes
 # FSM DEBUG: Yes
 ###################################################################
-ifeq ($(DEBUGLEVEL),FULL)
+ifeq ($(DEBUG_LEVEL),FULL)
 DEBUG=-debugdb 
 POSTSIMDEBUG=-postsimdataflow
 CLASSDEBUG=-classdebug
@@ -114,3 +115,42 @@ ASSERTION_DBG=-assertdebug
 FSMDEBUG=-fsmdebug
 endif
 
+DUT_FILELIST=${SRCHOME}/${BLOCKNAME}/${RTLDIR}/rtl.files
+TB_FILELIST=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/tb.files
+TC_SPEC=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/tc_spec.txt
+MERGED_UCDB_HOME=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/merged_ucdb_files
+HTML_REPORTS_HOME=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/html_reports
+
+
+
+ifeq ($(SETUP),____DEFAULT_SETUP)
+SETUPARGS=
+else
+SETUPARGS=-vlogargs=+define+${SETUP}
+endif
+
+
+# Regression timeouts
+ifeq ($(NOTIMEOUT),1)
+  TIMEOUTARGS=-notimeout
+else
+  TIMEOUTARGS=-mintimeout ${MAX_QUE_TIME}:${MAX_EXECUTION_TIME}  
+endif
+
+UVM_INC_DIR=+incdir+${UVM_HOME}/src
+DPI_GCC_VERSION=-dpicppinstall ${QUESTA_GCC_VERSION}  
+
+
+ifneq ($(EXTRA_VLOG_ARGS),)
+X_VLOG_ARGS=-vlogargs=${EXTRA_VLOG_ARGS}
+else
+X_VLOG_ARGS=
+endif
+
+ifneq ($(EXTRA_VCOM_ARGS),)
+X_VCOM_ARGS=-vcomargs=${EXTRA_VCOM_ARGS}
+else
+X_VCOM_ARGS=
+endif
+
+REGRESSION_ARGS=${TIMEOUTARGS} ${NOREUSESEEDS}
