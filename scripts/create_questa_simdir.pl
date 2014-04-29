@@ -164,6 +164,7 @@ if (-e $projhome."/".$block) {
 if (-e $projhome."/".$block."/".$simsettingsdir) {
     &print_note("Checking that $projhome/$block/$simsettingsdir exists (OK)");
 } else {
+    &print_note("Checking that $projhome/$block/$simsettingsdir exists (ERROR)");
     die("Please check either QME_SIM_SETTINGS_DIR ($simsettingsdir)");
 }
 

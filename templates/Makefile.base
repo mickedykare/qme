@@ -9,7 +9,8 @@ RECOMPILE_ANALYZE_SCRIPT=
 ###################################################################
 # Default settings
 ###################################################################
-
+# Enable RECOMPILE_UVM to compile UVM with timescale
+RECOMPILE_UVM=0
 UVM_VERSION=uvm-1.1d
 QUESTA_UVM_DEBUG=questa_uvm_pkg-1.2
 QUESTA_GCC_VERSION=4.5.0
@@ -21,7 +22,6 @@ UVM_VERBOSITY=UVM_MEDIUM
 UVM_VERBOSITY_REGR=UVM_NONE
 # LOW,FULL, MEDIUM
 DEBUG_LEVEL=MEDIUM
-
 
 # BLOCK,CHIP 
 VERIFICATION_LEVEL=BLOCK
@@ -39,9 +39,7 @@ UVM_HOME=${QUESTA_HOME}/verilog_src/${UVM_VERSION}
 RTLDIR=rtl
 WORKLIB=work
 LIBRARY_HOME=questa_libs
-AC_RESULTS=autocheck_output_results
 CDC_RESULTS=cdc_output_results
-COVERCHECK_RESULTS=covercheck_output_results
 FORMAL_RESULTS=formal_output_results
 UCDB_STORAGE=ucdbfiles
 HTML_HOME=html_reports
@@ -56,6 +54,12 @@ UCDBFILE=${TEST}.ucdb
 RUNDIR=${TEST}
 TB_LIB_NAME=work
 TB_TOP_NAME=top
+
+LOWER_DUT_NAME=$(shell echo ${BLOCKNAME} | tr '[:upper:]' '[:lower:]')
+DESIGN_LIB=${LOWER_DUT_NAME}_lib
+
+
+
 ###################################################################
 # Common default Settings
 ###################################################################
@@ -64,9 +68,8 @@ COVER=0
 ARCH=32
 RANKING=0
 VLOG_TIMESCALE=-timescale 1ns/1ps
-COVERCHECK=0
 FORMAL=0
-AUTOCHECK=0
+
 CDC_STATIC=0
 SETUP=____DEFAULT_SETUP
 
@@ -81,6 +84,38 @@ EXTRA_VLOG_ARGS=
 EXTRA_VCOM_ARGS=
 EXTRA_VOPT_ARGS=
 EXTRA_VSIM_ARGS=
+###################################################################
+# Autocheck defaults
+###################################################################
+AUTOCHECK=0
+AUTOCHECK_DO_COMMANDS=
+AUTOCHECK_DUT=${BLOCKNAME}
+AUTOCHECK_DESIGN_LIB=${DESIGN_LIB}
+AUTOCHECK_EFFORT=medium
+AUTOCHECK_GENERICS=
+AUTOCHECK_RESULTS=autocheck_output_results
+AUTOCHECK_EXTRA_ARGS=
+###################################################################
+# Covercheck defaults
+# Can be used in regression or interactivly 
+# Set COVERCHECK=1 to run in regression
+###################################################################
+COVERCHECK=0
+COVERCHECK_RESULTS=covercheck_output_results
+DISABLE_COVERCHECKS=covercheck disable -type toggle
+COVERCHECK_DO_COMMANDS=
+COVERCHECK_UCDB=override_COVERCHECK_UCDB_with_actual_ucdb_to_use
+COVERCHECK_GENERICS= -f generics.txt
+COVERCHECK_DUT=${BLOCKNAME}
+COVERCHECK_DESIGN_LIB=${DESIGN_LIB}
+COVERCHECK_EXTRA_COMPILE_ARGS=
+COVERCHECK_EXTRA_VERIFY_ARGS=
+COVERCHECK_EFFORT=medium
+COVERCHECK_WITNESS_WAVEFORM=-witness_waveforms
+
+
+
+
 
 ###################################################################
 # Regression default parameters
@@ -98,7 +133,6 @@ NOREUSESEEDS=-noreuseseeds
 
 #LSF STANDARD SETTINGS
 LSFARGS="-q asic -I" 
-
 # SGE STANDARD SETTINGS
 #SGEARGS="-V -cwd -b yes -e /dev/null -o /dev/null"
 SGEARGS=

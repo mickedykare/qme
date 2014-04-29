@@ -36,7 +36,7 @@ include ${QME_HOME}/templates/Makefile.relations
 default::help
 
 
-compile: clean compile_uvm compile_qvips compile_dut compile_tb liblist
+compile: clean ${COMPILE_UVM_TARGET} compile_qvips compile_dut compile_tb liblist
 
 
 clean::
@@ -46,6 +46,7 @@ clean::
 	rm -f transcript
 	rm -f *.dbg
 	rm -f modelsim.ini
+	rm -f ${LIBLIST}
 
 
 # Recompile UVM to catch timescale problem
@@ -110,7 +111,7 @@ clean_rundir:
 	@if test -e ${QUESTALIBS_DIR} ;then cd ${RUNDIR};ln -s ../${QUESTALIBS_DIR};fi
 	@if test -e ${MODELSIM_INI} ;then cd ${RUNDIR};ln -s ../modelsim.ini;fi
 	@if test -e ${LIBLIST} ;then cd ${RUNDIR};ln -s ../${LIBLIST};fi
-	@if test -e ${VSIM_SCRATCH_USER} ;then cd ${RUNDIR};ln -s ../${VSIM_SCRATCH_USER};fi
+#	@if test -e ${VSIM_SCRATCH_USER} ;then cd ${RUNDIR};ln -s ../${VSIM_SCRATCH_USER};fi
 
 
 #########################################################
@@ -367,13 +368,59 @@ regression:: check_prereq create_project_file
 
 
 ############# Formal tools ##############################
-get_generics:: compile 
-	@echo TBD
 
+#########################################################
+# Extract generics for a design. TB can override generics
+# This is necessary for covercheck
+#########################################################
+
+get_generics:: compile get_generics_only
+
+get_generics_only:
+	${DISABLE_VERDI_PLI};${VSIM} -c $(TB_LIB_NAME).$(TB_TOP_NAME) \
+	-quiet -$(ARCH)  ${VSIMSWITCHES} ${UVMCONTROL_REGR} ${VSIMARGS} \
+	${X_SIM_ARGS} \
+        -do "do ${QME_HOME}/dofiles/get_generics.do ${BLOCKNAME}" \
+	-voptargs="+acc" ${QUESTA_VIP_SIM_ARGS} ${VSIM_GCC_VERSION} -f ${LIBLIST} 
+	@echo "We have now a file called generics.txt that contains all top level generics"
+
+#########################################################
+# Run Questa Autocheck
+# Intended to be run interactively.
+# But can be run as part of regression as well.
+#########################################################
+
+autocheck::clean compile_dut liblist autocheck_only
 autocheck_only::
-	@echo TBD
+	${DISABLE_VERDI_PLI}; \
+	qautocheck -c -licq -od ${AUTOCHECK_RESULTS} -do "configure license queue on; \
+	${AUTOCHECK_DO_COMMAND}; \
+	autocheck run -d ${AUTOCHECK_DUT} \
+	-work ${AUTOCHECK_DESIGN_LIB} \
+	-effort ${AUTOCHECK_EFFORT} -f ${LIBLIST}  ${AUTOCHECK_GENERICS} ${AUTOCHECK_EXTRA_ARGS}; exit"
 
-autocheck::clean compile_dut autocheck_only
+#########################################################
+# Run Questa Covercheck
+# Can be run as part of regression or interactively
+#########################################################
+covercheck: compile covercheck_only
+
+covercheck_only:
+	${DISABLE_VERDI_PLI};qautocheck -c -licq -od ${COVERCHECK_RESULTS} -do "\
+	configure license queue on;\
+	${DISABLE_COVERCHECKS};\
+	${COVERCHECK_DO_COMMANDS}; \
+	covercheck load ucdb ${COVERCHECK_UCDB}; \
+	covercheck compile -d ${COVERCHECK_DUT} -work ${COVERCHECK_DESIGN_LIB} -f ${LIBLIST} ${COVERCHECK_GENERICS} ${COVERCHECK_EXTRA_COMPILE_ARGS}; \
+	covercheck verify -effort ${COVERCHECK_EFFORT}  ${COVERCHECK_WITNESS_WAVEFORM} ${COVERCHECK_EXTRA_VERIFY_ARGS}; \
+	covercheck generate exclude ${COVERCHECK_RESULTS}/covercheck_verify.db \
+	covercheck_exclude.do ; \
+	exit"
+
+
+
+
+
 
 ##########################################################
 

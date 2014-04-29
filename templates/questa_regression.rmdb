@@ -391,7 +391,7 @@
       <command>unsetenv MODELSIM </command>
       <command>ln -s 	../../compile_all/questa_libs</command>
       <command>if ($status != 0) exit 1 		</command>      
-      <command>make create_liblists get_generics autocheck_only  -f (%MAKEFILE%) </command>
+      <command>make liblist get_generics_only autocheck_only  -f (%MAKEFILE%) AUTOCHECK_GENERICS="-f generics.txt" </command>
       <command>if ($status != 0) exit 1 		</command>      
     </execScript>
   </runnable>
@@ -445,9 +445,10 @@
       <command>unsetenv MODELSIM </command>
       <command>   ln -s 	../../compile_all/questa_libs</command>
       <command>   if ($status != 0) exit 1 		</command>      
-      <command>   make create_liblists get_generics covercheck_only  -f (%MAKEFILE%) MERGED_UCDB=(%mymergefile%)  </command>
+      <command>   make liblist get_generics_only covercheck_only  -f (%MAKEFILE%) COVERCHECK_UCDB=(%mymergefile%) COVERCHECK_RESULTS=. </command>
       <command>   if ($status != 0) exit 1 		</command>      
-      <command>   vsim -viewcov (%mymergefile%) -do "coverage report -code ecsfb -totals -file before_exclusions.rpt;do Output_Results/covercheck_exclude.do;coverage save (%mymergefile%);coverage report -code ecsfb -totals -file after_exclusions.rpt;exit -f" -c</command>
+      <command>   vsim -viewcov (%mymergefile%) -do "coverage report -code ecsfb -totals -file before_exclusions.rpt;do covercheck_exclude.do;coverage save (%mymergefile%);coverage report -code ecsfb -totals -file after_exclusions.rpt;exit -f" -c </command>
+      <command>   if ($status != 0) exit 1 		</command>      
     </execScript>
   </runnable>
 
