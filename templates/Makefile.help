@@ -1,0 +1,84 @@
+# This file contains the help text
+help::header help_override help_compile help_simulate
+
+header::
+	@tput setaf 4;
+	@echo "########################## Questa Makefile Environment (QME) ############################################"
+	@echo "# This environment is developed by Mikael Andersson, Mentor Graphics"
+	@echo "# contact email: Mikael_Andersson@mentor.com"
+	@echo "# Documentation can be found at: http://www.github.com/detstorabla/qme"
+	@echo "#"
+	@tput setaf 9;
+
+
+help_override::
+	@tput setaf 4;
+	@echo "########################## OVERRIDING PARAMETERS ########################################################"
+	@echo "# Any parameter in the Makefile can be overridden in the following ways:"
+	@echo "# 1. Override on command line: make compile SEED=1234 (Override the param SEED with 1234)"
+	@echo "# 2. Add an override just for your block in ${BLOCK_OVERRIDES}:"
+	@echo "#    # enable 64 bit mode:"
+	@echo "#    x32=0"
+	@echo "# 3. Add an override for your project in ${QME_PROJECT_HOME}/qme_setup/Makefile.project.defaults:"
+	@echo "#    # We don't use verification plans by default:"
+	@echo "#    REQUIRE_VPLAN=0"
+	@echo "# 4. Add an override for your site in ${QME_SITE_SETTINGS}/Makefile.site.defaults:"
+	@echo "#    # We don't use verification plans by default:"
+	@echo "#    REQUIRE_VPLAN=0"
+	@echo "#"
+	@echo "# To find out what variables you can override, you can:"
+	@echo "#    a. Look in the Makefile in your simulation directory"
+	@echo "#    b. \"make info\" will list all variables and relations (in alphabetical order) "
+	@echo "#    c. \"make print-<variable name> will print value. Example; make print-BLOCK_OVERRIDES"
+	@echo "#"
+	@tput setaf 9;
+
+
+
+
+
+help_compile::
+	@tput setaf 4;
+	@echo "########################## COMPILATION ##################################################################"
+	@echo "# To compile everything:                                       make compile"
+	@echo "# To compile only the test bench (no opt):                     make compile_tb"
+	@echo "# To compile dut (no opt):                                     make compile_dut"
+	@echo "# To optimize (opt) all code:                                  make opt"
+	@echo "# Compilation Options:"
+	@echo "# SETUP=<setup> will compile the code with <setup> defined"
+	@echo "#"
+	@echo "# Some Examples:"
+	@echo "# mybsub make compile"
+	@echo "# mybsub make compile SETUP=SETUP_DL"
+	@echo "# mybsub make compile SETUP=SETUP_DL x32=true"
+	@echo "# mybsub make recompile (reuses previous setup)"
+	@echo "# mybsub make compile_tb SETUP=SETUP_DL"
+	@echo "# mybsub make compile_tb SETUP=SETUP_DL x32=1"
+	@echo "#"
+	@tput setaf 9;
+
+
+help_simulate::
+	@tput setaf 4;
+	@echo "########################## SIMULATION ###################################################################"
+	@echo "# To start simulation in GUI mode (Block level simulation):    make gui TEST=my_test_name "
+	@echo "# To start simulation in GUI mode in chip mode (3-step flow):  make gui TEST=my_test_name CHIP=true"
+	@echo "#"
+	@echo "# To start simulation in batch mode (2-step opt flow):         make batch TEST=my_test_name "
+	@echo "# To start simulation in GUI mode in chip mode (3-step flow):  make batch TEST=my_test_name CHIP=true"
+	@echo "#"
+	@echo "#"
+	@echo "# Debug level (affects performance):"
+	@echo "# add DEBUG_LEVEL=LOW|MEDIUM(default)|FULL"
+	@echo "#"
+	@echo "# Message verbosity:"
+	@echo "# add UVM_VERBOSITY=UVM_MEDIUM|UVM_NONE|UVM_HIGH|UVM_DEFAULT " 
+	@echo "#"
+	@echo "# Some Examples:"
+	@echo "#        make gui TEST=my_test"
+	@echo "#        make gui TEST=my_test FAST=1 UVM_VERBOSITY=UVM_NONE"
+	@echo "#        make gui TEST=my_test DEBUG_LEVEL=FULL UVM_VERBOSITY=UVM_HIGH"
+	@echo "#        make gui TEST=my_test FAST=1 CHIP=1"
+	@echo "#        make compile gui TEST=my_test FAST=1"
+	@echo "#"
+	@tput setaf 9;
