@@ -140,10 +140,13 @@
 
 `include "i2c_master_defines.v"
 
+
+// MGC now only one reset,
+// and 
+
 module i2c_master_bit_ctrl (
     input             clk,      // system clock
-    input             rst,      // synchronous active high reset
-    input             nReset,   // asynchronous active low reset
+    input             nreset,   // asynchronous active low reset
     input             ena,      // core enable signal
 
     input      [15:0] clk_cnt,  // clock prescale value
@@ -195,8 +198,8 @@ module i2c_master_bit_ctrl (
 
     // slave_wait is asserted when master wants to drive SCL high, but the slave pulls it low
     // slave_wait remains asserted until the slave releases SCL
-    always @(posedge clk or negedge nReset)
-      if (!nReset) slave_wait <= 1'b0;
+    always @(posedge clk or negedge nreset)
+      if (!nreset) slave_wait <= 1'b0;
       else         slave_wait <= (scl_oen & ~dscl_oen & ~sSCL) | (slave_wait & ~sSCL);
 
     // master drives SCL high, but another master pulls it low
@@ -205,13 +208,13 @@ module i2c_master_bit_ctrl (
 
 
     // generate clk enable signal
-    always @(posedge clk or negedge nReset)
-      if (~nReset)
+    always @(posedge clk or negedge nreset)
+      if (~nreset)
       begin
           cnt    <=  16'h0;
           clk_en <=  1'b1;
       end
-      else if (rst || ~|cnt || !ena || scl_sync)
+      else if ( ~|cnt || !ena || scl_sync)
       begin
           cnt    <=  clk_cnt;
           clk_en <=  1'b1;
@@ -232,13 +235,8 @@ module i2c_master_bit_ctrl (
 
     // capture SDA and SCL
     // reduce metastability risk
-    always @(posedge clk or negedge nReset)
-      if (!nReset)
-      begin
-          cSCL <=  2'b00;
-          cSDA <=  2'b00;
-      end
-      else if (rst)
+    always @(posedge clk or negedge nreset)
+      if (!nreset)
       begin
           cSCL <=  2'b00;
           cSDA <=  2'b00;
@@ -251,20 +249,15 @@ module i2c_master_bit_ctrl (
 
 
     // filter SCL and SDA signals; (attempt to) remove glitches
-    always @(posedge clk or negedge nReset)
-      if      (!nReset     ) filter_cnt <= 14'h0;
-      else if (rst || !ena ) filter_cnt <= 14'h0;
+    always @(posedge clk or negedge nreset)
+      if      (!nreset     ) filter_cnt <= 14'h0;
+      else if (!ena ) filter_cnt <= 14'h0;
       else if (~|filter_cnt) filter_cnt <= clk_cnt >> 2; //16x I2C bus frequency
       else                   filter_cnt <= filter_cnt -1;
 
 
-    always @(posedge clk or negedge nReset)
-      if (!nReset)
-      begin
-          fSCL <= 3'b111;
-          fSDA <= 3'b111;
-      end
-      else if (rst)
+    always @(posedge clk or negedge nreset)
+      if (!nreset)
       begin
           fSCL <= 3'b111;
           fSDA <= 3'b111;
@@ -277,16 +270,8 @@ module i2c_master_bit_ctrl (
 
 
     // generate filtered SCL and SDA signals
-    always @(posedge clk or negedge nReset)
-      if (~nReset)
-      begin
-          sSCL <=  1'b1;
-          sSDA <=  1'b1;
-
-          dSCL <=  1'b1;
-          dSDA <=  1'b1;
-      end
-      else if (rst)
+    always @(posedge clk or negedge nreset)
+      if (~nreset)
       begin
           sSCL <=  1'b1;
           sSDA <=  1'b1;
@@ -307,13 +292,8 @@ module i2c_master_bit_ctrl (
     // detect stop condition => detect rising edge on SDA while SCL is high
     reg sta_condition;
     reg sto_condition;
-    always @(posedge clk or negedge nReset)
-      if (~nReset)
-      begin
-          sta_condition <=  1'b0;
-          sto_condition <=  1'b0;
-      end
-      else if (rst)
+    always @(posedge clk or negedge nreset)
+      if (~nreset)
       begin
           sta_condition <=  1'b0;
           sto_condition <=  1'b0;
@@ -326,9 +306,8 @@ module i2c_master_bit_ctrl (
 
 
     // generate i2c bus busy signal
-    always @(posedge clk or negedge nReset)
-      if      (!nReset) busy <=  1'b0;
-      else if (rst    ) busy <=  1'b0;
+    always @(posedge clk or negedge nreset)
+      if      (!nreset) busy <=  1'b0;
       else              busy <=  (sta_condition | busy) & ~sto_condition;
 
 
@@ -337,18 +316,14 @@ module i2c_master_bit_ctrl (
     // 1) master drives SDA high, but the i2c bus is low
     // 2) stop detected while not requested
     reg cmd_stop;
-    always @(posedge clk or negedge nReset)
-      if (~nReset)
-          cmd_stop <=  1'b0;
-      else if (rst)
+    always @(posedge clk or negedge nreset)
+      if (~nreset)
           cmd_stop <=  1'b0;
       else if (clk_en)
           cmd_stop <=  cmd == `I2C_CMD_STOP;
 
-    always @(posedge clk or negedge nReset)
-      if (~nReset)
-          al <=  1'b0;
-      else if (rst)
+    always @(posedge clk or negedge nreset)
+      if (~nreset)
           al <=  1'b0;
       else
           al <=  (sda_chk & ~sSDA & sda_oen) | (|c_state & sto_condition & ~cmd_stop);
@@ -380,9 +355,11 @@ module i2c_master_bit_ctrl (
     parameter [17:0] wr_b    = 18'b0_0100_0000_0000_0000;
     parameter [17:0] wr_c    = 18'b0_1000_0000_0000_0000;
     parameter [17:0] wr_d    = 18'b1_0000_0000_0000_0000;
+   parameter [17:0] my_fake_state  ='1;
+   
 
-    always @(posedge clk or negedge nReset)
-      if (!nReset)
+    always @(posedge clk or negedge nreset)
+      if (!nreset)
       begin
           c_state <=  idle;
           cmd_ack <=  1'b0;
@@ -390,7 +367,7 @@ module i2c_master_bit_ctrl (
           sda_oen <=  1'b1;
           sda_chk <=  1'b0;
       end
-      else if (rst | al)
+      else if (al)
       begin
           c_state <=  idle;
           cmd_ack <=  1'b0;
@@ -565,9 +542,19 @@ module i2c_master_bit_ctrl (
                         sda_chk <=  1'b0; // don't check SDA output (SCL low)
                     end
 
-`ifdef AC_BUG
-		default:c_state <=  idle;
-`endif
+
+                    my_fake_state:
+                    begin
+                        c_state <=  idle;
+                        cmd_ack <=  1'b1;
+                        scl_oen <=  1'b0; // set SCL low
+                        sda_oen <=  din;
+                        sda_chk <=  1'b0; // don't check SDA output (SCL low)
+                    end
+
+		default:c_state <= idle;
+		
+
               endcase
       end
 

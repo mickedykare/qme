@@ -71,17 +71,16 @@
 // synopsys translate_on
 
 `include "i2c_master_defines.v"
-
+// MGC Removed sync resets
 module i2c_master_byte_ctrl (
-	clk, rst, nReset, ena, clk_cnt, start, stop, read, write, ack_in, din,
+	clk, nreset, ena, clk_cnt, start, stop, read, write, ack_in, din,
 	cmd_ack, ack_out, dout, i2c_busy, i2c_al, scl_i, scl_o, scl_oen, sda_i, sda_o, sda_oen );
 
 	//
 	// inputs & outputs
 	//
 	input clk;     // master clock
-	input rst;     // synchronous active high reset
-	input nReset;  // asynchronous active low reset
+	input nreset;  // asynchronous active low reset
 	input ena;     // core enable signal
 
 	input [15:0] clk_cnt; // 4x SCL
@@ -145,8 +144,7 @@ module i2c_master_byte_ctrl (
 	// hookup bit_controller
 	i2c_master_bit_ctrl bit_controller (
 		.clk     ( clk      ),
-		.rst     ( rst      ),
-		.nReset  ( nReset   ),
+		.nreset  ( nreset   ),
 		.ena     ( ena      ),
 		.clk_cnt ( clk_cnt  ),
 		.cmd     ( core_cmd ),
@@ -170,10 +168,8 @@ module i2c_master_byte_ctrl (
 	assign dout = sr;
 
 	// generate shift register
-	always @(posedge clk or negedge nReset)
-	  if (!nReset)
-	    sr <=  8'h0;
-	  else if (rst)
+	always @(posedge clk or negedge nreset)
+	  if (!nreset)
 	    sr <=  8'h0;
 	  else if (ld)
 	    sr <=  din;
@@ -181,10 +177,8 @@ module i2c_master_byte_ctrl (
 	    sr <=  {sr[6:0], core_rxd};
 
 	// generate counter
-	always @(posedge clk or negedge nReset)
-	  if (!nReset)
-	    dcnt <=  3'h0;
-	  else if (rst)
+	always @(posedge clk or negedge nreset)
+	  if (!nreset)
 	    dcnt <=  3'h0;
 	  else if (ld)
 	    dcnt <=  3'h7;
@@ -198,8 +192,8 @@ module i2c_master_byte_ctrl (
 	//
 	reg [4:0] c_state; // synopsys enum_state
 
-	always @(posedge clk or negedge nReset)
-	  if (!nReset)
+	always @(posedge clk or negedge nreset)
+	  if (!nreset)
 	    begin
 	        core_cmd <=  `I2C_CMD_NOP;
 	        core_txd <=  1'b0;
@@ -209,7 +203,7 @@ module i2c_master_byte_ctrl (
 	        c_state  <=  ST_IDLE;
 	        ack_out  <=  1'b0;
 	    end
-	  else if (rst | i2c_al)
+	  else if (i2c_al)
 	   begin
 	       core_cmd <=  `I2C_CMD_NOP;
 	       core_txd <=  1'b0;
@@ -338,10 +332,6 @@ module i2c_master_byte_ctrl (
 	                // generate command acknowledge signal
 	                cmd_ack  <=  1'b1;
 	            end
-		`ifdef AC_BUG
-	       default:
-		 c_state  <=  ST_IDLE;
-		`endif
 	      endcase
 	  end
 endmodule

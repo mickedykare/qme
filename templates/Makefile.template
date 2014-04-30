@@ -26,6 +26,7 @@ include ${BLOCK_OVERRIDES}
 # Include all relations that are calculated
 ##############################################################
 include ${QME_HOME}/templates/Makefile.relations
+include ${QME_HOME}/templates/Makefile.help
 
 
 ################################################################
@@ -387,7 +388,7 @@ get_generics_only:
 #########################################################
 # Run Questa Autocheck
 # Intended to be run interactively.
-# But can be run as part of regression as well.
+# Should not be run as regression. Missing UCDB storage
 #########################################################
 
 autocheck::clean compile_dut liblist autocheck_only
@@ -412,11 +413,15 @@ covercheck_only:
 	${COVERCHECK_DO_COMMANDS}; \
 	covercheck load ucdb ${COVERCHECK_UCDB}; \
 	covercheck compile -d ${COVERCHECK_DUT} -work ${COVERCHECK_DESIGN_LIB} -f ${LIBLIST} ${COVERCHECK_GENERICS} ${COVERCHECK_EXTRA_COMPILE_ARGS}; \
-	covercheck verify -effort ${COVERCHECK_EFFORT}  ${COVERCHECK_WITNESS_WAVEFORM} ${COVERCHECK_EXTRA_VERIFY_ARGS}; \
+	covercheck verify -effort ${COVERCHECK_EFFORT}  ${COVERCHECK_WITNESS_WAVEFORM} ${COVERCHECK_EXTRA_VERIFY_ARGS} -byinstance; \
 	covercheck generate exclude ${COVERCHECK_RESULTS}/covercheck_verify.db \
 	covercheck_exclude.do ; \
 	exit"
 
+#########################################################
+# Run Questa CDC
+# Can be run as part of regression or interactively
+#########################################################
 
 
 

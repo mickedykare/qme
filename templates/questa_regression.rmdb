@@ -345,7 +345,6 @@
       <!-- First time we run DEBUGMODE is 0 -->
       <command>if (("(%DEBUGMODE%)" == 0)) then  </command>
       <command>   echo "Running simulation with minimum visibilty"</command>      
-      <command>   ln -s 	../../compile_all/questa_libs</command>
       <command>   if ($status != 0) exit 1 </command>
       <command>   ln -s 	../../compile_all/c_libs</command>
       <command>   if ($status != 0) exit 1 </command>
@@ -355,7 +354,6 @@
       <!-- If we fail and have activated rerun mode, DEBUGMODE will be set to 1 -->
       <command>  echo "The current DEBUGMODE value is: (%DEBUGMODE:0%)"</command>
       <command>  echo "rerunning simulation with all full debug for postdebug" </command>
-      <command>  ln -s 	../../compile_all/questa_libs</command>
       <command>  if ($status != 0) exit 1 </command>
       <command>  ln -s 	../../compile_all/c_libs</command>
       <command>  if ($status != 0) exit 1 </command>
@@ -388,8 +386,10 @@
   <runnable name="autocheck" type="task" base="exec" if="(%AUTOCHECK%) eq {1}">
     <localfile type="link" src="(%TASKDIR%)/../../compile_all/modelsim.ini"/>
     <execScript launch="/bin/csh -f">
+      <command> echo "autocheck in regression not yet implemented" </command>
+      <command> echo "Missing ucdb from autocheck" </command>
+      <command> exit 1 		</command>      
       <command>unsetenv MODELSIM </command>
-      <command>ln -s 	../../compile_all/questa_libs</command>
       <command>if ($status != 0) exit 1 		</command>      
       <command>make liblist get_generics_only autocheck_only  -f (%MAKEFILE%) AUTOCHECK_GENERICS="-f generics.txt" </command>
       <command>if ($status != 0) exit 1 		</command>      
@@ -443,7 +443,6 @@
     <localfile type="link" src="(%TASKDIR%)/../../compile_all/modelsim.ini"/>
     <execScript launch="/bin/csh -f">
       <command>unsetenv MODELSIM </command>
-      <command>   ln -s 	../../compile_all/questa_libs</command>
       <command>   if ($status != 0) exit 1 		</command>      
       <command>   make liblist get_generics_only covercheck_only  -f (%MAKEFILE%) COVERCHECK_UCDB=(%mymergefile%) COVERCHECK_RESULTS=. </command>
       <command>   if ($status != 0) exit 1 		</command>      

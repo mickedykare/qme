@@ -18,3 +18,11 @@ ra_tmp:
 	/mnt/hgfs/Documents/presentations/2014/OSVVM_VS_SV/maps.csv \
 	-uvmout tmp.sv -block my_chip_top_block
 
+
+
+REQUIRE_VPLAN=0
+COVERCHECK=1
+#COVERCHECK_DO_COMMANDS=formal netlist constraint nreset_i 1
+#COVERCHECK_WITNESS_WAVEFORM=-witness_waveforms
+
+#AUTOCHECK_DO_COMMAND=formal netlist constraint nreset_i 1

@@ -41,8 +41,7 @@ module top();
    // This is the DUT
    i2c_master_top dut (// wishbone interface
 			   .wb_clk_i(clk),
-			   .wb_rst_i(1'b0),
-			   .arst_i(rstn),
+			   .nreset_i(rstn),
 			   .wb_adr_i(i_wb_if.adr[2:0]),
 			   .wb_dat_i(i_wb_if.dout),
 			   .wb_dat_o(i_wb_if.din),
