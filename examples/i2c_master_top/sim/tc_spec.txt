@@ -1,2 +1,3 @@
+DEFAULT_SETUP:VPLAN_EXCEL=/home/mikaela/questa_makefile_environment/examples/i2c_master_top/doc/i2c_master_top_vplan.xls
 DEFAULT_SETUP i2c_base_test 2 random
 DEFAULT_SETUP i2c_orig_test 2 random
