@@ -12,7 +12,7 @@ my $col;
 my $row=0;
 # These are the names of the tabs.
 my @sheets=('regs','mems','blocks','maps');
-
+my $old_key="XXXXXX";
 
 sub print_note{
     my $msg=pop;
@@ -35,12 +35,18 @@ sub is_row_empty{
 
     for (my $i=0;$i<$no_of_columns;$i++) {
 	my $column=$sheet->get_cell($row,$i);
+
 	if (defined $column) {
-	    return 1;
+	    $val=$column->value();
+	    if ($val eq "") {
+	    } else {
+		return 1;
+	    }
 	} else {
 	    return 0;
 	}
     }
+    return 0;
 }
 sub print_row {
     my $row=pop;
@@ -48,16 +54,33 @@ sub print_row {
     my $sheet=pop;
     my $val;
     my $columnx;
-    for (my $i=0;$i<$no_of_columns-1;$i++) {
+    # Get first column; It is always the key
+    $columnx=$sheet->get_cell($row,0);
+    if (defined $columnx) {
+	$val=$columnx->value();
+	if ($val eq "") {
+	    $val=$old_key;
+	}else {
+	    $old_key=$val;
+	}
+    } else {
+	$val="";
+    }
+    print FILEP "\"$val\",";
+#    print "DBG key=$val old=$old_key\n";
+
+
+    for (my $i=1;$i<$no_of_columns-1;$i++) {
 	$columnx=$sheet->get_cell($row,$i);
 	if (defined $columnx) {
 	    $val=$columnx->value();
-	} else {
+    	} else {
 	    $val="";
 	}
 	print FILEP "\"$val\",";
-
     }
+
+    # Last column
     $columnx=$sheet->get_cell($row,$no_of_columns-1);
     if (defined $columnx) {
 	$val=$columnx->value();

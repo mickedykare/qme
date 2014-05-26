@@ -13,10 +13,10 @@
 @library vip_lib
 # wb agent
 $QME_PROJECT_HOME/vips/wb_agent/wb_if.sv
-$QME_PROJECT_HOME/vips/wb_agent/wb_pkg.sv:+incdir+$QME_PROJECT_HOME/i2c/uvm/vips/wb_agent/
+$QME_PROJECT_HOME/vips/wb_agent/wb_pkg.sv:+incdir+$QME_PROJECT_HOME/vips/wb_agent/
 # simple irq agent
 $QME_PROJECT_HOME/vips/simple_irq_agent/sv/simple_irq_if.sv
-$QME_PROJECT_HOME/vips/simple_irq_agent/sv/simple_irq_pkg.sv:+incdir+$QME_PROJECT_HOME/i2c/uvm/vips/simple_irq_agent/sv/
+$QME_PROJECT_HOME/vips/simple_irq_agent/sv/simple_irq_pkg.sv:+incdir+$QME_PROJECT_HOME/vips/simple_irq_agent/sv/
 
 # Actual test bench
 @library work

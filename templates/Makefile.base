@@ -428,3 +428,4 @@ QUESTA_SCRATCH_USER_DO = $(shell \
         fi; \
 ) 
 
+default::help

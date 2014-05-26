@@ -7,7 +7,7 @@ QVIP_TARGETS=i2c
 COVERCHECK=1
 # I don't want emails
 #SEND_EMAIL=0
-
+DEBUG_LEVEL=FULL
 
 
 # Define XLS file for RM (used in this file)

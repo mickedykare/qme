@@ -34,7 +34,6 @@ include ${QME_HOME}/templates/Makefile.help
 ################################################################
 
 # clean out
-default::help
 
 
 compile: clean ${COMPILE_UVM_TARGET} compile_qvips compile_dut compile_tb liblist
@@ -69,6 +68,11 @@ compile_dut::prepare_filelist_dut
 compile_tb::prepare_filelist_tb
 	${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 
+compile_uvmc::
+	test -d ${QUESTALIBS_DIR}/uvmc_lib||vlib ${QUESTALIBS_DIR}/uvmc_lib
+	make -f ${UVMC_HOME}/lib/Makefile.questa UVM_HOME=${UVM_HOME}/.. UVMC_HOME=${UVMC_HOME} \
+	UVMC_LIB=${LIBDIR}/uvmc_lib BITS=32 UVM_LIB=${LIBDIR}/${UVM_VERSION} CPPVER=${CPPVER} \
+	UVM_VERSION=${UVM_VERSION} UVMC_X_ARGS=${UVM_X_ARGS} UVMC_SC_X_ARGS=${UVMC_SC_X_ARGS} uvmc_pkg
 
 #########################################################
 # Optimize tb ,used in chip level and regressions
