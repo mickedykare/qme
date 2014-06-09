@@ -1,0 +1,4 @@
+@library ra_example_lib
+${QME_PROJECT_HOME}/ra_example/rtl/apb3_to_regbus_bridge.sv
+${QME_PROJECT_HOME}/ra_example/rtl/example_block_registers.v
+${QME_PROJECT_HOME}/ra_example/rtl/ra_example.sv

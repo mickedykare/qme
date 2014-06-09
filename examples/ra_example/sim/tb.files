@@ -1,0 +1,9 @@
+
+@library work
+${QME_PROJECT_HOME}/ra_example/tb/registers/example_block_regs_pkg.sv
+${QME_PROJECT_HOME}/vips/apb3_register_stuff/apb3_uvm_reg_pkg.sv:+incdir+${QME_PROJECT_HOME}/vips/apb3_register_stuff/
+${QME_PROJECT_HOME}/vips/sli_clk_reset/sv/sli_clk_reset_pkg.sv:+incdir+${QME_PROJECT_HOME}/vips/sli_clk_reset/sv/
+${QME_PROJECT_HOME}/vips/sli_clk_reset/sv/sli_clk_reset_if.sv
+${QME_PROJECT_HOME}/ra_example/tb/src/ra_example_tb_pkg.sv:+incdir+${QME_PROJECT_HOME}/ra_example/tb/src/ +incdir+${QME_PROJECT_HOME}/ra_example/tb/tc
+${QME_PROJECT_HOME}/ra_example/tb/src/top.sv
+

@@ -1,0 +1,36 @@
+#Define QVIP to be compiled
+QVIP_TARGETS=apb3
+
+# Some settings
+#REQUIRE_VPLAN=0
+# Always run covercheck
+#COVERCHECK=1
+# I don't want emails
+SEND_EMAIL=0
+#DEBUG_LEVEL=FULL
+
+
+# Define XLS file for RM (used in this file)
+XLSFILE=/mnt/hgfs/Documents/kunder/ericsson/milan_registers/RA_test.xls
+
+
+# Do this step to convert own file lists. Also fixing Register package
+prepare_filelist_tb::convert2csv generate_hdl generate_rm
+
+convert2csv:
+	ruvm_xls2csv.pl ${XLSFILE}
+
+
+# This is using the extended functionality in register assistant
+generate_hdl:
+	test -e ra_work||mkdir ra_work
+	/opt/sw2/hdldesigner/2013.1/registerassistant/regassist -f ${QME_PROJECT_HOME}/ra_example/sim/ctrl.rcf -project ra_work
+
+
+# This is using Questa RM
+generate_rm:
+	${QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin regs.csv -autoinstance -block example_block_registers -uvmout ${QME_PROJECT_HOME}/ra_example/tb/registers/example_block_regs_pkg.sv 
+
+
+
+

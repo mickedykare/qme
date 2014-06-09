@@ -9,5 +9,5 @@
 // *************************************************************************************
 
 interface sli_clk_reset_if();
-   logic clk,nreset;
+   bit clk,nreset;
 endinterface // sli_clk_reset_if

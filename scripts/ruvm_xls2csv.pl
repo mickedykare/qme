@@ -11,7 +11,7 @@ my @cols;
 my $col;
 my $row=0;
 # These are the names of the tabs.
-my @sheets=('regs','mems','blocks','maps');
+my @sheets=('regs','mems','blocks','maps','RTL_settings','C_settings');
 my $old_key="XXXXXX";
 
 sub print_note{
