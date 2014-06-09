@@ -19,9 +19,18 @@ interface generic_reg_bus_if #(parameter ADDR_WIDTH,parameter DATA_WIDTH)(logic 
 	(a==0 & b==0)| (a!=b);
    endproperty
 
-   a_strobe:assert property(p_not_at_the_same_time(rstrobe,wstrobe));
-   a_ack:assert property(p_not_at_the_same_time(wack,rack));
-   a_error:assert property(p_not_at_the_same_time(raddrerr,waddrerr));
+   property p_strobe_one_cycle(strobe);
+      @(posedge clk) disable iff(~nreset)
+	$rose(strobe)|=>~strobe;
+   endproperty
+      
+   a_rstrobe_only_one_cycle:assert property(p_strobe_one_cycle(rstrobe));
+   a_wstrobe_only_one_cycle:assert property(p_strobe_one_cycle(wstrobe));
+   
+
+   a_strobe_not_at_the_same_time:assert property(p_not_at_the_same_time(rstrobe,wstrobe));
+   a_ack_not_at_the_same_time:assert property(p_not_at_the_same_time(wack,rack));
+   a_error_not_at_the_same_time:assert property(p_not_at_the_same_time(raddrerr,waddrerr));
 endinterface
 
 
@@ -39,27 +48,45 @@ module apb3_to_regbus_bridge #(int ADDR_WIDTH,int DATA_WIDTH)(   input  pclk,
 								 output logic		      pslverr,
 											      // Generic bus interface to register
 								 generic_reg_bus_if rb_pins);
+
    
    // Used to decode bus control signals
    
-   typedef enum 									      { IDLE=0,SETUP=2,ACCESS=3,UNKNOWN=1} state_t;
-   
-   integer 										   wait_count = 0;
-   bit 											   slverr     = 1'b0;
-
+   typedef enum { IDLE=0,SETUP=2,ACCESS=3,UNKNOWN=1} state_t;
    
 
+   state_t state,state_d;
+   logic 	mainstrobe;
+  
 
-   state_t state=state_t'({psel,penable} );
-   
-
+   always_comb state=state_t'({psel,penable} );
    
    // Evaluate cycle accurate bus controls for protocol
    always_comb rb_pins.raddr=paddr;
    always_comb rb_pins.waddr=paddr;
    always_comb rb_pins.wdata=pwdata;
    always_comb prdata = rb_pins.rdata;
-   always_comb pslverr = rb_pins.raddrerr|rb_pins.waddrerr;
+   always_comb pslverr = (rb_pins.raddrerr|rb_pins.waddrerr) & psel&penable&pready;
+
+   
+   // We need to detect pos edge of ACCESS
+   always @(posedge pclk or negedge presetn) begin
+      if (presetn !== 1'b1) begin
+	 state_d <= IDLE;
+      end
+      else begin
+	 state_d <= state;
+      end
+   end
+   always_comb mainstrobe = (state==ACCESS) & (state_d == SETUP);
+   
+   
+   always_comb rb_pins.rstrobe = mainstrobe & ~pwrite;
+   always_comb rb_pins.wstrobe = mainstrobe & pwrite;
+   
+
+   
+
    
 
    
@@ -67,50 +94,11 @@ module apb3_to_regbus_bridge #(int ADDR_WIDTH,int DATA_WIDTH)(   input  pclk,
       
       if (presetn !== 1'b1) begin
 	 pready  <= 1'b0;
-//	 pslverr <= 1'b0;
-//	 prdata  <= 0;
-	 rb_pins.rstrobe<=0;
-	 rb_pins.wstrobe <=0;
       end
-      
       else begin
-	 
-	 // Conceptual state-machine to decode bus protocol transitions
-	 case( state )
-           IDLE  : 
-             begin
-		pready  <= 1'b0;
-//		pslverr <= 1'b0;
-//		prdata <= 0;
-		rb_pins.rstrobe<=0;
-		rb_pins.wstrobe <=0;
-             end
-	   
-           SETUP, ACCESS  : begin 
-              pready  <= (wait_count)? 1'b0 : 1'b1;
-//              pslverr <= (wait_count)? 1'b0 : slverr;
-              if(wait_count)
-                wait_count--;
-	      
-              if (~pwrite) begin
-		 // Read
-		 rb_pins.rstrobe<=1;
-		 rb_pins.wstrobe <=1;
-	      end
-              else begin
-		 // write
-                 if(!wait_count)
-		   begin
-		      rb_pins.wstrobe<=1;
-		      rb_pins.rstrobe<=0;
-		   end 
-	      end // else: !if(~pwrite)
-	      
-	   end // case: SETUP, ACCESS
-	   
-           endcase // case ( state )
-	 
-    end 
-  end 
+              pready  <= rb_pins.wack|rb_pins.rack;
+      end 
+   end
+   
 endmodule
 

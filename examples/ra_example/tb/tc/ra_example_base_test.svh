@@ -15,6 +15,10 @@ class ra_example_base_test extends uvm_test;
    
    // register model
    example_block_registers m_registermodel;
+
+   // Pointer to sequencere
+   mvc_sequencer m_apb3_sequencer;
+   
    
   //--------------------------------------------------------------------
   // new
@@ -31,6 +35,9 @@ class ra_example_base_test extends uvm_test;
       // Configure apb3 master vip
       m_apb3_master_config = apb3_config_t::type_id::create("m_apb3_master_config");
       m_clk_config = sli_clk_reset_config::type_id::create("m_clk_config");
+      assert(m_clk_config.randomize() with {m_reset_delay>3;
+					    m_reset_delay<10;} );
+      
       
       // APB3
       if(!uvm_config_db #(apb3_if_t )::get( this , "", "APB3_IF" , m_apb3_master_config.m_bfm )) begin
@@ -41,6 +48,8 @@ class ra_example_base_test extends uvm_test;
       m_apb3_master_config.default_mem_data          = 5;
       m_apb3_master_config.slave_err_not_supported   = 0;
       m_apb3_master_config.m_coverage_per_instance   = 1;
+      m_apb3_master_config.delete_analysis_component("trans_ap","checker");      
+
       m_apb3_master_config.m_bfm.set_config_response_max_timeout(600);
       m_apb3_master_config.m_bfm.apb3_set_host_abstraction_level(0, 1);  //Master TLM
       m_apb3_master_config.m_bfm.apb3_set_slave_abstraction_level(1, 0); // SLave RTL
@@ -62,13 +71,22 @@ class ra_example_base_test extends uvm_test;
       m_env=ra_example_tb_env#(example_block_registers,3,8)::type_id::create("m_env",this);
   endfunction: build_phase
 
+   function void connect_phase(uvm_phase phase);
+      $cast(m_apb3_sequencer,uvm_top.find("*m_env.m_apb3_master_agent.sequencer"));
+   endfunction // connect_phase
+   
+   
+
+
+
+   
    task run_phase(uvm_phase phase);
+      uvm_reg_hw_reset_seq m_sequence = uvm_reg_hw_reset_seq::type_id::create("m_sequence");
+      m_sequence.model=m_registermodel;
+
       phase.raise_objection(this);
       m_registermodel.print();
-      
       phase.drop_objection(this);
-      
-      
    endtask // run_phase
    
    

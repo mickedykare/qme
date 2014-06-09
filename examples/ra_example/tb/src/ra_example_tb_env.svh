@@ -7,13 +7,11 @@ class ra_example_tb_env #(type REGISTERMODEL_T=int,int ADDR_WIDTH,int DATA_WIDTH
    //  coverage     m_generic_reg_bus_agent_cov;   
    //  scoreboard   m_scoreboard;
    //
+   typedef apb3_host_apb3_transaction #(1,ADDR_WIDTH, DATA_WIDTH,DATA_WIDTH) apb3_host_apb3_transaction_t;
 
-   typedef apb3_reg_predictor #(1,ADDR_WIDTH, DATA_WIDTH) apb3_reg_predictor_t;
+   typedef apb_reg_predictor #(apb3_host_apb3_transaction_t,1,ADDR_WIDTH, DATA_WIDTH,DATA_WIDTH) apb3_reg_predictor_t;
 
-   typedef reg2apb_adapter #(.NO_OF_SLAVES(1),
-                             .ADDRESS_CHUNK(0),
-                             .ADDRESS_WIDTH(ADDR_WIDTH), 
-                             .DATA_WIDTH(DATA_WIDTH)) reg2apb_adapter_t; 
+   typedef reg2apb_adapter #(apb3_host_apb3_transaction_t,1,ADDR_WIDTH, DATA_WIDTH,DATA_WIDTH) reg2apb_adapter_t; 
    
    // adapter for register bus
    reg2apb_adapter_t m_reg2apb;           
@@ -45,7 +43,6 @@ class ra_example_tb_env #(type REGISTERMODEL_T=int,int ADDR_WIDTH,int DATA_WIDTH
      m_clk_reset_agent = sli_clk_reset_agent::type_id::create("m_clk_reset_agent", this);
      m_reg2apb = reg2apb_adapter_t::type_id::create("m_reg2apb");
      m_reg_predictor = apb3_reg_predictor_t::type_id::create("m_reg_predictor",this);
-     uvm_default_printer = uvm_default_table_printer;
   endfunction: build_phase
 
   //--------------------------------------------------------------------
