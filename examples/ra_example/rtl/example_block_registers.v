@@ -6,12 +6,15 @@
 // File            : /home/mikaela/questa_makefile_environment/examples/ra_example/rtl/example_block_registers.v
 //----------------------------------------------------------------------
 // Created by      : mikaela
-// Creation Date   : 10 06 2014 00:28::59
+// Creation Date   : 10 06 2014 19:26::45
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
 // Block           : example_block_registers
 // Address Range   : 0x4
+//----------------------------------------------------------------------
+// Description: 
+//    Register block
 //----------------------------------------------------------------------
 
 module example_block_registers
@@ -145,7 +148,7 @@ module example_block_registers
   //------------------------------------------------------------
   // Register: SYSPOR_DBB_RST_N_MASK1_REG
   //   SW Access     : read-write
-  //   Address Offset: 0x00
+  //   Address Offset: 0x0
   //   HW Access     : read-write
   // 
   // Instance: SYSPOR_DBB_RST_N_MASK1
@@ -310,7 +313,7 @@ module example_block_registers
   //------------------------------------------------------------
   // Register: SYSPOR_DBB_RST_N_MASK2_REG
   //   SW Access     : read-write
-  //   Address Offset: 0x01
+  //   Address Offset: 0x1
   //   HW Access     : read-write
   // 
   // Instance: SYSPOR_DBB_RST_N_MASK2
@@ -475,7 +478,7 @@ module example_block_registers
   //------------------------------------------------------------
   // Register: SYSPOR_DBB_RST_N_MASK3_REG
   //   SW Access     : read-write
-  //   Address Offset: 0x02
+  //   Address Offset: 0x2
   //   HW Access     : read-write
   // 
   // Instance: SYSPOR_DBB_RST_N_MASK3
@@ -526,7 +529,7 @@ module example_block_registers
   //------------------------------------------------------------
   // Register: SYSPOR_DBB_RST_N_MASK4_REG
   //   SW Access     : read-write
-  //   Address Offset: 0x03
+  //   Address Offset: 0x3
   //   HW Access     : read-write
   // 
   // Instance: SYSPOR_DBB_RST_N_MASK4

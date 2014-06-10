@@ -381,13 +381,13 @@ liblist:
 ###################################################################
 # Some defaults target , meant to be extended
 ###################################################################
-prepare_filelist_dut::
+precompile_rtl::
 	@tput setaf 6;
-	@echo "Preparing file list for dut (optional)"
+	@echo "Extend target precompile_rtl to do stuff before compiling RTL"
 	@tput setaf 9;
-prepare_filelist_tb::
+precompile_tb::
 	@tput setaf 6;
-	@echo "Preparing file list for tb (optional)"
+	@echo "Extend target precompile_tb to do stuff before compiling TB"
 	@tput setaf 9;
 presim::
 	@tput setaf 6;

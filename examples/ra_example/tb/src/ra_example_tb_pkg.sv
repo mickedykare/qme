@@ -34,6 +34,7 @@ package ra_example_tb_pkg;
    `include "ra_example_seq_lib.svh"
   `include "ra_example_base_test.svh"
   `include "ra_example_smoke_test.svh"
+  `include "ra_example_reg_test.svh"
   
    
    

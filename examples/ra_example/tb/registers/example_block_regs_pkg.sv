@@ -8,7 +8,7 @@
 // File            : example_block_regs_pkg.sv
 //----------------------------------------------------------------------
 // Created by      : mikaela
-// Creation Date   : 6/10/14 12:29 AM
+// Creation Date   : 6/10/14 7:28 PM
 //----------------------------------------------------------------------
 // Title           : registers
 //
@@ -30,12 +30,94 @@ package example_block_regs_pkg;
 
 
    //--------------------------------------------------------------------
-   // Class: SYSPOR_DBB_RST_N_MASK1_REG_reg
+   // Class: SYSPOR_DBB_RST_N_MASK4_REG
    // 
    //--------------------------------------------------------------------
 
-   class SYSPOR_DBB_RST_N_MASK1_REG_reg extends uvm_reg;
-      `uvm_object_utils(SYSPOR_DBB_RST_N_MASK1_REG_reg)
+   class SYSPOR_DBB_RST_N_MASK4_REG extends uvm_reg;
+      `uvm_object_utils(SYSPOR_DBB_RST_N_MASK4_REG)
+
+      rand uvm_reg_field spare; 
+      rand uvm_reg_field rtcclk12_mask; 
+
+
+      // Function: new
+      // 
+      function new(string name = "SYSPOR_DBB_RST_N_MASK4_REG");
+         super.new(name, 8, UVM_NO_COVERAGE);
+      endfunction
+
+
+      // Function: build
+      // 
+      virtual function void build();
+         spare = uvm_reg_field::type_id::create("spare");
+         rtcclk12_mask = uvm_reg_field::type_id::create("rtcclk12_mask");
+
+         spare.configure(this, 7, 1, "RW", 0, 7'b0000000, 1, 1, 0);
+         rtcclk12_mask.configure(this, 1, 0, "RW", 0, 1'b0, 1, 1, 0);
+      endfunction
+   endclass
+
+
+
+   //--------------------------------------------------------------------
+   // Class: SYSPOR_DBB_RST_N_MASK2_REG
+   // 
+   //--------------------------------------------------------------------
+
+   class SYSPOR_DBB_RST_N_MASK2_REG extends uvm_reg;
+      `uvm_object_utils(SYSPOR_DBB_RST_N_MASK2_REG)
+
+      rand uvm_reg_field LDOM_mask; 
+      rand uvm_reg_field LDOS_mask; 
+      rand uvm_reg_field EXTBST1_mask; 
+      rand uvm_reg_field spare; 
+      rand uvm_reg_field BUCK2_mask; 
+      rand uvm_reg_field BUCK4_mask; 
+      rand uvm_reg_field BUCK1_mask; 
+      rand uvm_reg_field LDOP_mask; 
+
+
+      // Function: new
+      // 
+      function new(string name = "SYSPOR_DBB_RST_N_MASK2_REG");
+         super.new(name, 8, UVM_NO_COVERAGE);
+      endfunction
+
+
+      // Function: build
+      // 
+      virtual function void build();
+         LDOM_mask = uvm_reg_field::type_id::create("LDOM_mask");
+         LDOS_mask = uvm_reg_field::type_id::create("LDOS_mask");
+         EXTBST1_mask = uvm_reg_field::type_id::create("EXTBST1_mask");
+         spare = uvm_reg_field::type_id::create("spare");
+         BUCK2_mask = uvm_reg_field::type_id::create("BUCK2_mask");
+         BUCK4_mask = uvm_reg_field::type_id::create("BUCK4_mask");
+         BUCK1_mask = uvm_reg_field::type_id::create("BUCK1_mask");
+         LDOP_mask = uvm_reg_field::type_id::create("LDOP_mask");
+
+         LDOM_mask.configure(this, 1, 7, "RW", 0, 1'b0, 1, 1, 0);
+         LDOS_mask.configure(this, 1, 6, "RW", 0, 1'b0, 1, 1, 0);
+         EXTBST1_mask.configure(this, 1, 5, "RW", 0, 1'b0, 1, 1, 0);
+         spare.configure(this, 1, 4, "RW", 0, 1'b0, 1, 1, 0);
+         BUCK2_mask.configure(this, 1, 3, "RW", 0, 1'b0, 1, 1, 0);
+         BUCK4_mask.configure(this, 1, 2, "RW", 0, 1'b0, 1, 1, 0);
+         BUCK1_mask.configure(this, 1, 1, "RW", 0, 1'b0, 1, 1, 0);
+         LDOP_mask.configure(this, 1, 0, "RW", 0, 1'b0, 1, 1, 0);
+      endfunction
+   endclass
+
+
+
+   //--------------------------------------------------------------------
+   // Class: SYSPOR_DBB_RST_N_MASK1_REG
+   // 
+   //--------------------------------------------------------------------
+
+   class SYSPOR_DBB_RST_N_MASK1_REG extends uvm_reg;
+      `uvm_object_utils(SYSPOR_DBB_RST_N_MASK1_REG)
 
       rand uvm_reg_field LDOA_mask; 
       rand uvm_reg_field LDOB_mask; 
@@ -49,7 +131,7 @@ package example_block_regs_pkg;
 
       // Function: new
       // 
-      function new(string name = "SYSPOR_DBB_RST_N_MASK1_REG_reg");
+      function new(string name = "SYSPOR_DBB_RST_N_MASK1_REG");
          super.new(name, 8, UVM_NO_COVERAGE);
       endfunction
 
@@ -80,44 +162,12 @@ package example_block_regs_pkg;
 
 
    //--------------------------------------------------------------------
-   // Class: SYSPOR_DBB_RST_N_MASK4_REG_reg
+   // Class: SYSPOR_DBB_RST_N_MASK3_REG
    // 
    //--------------------------------------------------------------------
 
-   class SYSPOR_DBB_RST_N_MASK4_REG_reg extends uvm_reg;
-      `uvm_object_utils(SYSPOR_DBB_RST_N_MASK4_REG_reg)
-
-      rand uvm_reg_field spare; 
-      rand uvm_reg_field rtcclk12_mask; 
-
-
-      // Function: new
-      // 
-      function new(string name = "SYSPOR_DBB_RST_N_MASK4_REG_reg");
-         super.new(name, 8, UVM_NO_COVERAGE);
-      endfunction
-
-
-      // Function: build
-      // 
-      virtual function void build();
-         spare = uvm_reg_field::type_id::create("spare");
-         rtcclk12_mask = uvm_reg_field::type_id::create("rtcclk12_mask");
-
-         spare.configure(this, 7, 1, "RW", 0, 7'b0000000, 1, 1, 0);
-         rtcclk12_mask.configure(this, 1, 0, "RW", 0, 1'b0, 1, 1, 0);
-      endfunction
-   endclass
-
-
-
-   //--------------------------------------------------------------------
-   // Class: SYSPOR_DBB_RST_N_MASK3_REG_reg
-   // 
-   //--------------------------------------------------------------------
-
-   class SYSPOR_DBB_RST_N_MASK3_REG_reg extends uvm_reg;
-      `uvm_object_utils(SYSPOR_DBB_RST_N_MASK3_REG_reg)
+   class SYSPOR_DBB_RST_N_MASK3_REG extends uvm_reg;
+      `uvm_object_utils(SYSPOR_DBB_RST_N_MASK3_REG)
 
       rand uvm_reg_field BUCK5_mask; 
       rand uvm_reg_field spare; 
@@ -125,7 +175,7 @@ package example_block_regs_pkg;
 
       // Function: new
       // 
-      function new(string name = "SYSPOR_DBB_RST_N_MASK3_REG_reg");
+      function new(string name = "SYSPOR_DBB_RST_N_MASK3_REG");
          super.new(name, 8, UVM_NO_COVERAGE);
       endfunction
 
@@ -143,113 +193,127 @@ package example_block_regs_pkg;
 
 
 
-   //--------------------------------------------------------------------
-   // Class: SYSPOR_DBB_RST_N_MASK2_REG_reg
-   // 
-   //--------------------------------------------------------------------
-
-   class SYSPOR_DBB_RST_N_MASK2_REG_reg extends uvm_reg;
-      `uvm_object_utils(SYSPOR_DBB_RST_N_MASK2_REG_reg)
-
-      rand uvm_reg_field LDOM_mask; 
-      rand uvm_reg_field LDOS_mask; 
-      rand uvm_reg_field EXTBST1_mask; 
-      rand uvm_reg_field spare; 
-      rand uvm_reg_field BUCK2_mask; 
-      rand uvm_reg_field BUCK4_mask; 
-      rand uvm_reg_field BUCK1_mask; 
-      rand uvm_reg_field LDOP_mask; 
-
-
-      // Function: new
-      // 
-      function new(string name = "SYSPOR_DBB_RST_N_MASK2_REG_reg");
-         super.new(name, 8, UVM_NO_COVERAGE);
-      endfunction
-
-
-      // Function: build
-      // 
-      virtual function void build();
-         LDOM_mask = uvm_reg_field::type_id::create("LDOM_mask");
-         LDOS_mask = uvm_reg_field::type_id::create("LDOS_mask");
-         EXTBST1_mask = uvm_reg_field::type_id::create("EXTBST1_mask");
-         spare = uvm_reg_field::type_id::create("spare");
-         BUCK2_mask = uvm_reg_field::type_id::create("BUCK2_mask");
-         BUCK4_mask = uvm_reg_field::type_id::create("BUCK4_mask");
-         BUCK1_mask = uvm_reg_field::type_id::create("BUCK1_mask");
-         LDOP_mask = uvm_reg_field::type_id::create("LDOP_mask");
-
-         LDOM_mask.configure(this, 1, 7, "RW", 0, 1'b0, 1, 1, 0);
-         LDOS_mask.configure(this, 1, 6, "RW", 0, 1'b0, 1, 1, 0);
-         EXTBST1_mask.configure(this, 1, 5, "RW", 0, 1'b0, 1, 1, 0);
-         spare.configure(this, 1, 4, "RW", 0, 1'b0, 1, 1, 0);
-         BUCK2_mask.configure(this, 1, 3, "RW", 0, 1'b0, 1, 1, 0);
-         BUCK4_mask.configure(this, 1, 2, "RW", 0, 1'b0, 1, 1, 0);
-         BUCK1_mask.configure(this, 1, 1, "RW", 0, 1'b0, 1, 1, 0);
-         LDOP_mask.configure(this, 1, 0, "RW", 0, 1'b0, 1, 1, 0);
-      endfunction
-   endclass
-
-
-
 
    /* BLOCKS */
 
 
 
    //--------------------------------------------------------------------
+   // Class: example_block_registers_example_block_registers_map_coverage
+   // 
+   // Coverage for the 'example_block_registers_map' in 'example_block_registers'
+   //--------------------------------------------------------------------
+
+   class example_block_registers_example_block_registers_map_coverage extends uvm_object;
+      `uvm_object_utils(example_block_registers_example_block_registers_map_coverage)
+
+      covergroup ra_cov(string name) with function sample(uvm_reg_addr_t addr, bit is_read);
+
+         option.per_instance = 1;
+         option.name = name; 
+
+         ADDR: coverpoint addr {
+            bins SYSPOR_DBB_RST_N_MASK1 = {'h0};
+            bins SYSPOR_DBB_RST_N_MASK2 = {'h1};
+            bins SYSPOR_DBB_RST_N_MASK3 = {'h2};
+            bins SYSPOR_DBB_RST_N_MASK4 = {'h3};
+         }
+
+         RW: coverpoint is_read {
+            bins RD = {1};
+            bins WR = {0};
+         }
+
+         ACCESS: cross ADDR, RW;
+
+      endgroup: ra_cov
+
+      function new(string name = "example_block_registers_example_block_registers_map_coverage");
+         ra_cov = new(name);
+      endfunction: new
+
+      function void sample(uvm_reg_addr_t offset, bit is_read);
+         ra_cov.sample(offset, is_read);
+      endfunction: sample
+
+   endclass: example_block_registers_example_block_registers_map_coverage
+
+
+
+   //--------------------------------------------------------------------
    // Class: example_block_registers
    // 
+   // Register block
    //--------------------------------------------------------------------
 
    class example_block_registers extends uvm_reg_block;
       `uvm_object_utils(example_block_registers)
 
-      rand SYSPOR_DBB_RST_N_MASK1_REG_reg SYSPOR_DBB_RST_N_MASK1_REG; 
-      rand SYSPOR_DBB_RST_N_MASK2_REG_reg SYSPOR_DBB_RST_N_MASK2_REG; 
-      rand SYSPOR_DBB_RST_N_MASK3_REG_reg SYSPOR_DBB_RST_N_MASK3_REG; 
-      rand SYSPOR_DBB_RST_N_MASK4_REG_reg SYSPOR_DBB_RST_N_MASK4_REG; 
+      rand SYSPOR_DBB_RST_N_MASK1_REG SYSPOR_DBB_RST_N_MASK1; 
+      rand SYSPOR_DBB_RST_N_MASK2_REG SYSPOR_DBB_RST_N_MASK2; 
+      rand SYSPOR_DBB_RST_N_MASK3_REG SYSPOR_DBB_RST_N_MASK3; 
+      rand SYSPOR_DBB_RST_N_MASK4_REG SYSPOR_DBB_RST_N_MASK4; 
 
       uvm_reg_map example_block_registers_map; 
+      example_block_registers_example_block_registers_map_coverage example_block_registers_map_cg;
 
 
       // Function: new
       // 
       function new(string name = "example_block_registers");
-         super.new(name, UVM_NO_COVERAGE);
+         super.new(name, build_coverage(UVM_CVR_ALL));
       endfunction
 
 
       // Function: build
       // 
       virtual function void build();
-         SYSPOR_DBB_RST_N_MASK1_REG = SYSPOR_DBB_RST_N_MASK1_REG_reg::type_id::create("SYSPOR_DBB_RST_N_MASK1_REG");
-         SYSPOR_DBB_RST_N_MASK1_REG.configure(this);
-         SYSPOR_DBB_RST_N_MASK1_REG.build();
 
-         SYSPOR_DBB_RST_N_MASK2_REG = SYSPOR_DBB_RST_N_MASK2_REG_reg::type_id::create("SYSPOR_DBB_RST_N_MASK2_REG");
-         SYSPOR_DBB_RST_N_MASK2_REG.configure(this);
-         SYSPOR_DBB_RST_N_MASK2_REG.build();
+         add_hdl_path("top.dut.i_example_block_registers");
 
-         SYSPOR_DBB_RST_N_MASK3_REG = SYSPOR_DBB_RST_N_MASK3_REG_reg::type_id::create("SYSPOR_DBB_RST_N_MASK3_REG");
-         SYSPOR_DBB_RST_N_MASK3_REG.configure(this);
-         SYSPOR_DBB_RST_N_MASK3_REG.build();
+         if(has_coverage(UVM_CVR_ADDR_MAP)) begin
+            example_block_registers_map_cg = example_block_registers_example_block_registers_map_coverage::type_id::create("example_block_registers_map_cg");
+            example_block_registers_map_cg.ra_cov.set_inst_name(this.get_full_name());
+            void'(set_coverage(UVM_CVR_ADDR_MAP));
+         end
+         SYSPOR_DBB_RST_N_MASK1 = SYSPOR_DBB_RST_N_MASK1_REG::type_id::create("SYSPOR_DBB_RST_N_MASK1");
+         SYSPOR_DBB_RST_N_MASK1.configure(this);
+         SYSPOR_DBB_RST_N_MASK1.build();
 
-         SYSPOR_DBB_RST_N_MASK4_REG = SYSPOR_DBB_RST_N_MASK4_REG_reg::type_id::create("SYSPOR_DBB_RST_N_MASK4_REG");
-         SYSPOR_DBB_RST_N_MASK4_REG.configure(this);
-         SYSPOR_DBB_RST_N_MASK4_REG.build();
+         SYSPOR_DBB_RST_N_MASK2 = SYSPOR_DBB_RST_N_MASK2_REG::type_id::create("SYSPOR_DBB_RST_N_MASK2");
+         SYSPOR_DBB_RST_N_MASK2.configure(this);
+         SYSPOR_DBB_RST_N_MASK2.build();
+
+         SYSPOR_DBB_RST_N_MASK3 = SYSPOR_DBB_RST_N_MASK3_REG::type_id::create("SYSPOR_DBB_RST_N_MASK3");
+         SYSPOR_DBB_RST_N_MASK3.configure(this);
+         SYSPOR_DBB_RST_N_MASK3.build();
+
+         SYSPOR_DBB_RST_N_MASK4 = SYSPOR_DBB_RST_N_MASK4_REG::type_id::create("SYSPOR_DBB_RST_N_MASK4");
+         SYSPOR_DBB_RST_N_MASK4.configure(this);
+         SYSPOR_DBB_RST_N_MASK4.build();
 
          example_block_registers_map = create_map("example_block_registers_map", 'h0, 1, UVM_LITTLE_ENDIAN);
          default_map = example_block_registers_map;
 
-         example_block_registers_map.add_reg(SYSPOR_DBB_RST_N_MASK1_REG, 'h0, "RW");
-         example_block_registers_map.add_reg(SYSPOR_DBB_RST_N_MASK2_REG, 'h1, "RW");
-         example_block_registers_map.add_reg(SYSPOR_DBB_RST_N_MASK3_REG, 'h2, "RW");
-         example_block_registers_map.add_reg(SYSPOR_DBB_RST_N_MASK4_REG, 'h3, "RW");
+         example_block_registers_map.add_reg(SYSPOR_DBB_RST_N_MASK1, 'h0, "RW");
+         example_block_registers_map.add_reg(SYSPOR_DBB_RST_N_MASK2, 'h1, "RW");
+         example_block_registers_map.add_reg(SYSPOR_DBB_RST_N_MASK3, 'h2, "RW");
+         example_block_registers_map.add_reg(SYSPOR_DBB_RST_N_MASK4, 'h3, "RW");
 
          lock_model();
       endfunction
+
+
+      // Function: sample
+      // 
+      function void sample(uvm_reg_addr_t offset, bit is_read, uvm_reg_map  map);
+         if(get_coverage(UVM_CVR_ADDR_MAP)) begin
+            if(map.get_name() == "example_block_registers_map") begin
+               example_block_registers_map_cg.sample(offset, is_read);
+            end
+         end
+      endfunction: sample
+
    endclass
 
 

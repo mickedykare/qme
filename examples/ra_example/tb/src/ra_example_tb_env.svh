@@ -58,6 +58,9 @@ class ra_example_tb_env #(type REGISTERMODEL_T=int,int ADDR_WIDTH,int DATA_WIDTH
      m_reg_predictor.map=m_registermodel.example_block_registers_map;
      m_reg_predictor.adapter = m_reg2apb;
      m_registermodel.example_block_registers_map.set_auto_predict(0);
+     m_registermodel.example_block_registers_map.set_sequencer(this.m_apb3_master_agent.m_sequencer,m_reg2apb);
+     
+     
      uvm_config_db #(mvc_sequencer)::set(null, "*", "apb3_sequencer", m_apb3_master_agent.m_sequencer);
   endfunction: connect_phase
 

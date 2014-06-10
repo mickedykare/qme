@@ -15,7 +15,9 @@
 #----------------------------------------------------------------------
 
 # ----- Import
-js, $(RA_EXAMPLES)/csv.js, example_block_registers, blocks.csv, maps.csv,regs.csv, RTL_settings.csv
+
+#js, $(RA_HOME)/examples/csv.js, sw_top_block, sw_regs.csv, sw_block.csv, 
+js, $(RA_EXAMPLES)/csv.js,example_block_registers,blocks.csv,maps.csv,regs.csv,RTL_settings.csv
 
 # ----- Checks
 java, addDefaultChecks
@@ -31,6 +33,6 @@ java, check
 
 # ----- Generators
 java, rtl, /home/mikaela/questa_makefile_environment/examples/ra_example/rtl
-#java, uvm, example_block_regs_pkg.sv, 1.1, false, /home/mikaela/questa_makefile_environment/examples/ra_example/tb/registers
+java, uvm, example_block_regs_pkg.sv, 1.1, false, /home/mikaela/questa_makefile_environment/examples/ra_example/tb/registers/ra
 js, $(RA_EXAMPLES)/html.js, .
 

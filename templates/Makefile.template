@@ -36,17 +36,20 @@ include ${QME_HOME}/templates/Makefile.help
 # clean out
 
 
-compile: clean ${COMPILE_UVM_TARGET} compile_qvips compile_dut compile_tb liblist
+compile: clean ${COMPILE_UVM_TARGET} compile_qvips compile_rtl compile_tb liblist
 
 
 clean::
-	rm -rf ${LIBRARY_HOME}
-	rm -rf ${TESTCASE_DIR}
-	rm -f *.wlf
-	rm -f transcript
-	rm -f *.dbg
-	rm -f modelsim.ini
-	rm -f ${LIBLIST}
+	@rm -rf ${LIBRARY_HOME}
+	@rm -rf ${TESTCASE_DIR}
+	@rm -f *.wlf
+	@rm -f transcript
+	@rm -f *.dbg
+	@rm -f modelsim.ini
+	@rm -f ${LIBLIST}
+	@rm -f *.csv
+	@rm -rf ra_work
+	@rm -rf html
 
 
 # Recompile UVM to catch timescale problem
@@ -62,10 +65,10 @@ compile_uvm::
 
 compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 
-compile_dut::prepare_filelist_dut
+compile_rtl::precompile_rtl
 	${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 
-compile_tb::prepare_filelist_tb
+compile_tb::precompile_tb
 	${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 
 compile_uvmc::
@@ -94,11 +97,11 @@ opt_dbg:
 
 ifeq (${VERIFICATION_LEVEL},BLOCK)
 # targets and switches used when you run on block level.
-GUI_TARGET=gui_block
-BATCH_TARGET=batch_block
+GUI_TARGET=gui_block postsim
+BATCH_TARGET=batch_block postsim
 else
-GUI_TARGET=gui_chip
-BATCH_TARGET=batch_chip
+GUI_TARGET=gui_chip postsim
+BATCH_TARGET=batch_chip postsim
 endif
 
 batch::${BATCH_TARGET}
@@ -123,7 +126,7 @@ clean_rundir:
 # Start a block level simulation, using built in vopt
 #########################################################
 
-gui_block:: liblist clean_rundir
+gui_block:: liblist clean_rundir presim
 	@echo "Launching GUI in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME) -$(ARCH) \
@@ -157,7 +160,7 @@ gui_block:: liblist clean_rundir
 # Start a chip level simulation, using vopt separately
 #########################################################
 
-gui_chip:: liblist clean_rundir opt_dbg
+gui_chip:: liblist clean_rundir opt_dbg presim
 	@echo "Launching GUI in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_dbg -$(ARCH) \
@@ -190,7 +193,7 @@ gui_chip:: liblist clean_rundir opt_dbg
 # Start a block level simulation, using built in vopt
 #########################################################
 
-batch_block:: liblist clean_rundir
+batch_block:: liblist clean_rundir presim
 	@echo "Launching batch in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME) -$(ARCH) \
@@ -224,7 +227,7 @@ batch_block:: liblist clean_rundir
 # Start a chip level simulation, using vopt separately
 #########################################################
 
-batch_chip:: liblist clean_rundir opt_dbg
+batch_chip:: liblist clean_rundir opt_dbg presim
 	@echo "Launching batch in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_dbg -$(ARCH) \
@@ -260,7 +263,7 @@ batch_chip:: liblist clean_rundir opt_dbg
 # Start a simulation in regression, vopt is done before
 #########################################################
 
-batch_regression:: liblist 
+batch_regression:: liblist presim
 	${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_opt -$(ARCH) \
 	${VSIM_TIMERES} \
@@ -290,7 +293,7 @@ batch_regression:: liblist
 # Start a simulation in regression with debug, vopt is done before
 #########################################################
 
-batch_regression_dbg:: liblist
+batch_regression_dbg:: liblist presim
 	${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_dbg -$(ARCH) \
 	${VSIM_TIMERES} \
@@ -395,7 +398,7 @@ get_generics_only:
 # Should not be run as regression. Missing UCDB storage
 #########################################################
 
-autocheck::clean compile_dut liblist autocheck_only
+autocheck::clean compile_rtl liblist autocheck_only
 autocheck_only::
 	${DISABLE_VERDI_PLI}; \
 	qautocheck -c -licq -od ${AUTOCHECK_RESULTS} -do "configure license queue on; \

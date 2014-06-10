@@ -11,8 +11,11 @@ my @cols;
 my $col;
 my $row=0;
 # These are the names of the tabs.
-my @sheets=('regs','mems','blocks','maps','RTL_settings','C_settings');
+#my @sheets=('regs','mems','blocks','maps','RTL_settings','C_settings');
+my @sheets=('regs','blocks','maps','RTL_settings','C_settings');
+
 my $old_key="XXXXXX";
+my $old_key_2="XXXXXX";
 
 sub print_note{
     my $msg=pop;
@@ -48,29 +51,61 @@ sub is_row_empty{
     }
     return 0;
 }
+
+sub fill_column_if_empty{
+    my $fill = pop;
+    my $sheet = pop;
+    my $col = pop;
+    my $row = pop;
+    my $old_val = pop;
+    my $columnx;
+    my $val;
+#    print "Checking $row,$col\n";
+    $columnx=$sheet->get_cell($row,$col);
+    
+    if (defined $columnx) {
+	$val=$columnx->value();
+	if (($val eq "") & ($fill)) {
+	    $val=$old_val;
+	}else {
+	    $old_val=$val;
+	}
+    } else {
+	$val="";
+    }
+    return $val;
+}
+
+
+
+
+
 sub print_row {
     my $row=pop;
     my $no_of_columns=pop;
     my $sheet=pop;
     my $val;
     my $columnx;
+    my $filled=0;
     # Get first column; It is always the key
-    $columnx=$sheet->get_cell($row,0);
-    if (defined $columnx) {
-	$val=$columnx->value();
-	if ($val eq "") {
-	    $val=$old_key;
-	}else {
-	    $old_key=$val;
-	}
+    $val=&fill_column_if_empty($old_key,$row,0,$sheet,1);
+    if ($old_key eq $val) {
+	$filled=1;
     } else {
-	$val="";
+	$old_key = $val;
+	$filled=0;
     }
     print FILEP "\"$val\",";
+
+    # this should only be done if we kept the old key. Not for new keys
+    $val=&fill_column_if_empty($old_key_2,$row,1,$sheet,$filled);
+    $old_key_2 = $val;
+    print FILEP "\"$val\",";
+
 #    print "DBG key=$val old=$old_key\n";
 
 
-    for (my $i=1;$i<$no_of_columns-1;$i++) {
+    for (my $i=2;$i<$no_of_columns-1;$i++) {
 	$columnx=$sheet->get_cell($row,$i);
 	if (defined $columnx) {
 	    $val=$columnx->value();

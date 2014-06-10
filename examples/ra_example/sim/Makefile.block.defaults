@@ -11,11 +11,11 @@ SEND_EMAIL=0
 
 
 # Define XLS file for RM (used in this file)
-XLSFILE=/mnt/hgfs/Documents/kunder/ericsson/milan_registers/RA_test.xls
+#XLSFILE=/mnt/hgfs/Documents/kunder/ericsson/milan_registers/RA_test.xls
+XLSFILE=/mnt/hgfs/Documents/kunder/ericsson/milan_registers/ra_example_new_as_I_want_it.xls
 
-
-# Do this step to convert own file lists. Also fixing Register package
-prepare_filelist_tb::convert2csv generate_hdl generate_rm
+precompile_rtl::convert2csv generate_hdl
+precompile_tb::convert2csv generate_rm
 
 convert2csv:
 	ruvm_xls2csv.pl ${XLSFILE}
@@ -23,14 +23,23 @@ convert2csv:
 
 # This is using the extended functionality in register assistant
 generate_hdl:
-	test -e ra_work||mkdir ra_work
-	/opt/sw2/hdldesigner/2013.1/registerassistant/regassist -f ${QME_PROJECT_HOME}/ra_example/sim/ctrl.rcf -project ra_work
+	/opt/sw2/hdldesigner/2013.1b/registerassistant/regassist -f ${QME_PROJECT_HOME}/ra_example/sim/ctrl.rcf -project ra_work
 
 
 # This is using Questa RM
-generate_rm:
+generate_rm_old:
 	${QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin regs.csv -autoinstance -block example_block_registers -uvmout ${QME_PROJECT_HOME}/ra_example/tb/registers/example_block_regs_pkg.sv 
 
 
+generate_rm:
+	${QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin regs.csv blocks.csv maps.csv -block example_block_registers -uvmout ${QME_PROJECT_HOME}/ra_example/tb/registers/example_block_regs_pkg.sv 
+
+
+#generate_hdl2:
+#	/opt/sw2/hdldesigner/2013.1b/registerassistant/regassist -f ${QME_PROJECT_HOME}/ra_example/sim/ctrl_mark.rcf -project ra_work
+
+
+#generate_rm3:
+#	${QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin /mnt/hgfs/Documents/kunder/ericsson/milan_registers/rsp_regs.csv /mnt/hgfs/Documents/kunder/ericsson/milan_registers/rsp_blocks.csv /mnt/hgfs/Documents/kunder/ericsson/milan_registers/rsp_maps.csv  -block example_block_registers -uvmout ${QME_PROJECT_HOME}/ra_example/tb/registers/example_block_regs_pkg.sv 
 
 
