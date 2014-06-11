@@ -128,8 +128,8 @@ module ra_example
 									      .spare_SYSPOR_DBB_RST_N_MASK4_ip        (spare_SYSPOR_DBB_RST_N_MASK4_ip),
 									      .rtcclk12_mask_SYSPOR_DBB_RST_N_MASK4_ip(rtcclk12_mask_SYSPOR_DBB_RST_N_MASK4_ip),
 									      // GENERIC BUS PORTS
-									      .clock   (i_generic_reg_bus_if.clk), // Register Bus Clock
-									      .reset   (i_generic_reg_bus_if.nreset), // Register Bus Reset
+									      .clk   (i_generic_reg_bus_if.clk), // Register Bus Clock
+									      .nreset   (i_generic_reg_bus_if.nreset), // Register Bus Reset
 									      .waddr   (i_generic_reg_bus_if.waddr), // Write Address-Bus
 									      .raddr   (i_generic_reg_bus_if.raddr), // Read Address-Bus
 									      .wdata   (i_generic_reg_bus_if.wdata), // Write Data-Bus

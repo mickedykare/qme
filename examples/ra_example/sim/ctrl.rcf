@@ -17,7 +17,7 @@
 # ----- Import
 
 #js, $(RA_HOME)/examples/csv.js, sw_top_block, sw_regs.csv, sw_block.csv, 
-js, $(RA_EXAMPLES)/csv.js,example_block_registers,blocks.csv,maps.csv,regs.csv,RTL_settings.csv
+js, $(RA_EXAMPLES)/csv.js,example_block_registers,RTL_settings.csv,blocks.csv,maps.csv,regs.csv
 
 # ----- Checks
 java, addDefaultChecks

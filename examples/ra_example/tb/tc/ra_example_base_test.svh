@@ -5,10 +5,20 @@ class ra_example_base_test extends uvm_test;
 
    typedef apb3_vip_config #( 1,3,8,8 ) apb3_config_t;
    typedef virtual mgc_apb3 #( 1,3,8,8 ) apb3_if_t;
+   typedef apb3_host_apb3_transaction #(1,3,8,8) apb3_host_apb3_transaction_t;
+   typedef apb_reg_predictor #(apb3_host_apb3_transaction_t,1,3,8,8) apb3_reg_predictor_t;
+   typedef reg2apb_adapter #(apb3_host_apb3_transaction_t,1,3,8,8) reg2apb_adapter_t; 
 
    // env 
-   ra_example_tb_env #(example_block_registers,3,8) m_env;
+   ra_example_tb_env #(3,8) m_env;
 
+   // Components used by the register model
+   // adapter for register bus
+   reg2apb_adapter_t m_reg2apb;           
+   // Predictor           
+   apb3_reg_predictor_t m_reg_predictor;  
+
+   
    // configurations
    apb3_config_t m_apb3_master_config;
    sli_clk_reset_config m_clk_config;
@@ -67,11 +77,19 @@ class ra_example_base_test extends uvm_test;
       m_registermodel = example_block_registers::type_id::create("m_registermodel");          // create the register model
       m_registermodel.build();
       uvm_config_db #( example_block_registers)::set( null , "*" , "REGISTERMAP", m_registermodel );
-      
-      m_env=ra_example_tb_env#(example_block_registers,3,8)::type_id::create("m_env",this);
+
+      m_reg2apb = reg2apb_adapter_t::type_id::create("m_reg2apb");
+      m_reg_predictor = apb3_reg_predictor_t::type_id::create("m_reg_predictor",this);
+      m_env=ra_example_tb_env#(3,8)::type_id::create("m_env",this);
   endfunction: build_phase
 
    function void connect_phase(uvm_phase phase);
+      m_env.mon_ap.connect(m_reg_predictor.bus_item_export);
+     // Note CHECK for REUSE! How do I know that this is not a top level env?
+      m_reg_predictor.map=m_registermodel.example_block_registers_map;
+      m_reg_predictor.adapter = m_reg2apb;
+      m_registermodel.example_block_registers_map.set_auto_predict(0);
+      m_registermodel.example_block_registers_map.set_sequencer(this.m_env.m_apb3_master_agent.m_sequencer,m_reg2apb);
       $cast(m_apb3_sequencer,uvm_top.find("*m_env.m_apb3_master_agent.sequencer"));
    endfunction // connect_phase
    

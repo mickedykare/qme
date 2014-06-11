@@ -2,7 +2,7 @@
 QVIP_TARGETS=apb3
 
 # Some settings
-#REQUIRE_VPLAN=0
+REQUIRE_VPLAN=0
 # Always run covercheck
 #COVERCHECK=1
 # I don't want emails
@@ -23,7 +23,7 @@ convert2csv:
 
 # This is using the extended functionality in register assistant
 generate_hdl:
-	/opt/sw2/hdldesigner/2013.1b/registerassistant/regassist -f ${QME_PROJECT_HOME}/ra_example/sim/ctrl.rcf -project ra_work
+	${HDS_HOME}/registerassistant/regassist -f ${QME_PROJECT_HOME}/ra_example/sim/ctrl.rcf -project ra_work
 
 
 # This is using Questa RM

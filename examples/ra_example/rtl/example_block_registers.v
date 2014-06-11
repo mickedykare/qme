@@ -6,15 +6,26 @@
 // File            : /home/mikaela/questa_makefile_environment/examples/ra_example/rtl/example_block_registers.v
 //----------------------------------------------------------------------
 // Created by      : mikaela
-// Creation Date   : 10 06 2014 19:26::45
+// Creation Date   : 11 06 2014 12:58::36
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
 // Block           : example_block_registers
 // Address Range   : 0x4
 //----------------------------------------------------------------------
-// Description: 
-//    Register block
+// Block Settings:
+//    rtl.BUS_TYPE                 : NONE
+//    rtl.CLOCK                    : clk
+//    rtl.CLOCK_EDGE               : POSITIVE
+//    rtl.DECLARE_INFERRED_SIGNALS : TRUE
+//    rtl.DEFAULT_RDATA_NAME       : DEFAULT_RDATA
+//    rtl.DEFAULT_RDATA_VALUE      : 0
+//    rtl.DEFAULT_SCALAR_INPUT_TYPE: wire
+//    rtl.DEFAULT_VECTOR_INPUT_TYPE: wire
+//    rtl.LANGUAGE                 : VLOG_2005
+//    rtl.RESET                    : nreset
+//    rtl.RESET_LEVEL              : LOW
+//    rtl.RESET_STYLE              : ASYNC
 //----------------------------------------------------------------------
 
 module example_block_registers
@@ -68,8 +79,8 @@ module example_block_registers
   input wire         rtcclk12_mask_SYSPOR_DBB_RST_N_MASK4_ip,
 
   // GENERIC BUS PORTS
-  input  wire                  clock   , // Register Bus Clock
-  input  wire                  reset   , // Register Bus Reset
+  input  wire                  clk     , // Register Bus Clock
+  input  wire                  nreset  , // Register Bus Reset
   input  wire [ADDR_WIDTH-1:0] waddr   , // Write Address-Bus
   input  wire [ADDR_WIDTH-1:0] raddr   , // Read Address-Bus
   input  wire [DATA_WIDTH-1:0] wdata   , // Write Data-Bus
@@ -95,7 +106,7 @@ module example_block_registers
   wire [DATA_WIDTH-1:0] rmux_SYSPOR_DBB_RST_N_MASK4;
 
   // DEFAULT VALUE FOR READ DATA BUS
-  localparam DEF_RDATA_VAL = 8'h00;
+  localparam DEFAULT_RDATA = 8'h00;
 
   // ADDRESS PARAMETERS
   localparam SYSPOR_DBB_RST_N_MASK1_ADDR = 3'b000;
@@ -170,10 +181,10 @@ module example_block_registers
   //   Width: 1              , Offset: 7              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask1_reg_ldoa_mask_syspor_dbb_rst_n_mask1
     // Reset
-    if ( !reset )
+    if ( !nreset )
       LDOA_mask_SYSPOR_DBB_RST_N_MASK1 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK1)
@@ -188,10 +199,10 @@ module example_block_registers
   //   Width: 1              , Offset: 6              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask1_reg_ldob_mask_syspor_dbb_rst_n_mask1
     // Reset
-    if ( !reset )
+    if ( !nreset )
       LDOB_mask_SYSPOR_DBB_RST_N_MASK1 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK1)
@@ -206,10 +217,10 @@ module example_block_registers
   //   Width: 1              , Offset: 5              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask1_reg_ldoc_mask_syspor_dbb_rst_n_mask1
     // Reset
-    if ( !reset )
+    if ( !nreset )
       LDOC_mask_SYSPOR_DBB_RST_N_MASK1 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK1)
@@ -224,10 +235,10 @@ module example_block_registers
   //   Width: 1              , Offset: 4              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask1_reg_ldof_mask_syspor_dbb_rst_n_mask1
     // Reset
-    if ( !reset )
+    if ( !nreset )
       LDOF_mask_SYSPOR_DBB_RST_N_MASK1 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK1)
@@ -242,10 +253,10 @@ module example_block_registers
   //   Width: 1              , Offset: 3              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask1_reg_ldog_mask_syspor_dbb_rst_n_mask1
     // Reset
-    if ( !reset )
+    if ( !nreset )
       LDOG_mask_SYSPOR_DBB_RST_N_MASK1 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK1)
@@ -260,10 +271,10 @@ module example_block_registers
   //   Width: 1              , Offset: 2              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask1_reg_ldoh_mask_syspor_dbb_rst_n_mask1
     // Reset
-    if ( !reset )
+    if ( !nreset )
       LDOH_mask_SYSPOR_DBB_RST_N_MASK1 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK1)
@@ -278,10 +289,10 @@ module example_block_registers
   //   Width: 1              , Offset: 1              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask1_reg_spare_syspor_dbb_rst_n_mask1
     // Reset
-    if ( !reset )
+    if ( !nreset )
       spare_SYSPOR_DBB_RST_N_MASK1 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK1)
@@ -296,10 +307,10 @@ module example_block_registers
   //   Width: 1              , Offset: 0              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask1_reg_ldot_mask_syspor_dbb_rst_n_mask1
     // Reset
-    if ( !reset )
+    if ( !nreset )
       LDOT_mask_SYSPOR_DBB_RST_N_MASK1 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK1)
@@ -335,10 +346,10 @@ module example_block_registers
   //   Width: 1              , Offset: 7              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask2_reg_ldom_mask_syspor_dbb_rst_n_mask2
     // Reset
-    if ( !reset )
+    if ( !nreset )
       LDOM_mask_SYSPOR_DBB_RST_N_MASK2 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK2)
@@ -353,10 +364,10 @@ module example_block_registers
   //   Width: 1              , Offset: 6              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask2_reg_ldos_mask_syspor_dbb_rst_n_mask2
     // Reset
-    if ( !reset )
+    if ( !nreset )
       LDOS_mask_SYSPOR_DBB_RST_N_MASK2 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK2)
@@ -371,10 +382,10 @@ module example_block_registers
   //   Width: 1              , Offset: 5              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask2_reg_extbst1_mask_syspor_dbb_rst_n_mask2
     // Reset
-    if ( !reset )
+    if ( !nreset )
       EXTBST1_mask_SYSPOR_DBB_RST_N_MASK2 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK2)
@@ -389,10 +400,10 @@ module example_block_registers
   //   Width: 1              , Offset: 4              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask2_reg_spare_syspor_dbb_rst_n_mask2
     // Reset
-    if ( !reset )
+    if ( !nreset )
       spare_SYSPOR_DBB_RST_N_MASK2 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK2)
@@ -407,10 +418,10 @@ module example_block_registers
   //   Width: 1              , Offset: 3              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask2_reg_buck2_mask_syspor_dbb_rst_n_mask2
     // Reset
-    if ( !reset )
+    if ( !nreset )
       BUCK2_mask_SYSPOR_DBB_RST_N_MASK2 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK2)
@@ -425,10 +436,10 @@ module example_block_registers
   //   Width: 1              , Offset: 2              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask2_reg_buck4_mask_syspor_dbb_rst_n_mask2
     // Reset
-    if ( !reset )
+    if ( !nreset )
       BUCK4_mask_SYSPOR_DBB_RST_N_MASK2 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK2)
@@ -443,10 +454,10 @@ module example_block_registers
   //   Width: 1              , Offset: 1              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask2_reg_buck1_mask_syspor_dbb_rst_n_mask2
     // Reset
-    if ( !reset )
+    if ( !nreset )
       BUCK1_mask_SYSPOR_DBB_RST_N_MASK2 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK2)
@@ -461,10 +472,10 @@ module example_block_registers
   //   Width: 1              , Offset: 0              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask2_reg_ldop_mask_syspor_dbb_rst_n_mask2
     // Reset
-    if ( !reset )
+    if ( !nreset )
       LDOP_mask_SYSPOR_DBB_RST_N_MASK2 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK2)
@@ -494,10 +505,10 @@ module example_block_registers
   //   Width: 1              , Offset: 7              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask3_reg_buck5_mask_syspor_dbb_rst_n_mask3
     // Reset
-    if ( !reset )
+    if ( !nreset )
       BUCK5_mask_SYSPOR_DBB_RST_N_MASK3 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK3)
@@ -512,10 +523,10 @@ module example_block_registers
   //   Width: 7              , Offset: 0              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask3_reg_spare_syspor_dbb_rst_n_mask3
     // Reset
-    if ( !reset )
+    if ( !nreset )
       spare_SYSPOR_DBB_RST_N_MASK3 <= 7'h00;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK3)
@@ -545,10 +556,10 @@ module example_block_registers
   //   Width: 7              , Offset: 1              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask4_reg_spare_syspor_dbb_rst_n_mask4
     // Reset
-    if ( !reset )
+    if ( !nreset )
       spare_SYSPOR_DBB_RST_N_MASK4 <= 7'h00;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK4)
@@ -563,10 +574,10 @@ module example_block_registers
   //   Width: 1              , Offset: 0              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_syspor_dbb_rst_n_mask4_reg_rtcclk12_mask_syspor_dbb_rst_n_mask4
     // Reset
-    if ( !reset )
+    if ( !nreset )
       rtcclk12_mask_SYSPOR_DBB_RST_N_MASK4 <= 1'b0;
     // SW:read-write
     else if (wen_SYSPOR_DBB_RST_N_MASK4)
@@ -630,7 +641,7 @@ module example_block_registers
         end
         default:
         begin
-          rdata =  DEF_RDATA_VAL;
+          rdata =  DEFAULT_RDATA;
           raddrerr =  1'b1;
         end
       endcase
@@ -638,7 +649,7 @@ module example_block_registers
     end
     else
       begin
-        rdata =  DEF_RDATA_VAL;
+        rdata =  DEFAULT_RDATA;
       end
   end
 endmodule
