@@ -1,4 +1,5 @@
 #!/usr/bin/perl 
+BEGIN {push @INC,$ENV{'QME_HOME'}."perlmodules/lib/perl5"}
 use strict;
 use Spreadsheet::ParseExcel;
 my $excel_file=pop;
@@ -12,7 +13,7 @@ my $col;
 my $row=0;
 # These are the names of the tabs.
 #my @sheets=('regs','mems','blocks','maps','RTL_settings','C_settings');
-my @sheets=('regs','blocks','maps','RTL_settings','C_settings','mems');
+#my @sheets=('regs','blocks','maps','RTL_settings','C_settings','maems');
 
 my $old_key="XXXXXX";
 my $old_key_2="XXXXXX";
@@ -134,11 +135,13 @@ sub print_row {
 
 
 
-foreach my $s (@sheets) {
-    my $csvfile=$s.".csv";
+foreach my $s ($workbook->worksheets) {
+    my $sheetname=$s->get_name;
+    print "Processing sheet $sheetname\n";
+    my $csvfile=$sheetname.".csv";
     open FILEP,">",$csvfile;
 #    &print_note("Checking sheet $s");
-    $worksheet = $workbook->worksheet($s);  
+    $worksheet = $workbook->worksheet($sheetname);  
     # First thing we want to do is to find out how many columns we have
     # in the sheet. This is done by checking the first row
     $column=$worksheet->get_cell($row,0);

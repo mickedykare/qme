@@ -1,0 +1,13 @@
+1. From this directory, run 
+./install.sh
+2. Add the following variables
+   QME_HOME             : The location of this tree
+   QME_PROJECT_HOME     : The location of your project
+   QME_SIM_SETTINGS_DIR : The name of the directory under your block where 
+   			  you store all simulation information. 
+			  Normally set to  "sim" 
+
+   QME_SCRATCH_HOME     : This is where your simulation directories end up
+
+And finally you need to add  $QME_HOME/scripts to your path.
+
