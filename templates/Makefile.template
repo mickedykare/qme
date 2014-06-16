@@ -2,7 +2,9 @@
 BLOCKNAME=___REPLACE_THIS_BLOCKNAME
 BLOCK_OVERRIDES=___REPLACE_THIS_BLOCK_OVERRIDES
 SRCHOME=___REPLACE_THIS_SRCHOME
-default::help
+
+include ${QME_HOME}/templates/Makefile.help
+
 ################################################################
 # Base settings
 ################################################################
@@ -26,7 +28,6 @@ include ${BLOCK_OVERRIDES}
 # Include all relations that are calculated
 ##############################################################
 include ${QME_HOME}/templates/Makefile.relations
-include ${QME_HOME}/templates/Makefile.help
 
 
 ################################################################

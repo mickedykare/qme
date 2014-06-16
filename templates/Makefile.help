@@ -1,8 +1,10 @@
 # This file contains the help text
+default::header
 help::header 
+
 help_all::header help_override help_compile help_simulate
 
-header::
+header:
 	@tput setaf 4;
 	@echo "########################## Questa Makefile Environment (QME) ############################################"
 	@echo "# This environment is developed by Mikael Andersson, Mentor Graphics"
@@ -14,7 +16,8 @@ header::
 	@echo "#   make help_override"
 	@echo "#   make help_compile"
 	@echo "#   make help_simulate"
-
+	@echo "#   make help_tutorials"
+	@echo "#   make help_getting_started"
 
 	@tput setaf 9;
 
@@ -88,5 +91,39 @@ help_simulate::
 	@echo "#        make gui TEST=my_test DEBUG_LEVEL=FULL UVM_VERBOSITY=UVM_HIGH"
 	@echo "#        make gui TEST=my_test FAST=1 CHIP=1"
 	@echo "#        make compile gui TEST=my_test FAST=1"
+	@echo "#"
+	@tput setaf 9;
+
+
+
+help_tutorials::
+	@tput setaf 4;
+	@echo "########################## SIMULATION TUTORIALS #########################################"
+	@echo "# Here are some very simple tutorials on how to use QME"
+	@echo "#"
+	@echo "# BASIC SIMULATION "
+	@echo "#This tutorial shows how the environment is meant to be used"
+	@echo "# REGRESSION "
+	@echo "# USING QUESTA VIP "
+	@echo "# USING QUESTA VIP "
+	@tput setaf 9;
+
+help_getting_started::
+	@tput setaf 4;
+	@echo "########################## Getting started #########################################"
+	@echo "# Congratulations. Assuming that you have installed QME and that you have Questa installed"
+	@echo "# you are now ready to get started. This example illustrates how you do it"
+	@echo "#"
+	@echo "# 1. Create a simulation directory: create_questa_simdir.pl --simdir=sim_my_block --block=my_block"
+	@echo "#"
+	@echo "# 2. Provide a RTL filelist for your rtl code. Located at \$QME_PROJECT_HOME/<block>/rtl/rtl.files"
+	@echo "#    ( You can test if it works by doing \"make compile_rtl\" in your sim directory (sim_my_block)"
+	@echo "#"
+	@echo "# 3. Provide a TB filelist for your tb code. Located at \$QME_PROJECT_HOME/<block>/sim/tb.files"
+	@echo "#    ( You can test if it works by doing \"make compile_tb\" in your sim directory (sim_my_block)"
+	@echo "#"
+	@echo "# 4. \"make compile\" will compile everything together"
+	@echo "#"
+	@echo "# 5. Start simulation with \"make gui TEST=<testname>\""
 	@echo "#"
 	@tput setaf 9;
