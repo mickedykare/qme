@@ -1,0 +1,83 @@
+- This xl-uvmc-2.2/ library is a variation of the base uvmc-2.2 library
+  that has had the following additional features added:
+
+  - Support for "fast packers" for the specific case of passing
+    TLM generic payloads (class uvm_tlm_generic_payload) across
+    UVM-Connect'ed sockets.
+
+    - These "fast packers" add two features
+      - Improved performance
+      - Support TLM generic payloads with no fixed limitations on payload sizes.
+
+    - For the packers themselves see,
+
+        src/connect/
+          sc/xl_uvmc_converter.*
+          sv/xl_uvmc_converter_pkg.sv
+
+    - For examples that use them see
+
+        examples/xlerate.connections/Makefile
+
+  - Support for SC <-> SC UVM-Connect'ions. Previously this was not supported
+    but was added to allow SystemC applications to create UVM-Connect'ions
+    without knowing apriori whether the opposite endpoint will be in a
+    SystemC model or an SV-UVM model. It also provides a very easy way
+    of binding SystemC TLM-2.0 ports and letting the overloaded variations
+    of the uvmc_connect() function automatically whether they are initiator
+    port or target bindings. Just pass the port and the ID and presto,
+    UVM-Connect figures out the rest !
+
+  - Added support for SystemC standalone libraries that can be used
+    with OSCI SystemC and Vista SystemC in addition to Questa SystemC.
+
+    You will find special Makefile's for the standalone libraries here,
+
+      lib/
+        Makefile.uvmc_sysc_standalone
+        Makefile.uvmc_sysc_standalone_osci
+        Makefile.uvmc_sysc_standalone_vista
+
+    - These each build a library called xl_uvmc.so which can be directly
+      linked into the OSCI SystemC or Vista SystemC kernel program.
+
+      NOTE: This assumes SV-UVM is not being used. In fact, the SV-UVM
+      infrastructure is completely removed from these libraries. They
+      only support peer SC <-> SC UVM-Connect'ions.
+
+    - To build each of these libraries first, after setting up your normal
+      SystemC or Vista environments (with appropirate gcc or vista_g++ 
+      env setup as well)
+
+        setenv XL_BUILD_PLATFORM linux # for 32 bit platforms
+        setenv XL_BUILD_PLATFORM linux64 # for 64 bit platforms
+
+        cd lib/
+        # For Questa SystemC standalone lib ...
+        gmake -f Makefile.uvmc_sysc_standalone
+        # For OSCI SystemC standalone lib ...
+        gmake -f Makefile.uvmc_sysc_standalone_osci
+        # For Vista SystemC standalone lib ...
+        gmake -f Makefile.uvmc_sysc_standalone_vista
+
+    - NOTE: You can continue to use the default way of building UVMC libraries
+      for Questa SystemC+SV-UVM applications. Standalone libraries are not
+      needed in this case and the builds of them do not interfere with the
+      "normal" way of building UVM-Connect libraries.
+
+- To easily identify which files have been modified and what those
+  modifications are, please look under src/connect/sc/, sv/ and in each
+  you will find directories called ORIG/. You can diff the files in each
+  ORIG/ against the same files one level up to see precisely what is different.
+
+  Also, all MED_ADDITIONS are enclosed in `ifdef blocks as follows:
+
+    #ifdef MED_ADDITIONS // {
+      ...
+    #endif // } MED_ADDITIONS
+
+  for SystemC code and,
+
+    `ifdef MED_ADDITIONS // {
+      ...
+    `endif // } MED_ADDITIONS

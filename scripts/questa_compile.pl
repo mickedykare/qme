@@ -145,7 +145,7 @@ GetOptions ("cflags=s" => \$cflags,    # numeric
 
 &infomsg("Parsing $fltfile");
 open(FHIN, "<", $fltfile) 
-    or die "cannot open $!";
+    or die "cannot open $fltfile\n";
 # First remove all lines starting with "#"
 
 my @indata=<FHIN>;
@@ -170,9 +170,9 @@ foreach my $f (@indata) {
 	&infomsg("Creating library $lib if does not exists");
 	my $cmd="test -e $library_home||mkdir $library_home";
 	&system_cmd($cmd);
-	my $cmd="vlib $library_home/$lib";
+	$cmd="vlib $library_home/$lib";
 	&system_cmd_hl($cmd);
-	my $cmd="vmap $lib $ENV{'PWD'}/$library_home/$lib";
+	$cmd="vmap $lib $ENV{'PWD'}/$library_home/$lib";
 	&system_cmd_hl($cmd);
     } else {
 	 

@@ -2,8 +2,8 @@
 #define __FPU_CORE_H__
 #include "systemc.h"
 #include "tlm.h"
-#include "tlm_utils/simple_initiator_socket.h"
-#include "tlm_utils/simple_target_socket.h"
+#include "simple_initiator_socket.h"
+#include "simple_target_socket.h"
 
 class fpu_core: public sc_core::sc_module {
  public:

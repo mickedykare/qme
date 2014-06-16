@@ -201,4 +201,5 @@ if (-e $simdir_fp) {
 my $destination= $simdir_fp."/"."Makefile";
 &print_note("Creating $destination");
 &update_makefile($makefile,$destination);
+print "cd $simdir_fp\n";
 

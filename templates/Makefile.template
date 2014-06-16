@@ -2,7 +2,7 @@
 BLOCKNAME=___REPLACE_THIS_BLOCKNAME
 BLOCK_OVERRIDES=___REPLACE_THIS_BLOCK_OVERRIDES
 SRCHOME=___REPLACE_THIS_SRCHOME
-
+default::help
 ################################################################
 # Base settings
 ################################################################
@@ -36,7 +36,7 @@ include ${QME_HOME}/templates/Makefile.help
 # clean out
 
 
-compile: clean ${COMPILE_UVM_TARGET} compile_qvips compile_rtl compile_tb liblist
+compile: clean ${COMPILE_UVM_TARGET} ${COMPILE_UVMC_TARGET} ${COMPILE_SC_TARGET} compile_rtl compile_tb liblist
 
 
 clean::
@@ -50,6 +50,8 @@ clean::
 	@rm -f *.csv
 	@rm -rf ra_work
 	@rm -rf html
+
+
 
 
 # Recompile UVM to catch timescale problem
@@ -68,14 +70,40 @@ compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 compile_rtl::precompile_rtl
 	${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 
-compile_tb::precompile_tb
+compile_tb::precompile_tb compile_qvips 
 	${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 
+no_uvmc::
+	@echo "NOTE! UVMC not enabled. Use UVMC=1 to enable..."
+
+no_uvm::
+	@echo "NOTE! Using built in UVM package. Use RECOMPILE_UVM=1 to recompile UVM with timescale ${VLOG_TIMESCALE}"
+no_comp_sc::
+	@echo "NOTE! Not compiling System C TLM models. Use UVMC=1 to enable..."
+
+
 compile_uvmc::
+	@echo "NOTE! Compiling UVMC Library"
+	@test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
 	test -d ${QUESTALIBS_DIR}/uvmc_lib||vlib ${QUESTALIBS_DIR}/uvmc_lib
-	make -f ${UVMC_HOME}/lib/Makefile.questa UVM_HOME=${UVM_HOME}/.. UVMC_HOME=${UVMC_HOME} \
-	UVMC_LIB=${LIBDIR}/uvmc_lib BITS=32 UVM_LIB=${LIBDIR}/${UVM_VERSION} CPPVER=${CPPVER} \
-	UVM_VERSION=${UVM_VERSION} UVMC_X_ARGS=${UVM_X_ARGS} UVMC_SC_X_ARGS=${UVMC_SC_X_ARGS} uvmc_pkg
+	make -f ${UVMC_HOME}/lib/Makefile.questa UVM_HOME=${UVM_HOME} UVMC_HOME=${UVMC_HOME} \
+	UVMC_LIB=${QUESTALIBS_DIR}/uvmc_lib BITS=${ARCH} UVM_LIB=mtiUvm CPPVER=${QUESTA_GCC_VERSION} \
+	UVM_VERSION=${UVM_VERSION} UVMC_X_ARGS=${UVMC_X_ARGS} UVMC_SC_X_ARGS=${UVMC_SC_X_ARGS} uvmc_pkg
+	vmap uvmc_lib ${PWD}/${QUESTALIBS_DIR}/uvmc_lib
+
+
+
+compile_sc:: 
+	test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
+	test -d ${QUESTALIBS_DIR}/${TB_LIB_NAME}||vlib ${QUESTALIBS_DIR}/${TB_LIB_NAME};\
+	vmap ${TB_LIB_NAME} ${PWD}/${QUESTALIBS_DIR}/${TB_LIB_NAME}
+	${SCCOM} ${UVMC_HOME}/../sc_load_uvmc_dpi.cpp -work ${TB_LIB_NAME}
+	@if test -e  ${SC_MAKEFILE}; \
+	then make -f ${SC_MAKEFILE} $(SC_MAKE_TARGET) WORK=${TB_LIB_NAME} \
+	UVMC_HOME=${UVMC_HOME} MTECH=${QUESTA_HOME} C_ARGS=${SC_ARGS}; else \
+	echo "Did not find a makefile ($SC_MAKEFILE) for compiling your systemc tlm wrapper - skipping...";fi
+	${SCCOM_LINK}
+
 
 #########################################################
 # Optimize tb ,used in chip level and regressions
@@ -83,11 +111,11 @@ compile_uvmc::
 opt:opt_fast opt_dbg
 
 opt_fast:
-	${DISABLE_VERDI_PLI};${VOPT} -work $(TB_LIB_NAME) $(TB_TOP_NAME) -l vopt_fast.log \
+	${DISABLE_VERDI_PLI};${VOPT} -work $(TB_LIB_NAME) ${VOPT_TOP_LEVELS} -l vopt_fast.log \
 	-o $(TB_TOP_NAME)_opt -$(ARCH) $(VOPTSWITCHES) ${CC_OPT_ARGS} ${X_OPT_ARGS} -f ${LIBLIST} -time
 
 opt_dbg:
-	${DISABLE_VERDI_PLI};${VOPT} -work $(TB_LIB_NAME) $(TB_TOP_NAME) -l vopt_dbg.log \
+	${DISABLE_VERDI_PLI};${VOPT} -work $(TB_LIB_NAME) ${VOPT_TOP_LEVELS} -l vopt_dbg.log \
 	-o $(TB_TOP_NAME)_dbg -$(ARCH) $(VOPTSWITCHES_BLOCK) ${CC_OPT_ARGS} ${X_OPT_ARGS} -f ${LIBLIST} -time ${DEBUG}
 
 
@@ -129,7 +157,7 @@ clean_rundir:
 gui_block:: liblist clean_rundir presim
 	@echo "Launching GUI in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
-	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME) -$(ARCH) \
+	${VSIM}  ${VSIM_TOP_LEVELS} -$(ARCH) \
 	${VSIM_TIMERES} \
 	-f ${LIBLIST} \
 	-lib $(TB_LIB_NAME) \
@@ -196,7 +224,7 @@ gui_chip:: liblist clean_rundir opt_dbg presim
 batch_block:: liblist clean_rundir presim
 	@echo "Launching batch in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
-	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME) -$(ARCH) \
+	${VSIM} ${VSIM_TOP_LEVELS} -$(ARCH) \
 	${VSIM_TIMERES} \
 	-f ${LIBLIST} \
 	-lib $(TB_LIB_NAME) \
@@ -349,6 +377,7 @@ create_project_file::
 	-GTIMESTAMP=${TIMESTAMP} \
 	-GREQUIRE_VPLAN=${REQUIRE_VPLAN} \
 	-GSEND_EMAIL=${SEND_EMAIL} \
+	-GXML2UCDB_DATAFIELDS=${XML2UCDB_DATAFIELDS} \
 	-vrmdata ${SCRATCHDIR}}" >> default.vrm.tmp 
 	@echo "VRMEND" >> default.vrm.tmp;
 	@mv default.vrm.tmp  default.vrm

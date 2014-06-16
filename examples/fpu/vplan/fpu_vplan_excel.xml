@@ -1,0 +1,604 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>Mikael Andersson</Author>
+  <LastAuthor>Mikael Andersson</LastAuthor>
+  <Created>2014-06-16T08:25:29Z</Created>
+  <LastSaved>2014-06-16T08:48:19Z</LastSaved>
+  <Company>Mentor Graphics</Company>
+  <Version>14.00</Version>
+ </DocumentProperties>
+ <OfficeDocumentSettings xmlns="urn:schemas-microsoft-com:office:office">
+  <AllowPNG/>
+ </OfficeDocumentSettings>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>18075</WindowHeight>
+  <WindowWidth>22605</WindowWidth>
+  <WindowTopX>13500</WindowTopX>
+  <WindowTopY>-90</WindowTopY>
+  <MaxChange>252</MaxChange>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="s62">
+   <Alignment ss:Vertical="Top"/>
+  </Style>
+  <Style ss:ID="s63">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+  </Style>
+  <Style ss:ID="s84">
+   <NumberFormat ss:Format="General Date"/>
+  </Style>
+  <Style ss:ID="s137">
+   <Alignment ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"
+    ss:Bold="1"/>
+   <Interior ss:Color="#90EE90" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s138">
+   <Alignment ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"
+    ss:Bold="1"/>
+   <Interior ss:Color="#ADD8E6" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s139">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"
+    ss:Bold="1"/>
+   <Interior ss:Color="#90EE90" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s140">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"
+    ss:Bold="1"/>
+   <Interior ss:Color="#ADD8E6" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s141">
+   <Alignment ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Interior ss:Color="#90EE90" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s142">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Interior ss:Color="#90EE90" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s143">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Interior ss:Color="#ADD8E6" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s145">
+   <Alignment ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Interior ss:Color="#ADD8E6" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s146">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior ss:Color="#90EE90" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s147">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior ss:Color="#ADD8E6" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s148">
+   <Alignment ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior ss:Color="#90EE90" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s149">
+   <Alignment ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior ss:Color="#ADD8E6" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s150">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Interior ss:Color="#ADD8E6" ss:Pattern="Solid"/>
+   <NumberFormat/>
+  </Style>
+  <Style ss:ID="s151">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Interior ss:Color="#90EE90" ss:Pattern="Solid"/>
+   <NumberFormat/>
+  </Style>
+  <Style ss:ID="s154">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior ss:Color="#90EE90" ss:Pattern="Solid"/>
+   <NumberFormat/>
+  </Style>
+  <Style ss:ID="s155">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior ss:Color="#ADD8E6" ss:Pattern="Solid"/>
+   <NumberFormat/>
+  </Style>
+  <Style ss:ID="s157">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Arial" x:Family="Swiss" ss:Bold="1"/>
+   <Interior ss:Color="#ADD8E6" ss:Pattern="Solid"/>
+   <NumberFormat/>
+  </Style>
+  <Style ss:ID="s158">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Arial" x:Family="Swiss" ss:Bold="1"/>
+   <Interior ss:Color="#90EE90" ss:Pattern="Solid"/>
+   <NumberFormat/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="_LINK_DETAILS">
+  <Table ss:ExpandedColumnCount="7" ss:ExpandedRowCount="1" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Row>
+    <Cell ss:Index="4"><Data ss:Type="String">Testplan</Data></Cell>
+    <Cell><Data ss:Type="String">C:\Users\mikaela\Downloads\DEFAULT.fpu.2014_06_16_10.04.15.merge.ucdb</Data></Cell>
+    <Cell><Data ss:Type="String">C:\Users\Public\QuestaExcelAddInCache\fpu_vplan_excel.xml.Testplan</Data></Cell>
+    <Cell ss:StyleID="s84"><Data ss:Type="DateTime">2014-06-16T10:27:40.000</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Header x:Margin="0.3"/>
+    <Footer x:Margin="0.3"/>
+    <PageMargins x:Bottom="0.75" x:Left="0.7" x:Right="0.7" x:Top="0.75"/>
+   </PageSetup>
+   <Visible>SheetVeryHidden</Visible>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Testplan">
+  <Table ss:ExpandedColumnCount="8" ss:ExpandedRowCount="28" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Column ss:Index="2" ss:StyleID="s62" ss:Width="39.75"/>
+   <Column ss:StyleID="s62" ss:Width="184.5"/>
+   <Column ss:StyleID="s63" ss:AutoFitWidth="0" ss:Width="266.25" ss:Span="1"/>
+   <Column ss:Index="6" ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:StyleID="s62" ss:Width="39.75"/>
+   <Column ss:StyleID="s62" ss:Width="27"/>
+   <Row ss:AutoFitHeight="0"/>
+   <Row ss:Index="3" ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s137"><Data ss:Type="String">Section</Data></Cell>
+    <Cell ss:StyleID="s138"><Data ss:Type="String">Title</Data></Cell>
+    <Cell ss:StyleID="s139"><Data ss:Type="String">Description</Data></Cell>
+    <Cell ss:StyleID="s140"><Data ss:Type="String">Link</Data></Cell>
+    <Cell ss:StyleID="s137"><Data ss:Type="String">Type</Data></Cell>
+    <Cell ss:StyleID="s138"><Data ss:Type="String">Weight</Data></Cell>
+    <Cell ss:StyleID="s137"><Data ss:Type="String">Goal</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">1</Data></Cell>
+    <Cell ss:StyleID="s138"><Data ss:Type="String">Code Coverage</Data></Cell>
+    <Cell ss:StyleID="s142"/>
+    <Cell ss:StyleID="s143"/>
+    <Cell ss:StyleID="s141"/>
+    <Cell ss:StyleID="s145"/>
+    <Cell ss:StyleID="s141"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">1.1</Data></Cell>
+    <Cell ss:StyleID="s145"><Data ss:Type="String">Branch</Data></Cell>
+    <Cell ss:StyleID="s142"/>
+    <Cell ss:StyleID="s143"><Data ss:Type="String">/top/fpu_dut</Data></Cell>
+    <Cell ss:StyleID="s141"><Data ss:Type="String">Branch</Data></Cell>
+    <Cell ss:StyleID="s145"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s141"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">1.2</Data></Cell>
+    <Cell ss:StyleID="s145"><Data ss:Type="String">Condition</Data></Cell>
+    <Cell ss:StyleID="s146"/>
+    <Cell ss:StyleID="s147"><Data ss:Type="String">/top/fpu_dut</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="String">Condition</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">1.3</Data></Cell>
+    <Cell ss:StyleID="s145"><Data ss:Type="String">FSM</Data></Cell>
+    <Cell ss:StyleID="s146"/>
+    <Cell ss:StyleID="s147"><Data ss:Type="String">/top/fpu_dut</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="String">FSM</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">1.4</Data></Cell>
+    <Cell ss:StyleID="s145"><Data ss:Type="String">Expression</Data></Cell>
+    <Cell ss:StyleID="s146"/>
+    <Cell ss:StyleID="s147"><Data ss:Type="String">/top/fpu_dut</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="String">Expression</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">2</Data></Cell>
+    <Cell ss:StyleID="s145"><Data ss:Type="String">Reference tests</Data></Cell>
+    <Cell ss:StyleID="s142"><Data ss:Type="String">Reference pattern set </Data></Cell>
+    <Cell ss:StyleID="s143"/>
+    <Cell ss:StyleID="s141"/>
+    <Cell ss:StyleID="s145"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s141"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">2.1</Data></Cell>
+    <Cell ss:StyleID="s145"><Data ss:Type="String">Test pattern set</Data></Cell>
+    <Cell ss:StyleID="s146"/>
+    <Cell ss:StyleID="s147"><Data ss:Type="String">DEFAULT_fpu_test_patternset*</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="String">Test</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3</Data></Cell>
+    <Cell ss:StyleID="s138"><Data ss:Type="String">Core Functionality</Data></Cell>
+    <Cell ss:StyleID="s146"/>
+    <Cell ss:StyleID="s147"/>
+    <Cell ss:StyleID="s148"/>
+    <Cell ss:StyleID="s149"/>
+    <Cell ss:StyleID="s148"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.1</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">Exceptions</Data></Cell>
+    <Cell ss:StyleID="s146"/>
+    <Cell ss:StyleID="s147"/>
+    <Cell ss:StyleID="s148"/>
+    <Cell ss:StyleID="s149"/>
+    <Cell ss:StyleID="s148"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.2</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">Exception Signals</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String">Verify that all exceptions are operating</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">fcoverage:exception;</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String">CoverPoint</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="60">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.2.0</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String" x:Ticked="1">Invalid Operation &#10;</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String" x:Ticked="1">Verify that results of every invalid operation are a QNaN string with a QNaN or SNaN exception&#10;</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">fcoverage:add_subXinf; &#10;fcoverage:mul_Xinf; &#10;fcoverage:divXinf_zero;</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String">Cross</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="45">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.2.1</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String" x:Ticked="1">NaN1&#10;</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String" x:Ticked="1">Verify that the SNaN string can never be the result of any operation.&#10;</Data></Cell>
+    <Cell ss:StyleID="s150"/>
+    <Cell ss:StyleID="s151"/>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="60">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.2.2</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String" x:Ticked="1">Division by Zero&#10;</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String" x:Ticked="1">Verify that division of any number by zero other than zero itself gives infinity as a result. And verify that a divide-by-zero exception is created.&#10;</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">fcoverage:divXexc;</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String">Cross</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.3</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String" x:Ticked="1">Rounding Modes</Data></Cell>
+    <Cell ss:StyleID="s151"/>
+    <Cell ss:StyleID="s150"/>
+    <Cell ss:StyleID="s151"/>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.3.0</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">Rounding bits</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String" x:Ticked="1">Verify that the rounding bit are working as defined</Data></Cell>
+    <Cell ss:StyleID="s150"/>
+    <Cell ss:StyleID="s151"/>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="45">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.3.1</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String" x:Ticked="1">Round to nearest even </Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String" x:Ticked="1">Verify that the If the result value is exactly halfway between two infinitely precise results, it is rounded up to the nearest infinitely precise even. </Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">fcoverage:round;</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String">CoverPoint</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.3.2</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String" x:Ticked="1">Round-to-Zero </Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String" x:Ticked="1">Verify that the excess bits will simply get truncated</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">fcoverage:round;</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String">CoverPoint</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.3.3</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String" x:Ticked="1">Round-Up </Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String" x:Ticked="1">Verify that the number will be rounded up towards +</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">fcoverage:round;</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String">CoverPoint</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.3.4</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String" x:Ticked="1">Round-Down</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String" x:Ticked="1">Verify that the opposite of round-up, the number will be rounded</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">fcoverage:round;</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String">CoverPoint</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="90">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.4</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String" x:Ticked="1">Operations on floating point numbers </Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String" x:Ticked="1">Verify the operations supported&#10;Add &#10;Subtract &#10;Multiply &#10;Divide &#10;Square Root </Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String" x:Ticked="1">fcoverage:operation;</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String">CoverPoint</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">3.5</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String" x:Ticked="1">Operations followed by a Operations</Data></Cell>
+    <Cell ss:StyleID="s154"><Data ss:Type="String" x:Ticked="1">op followed by op</Data></Cell>
+    <Cell ss:StyleID="s155"><Data ss:Type="String">fcoverage:N2N_operations</Data></Cell>
+    <Cell ss:StyleID="s154"><Data ss:Type="String">CoverPoint</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">4</Data></Cell>
+    <Cell ss:StyleID="s157"><Data ss:Type="String">Pipeline</Data></Cell>
+    <Cell ss:StyleID="s158"/>
+    <Cell ss:StyleID="s157"/>
+    <Cell ss:StyleID="s158"/>
+    <Cell ss:StyleID="s149"/>
+    <Cell ss:StyleID="s148"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="105">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">4.1</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">Operation delay</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String" x:Ticked="1">&quot;Verify the pipelined spec:&#10;Addition, 7 clks&#10;Subtraction, 7 clks&#10;Multiplication, 12 clks&#10;Division, 35 clks&#10;Square-root, 35 clks  hardware, page 16&quot;&#10;</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">covered_*_delay</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String">Directive</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">5</Data></Cell>
+    <Cell ss:StyleID="s157"><Data ss:Type="String" x:Ticked="1">Pin interface</Data></Cell>
+    <Cell ss:StyleID="s158"/>
+    <Cell ss:StyleID="s157"/>
+    <Cell ss:StyleID="s158"/>
+    <Cell ss:StyleID="s149"/>
+    <Cell ss:StyleID="s148"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="60">
+    <Cell ss:Index="2" ss:StyleID="s141"><Data ss:Type="String" x:Ticked="1">5.1</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String" x:Ticked="1">Valid opcode on pins</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String" x:Ticked="1">&quot;Verify the pin if:&#10;fpu_op_i always have legal values x0 -&gt; x4 hardware, page 17&quot;&#10;</Data></Cell>
+    <Cell ss:StyleID="s150"><Data ss:Type="String">covered_opcode</Data></Cell>
+    <Cell ss:StyleID="s151"><Data ss:Type="String">Directive</Data></Cell>
+    <Cell ss:StyleID="s149"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s148"><Data ss:Type="Number">100</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Header x:Margin="0.3"/>
+    <Footer x:Margin="0.3"/>
+    <PageMargins x:Bottom="0.75" x:Left="0.7" x:Right="0.7" x:Top="0.75"/>
+   </PageSetup>
+   <Unsynced/>
+   <Print>
+    <ValidPrinterInfo/>
+    <PaperSizeIndex>9</PaperSizeIndex>
+    <HorizontalResolution>600</HorizontalResolution>
+    <VerticalResolution>600</VerticalResolution>
+   </Print>
+   <Selected/>
+   <FreezePanes/>
+   <FrozenNoSplit/>
+   <SplitHorizontal>3</SplitHorizontal>
+   <TopRowBottomPane>3</TopRowBottomPane>
+   <SplitVertical>2</SplitVertical>
+   <LeftColumnRightPane>2</LeftColumnRightPane>
+   <ActivePane>0</ActivePane>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+    </Pane>
+    <Pane>
+     <Number>1</Number>
+    </Pane>
+    <Pane>
+     <Number>2</Number>
+    </Pane>
+    <Pane>
+     <Number>0</Number>
+     <ActiveRow>10</ActiveRow>
+     <ActiveCol>7</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Sheet1">
+  <Table ss:ExpandedColumnCount="1" ss:ExpandedRowCount="1" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Row ss:AutoFitHeight="0"/>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Header x:Margin="0.3"/>
+    <Footer x:Margin="0.3"/>
+    <PageMargins x:Bottom="0.75" x:Left="0.7" x:Right="0.7" x:Top="0.75"/>
+   </PageSetup>
+   <Unsynced/>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Sheet2">
+  <Table ss:ExpandedColumnCount="1" ss:ExpandedRowCount="1" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Row ss:AutoFitHeight="0"/>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Header x:Margin="0.3"/>
+    <Footer x:Margin="0.3"/>
+    <PageMargins x:Bottom="0.75" x:Left="0.7" x:Right="0.7" x:Top="0.75"/>
+   </PageSetup>
+   <Unsynced/>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Sheet3">
+  <Table ss:ExpandedColumnCount="1" ss:ExpandedRowCount="1" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Row ss:AutoFitHeight="0"/>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Header x:Margin="0.3"/>
+    <Footer x:Margin="0.3"/>
+    <PageMargins x:Bottom="0.75" x:Left="0.7" x:Right="0.7" x:Top="0.75"/>
+   </PageSetup>
+   <Unsynced/>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>

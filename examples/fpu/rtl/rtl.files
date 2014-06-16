@@ -1,0 +1,17 @@
+@library fpu_lib
+${QME_HOME}/examples/fpu/rtl/vhdl/fpupack.vhd
+${QME_HOME}/examples/fpu//rtl/vhdl/comppack.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/addsub_28.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/fpu.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/mul_24.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/post_norm_addsub.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/post_norm_div.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/post_norm_mul.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/post_norm_sqrt.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/pre_norm_addsub.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/pre_norm_div.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/pre_norm_mul.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/pre_norm_sqrt.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/serial_div.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/serial_mul.vhd
+${QME_HOME}/examples/fpu/rtl/vhdl/sqrt.vhd

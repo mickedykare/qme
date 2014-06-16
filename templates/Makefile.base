@@ -22,10 +22,15 @@ UVM_VERBOSITY=UVM_MEDIUM
 UVM_VERBOSITY_REGR=UVM_NONE
 # LOW,FULL, MEDIUM
 DEBUG_LEVEL=MEDIUM
-
+UVMC=0
 # BLOCK,CHIP 
 VERIFICATION_LEVEL=BLOCK
+UVMC_HOME=${QME_HOME}/examples/uvmc/xl-uvmc-2.2
 
+COMPILE_UVMC_TARGET=no_uvmc
+COMPILE_SC_TARGET=no_comp_sc
+SC_MAKE_TARGET=comp_link
+SC_TOP_NAME=sc_main
 ###################################################################
 # Tool pointers  
 #################################################################
@@ -155,6 +160,7 @@ VLOG=vlog
 VCOM=vcom
 VOPT=vopt
 VSIM=vsim
+SCCOM=sccom
 # Using PLIOBJS will affect performance
 DISABLE_VERDI_PLI=unset PLIOBJS
 
@@ -428,4 +434,3 @@ QUESTA_SCRATCH_USER_DO = $(shell \
         fi; \
 ) 
 
-default::help

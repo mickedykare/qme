@@ -113,7 +113,7 @@
     <parameters>
       <parameter name="CURRENT_SETUP">(%preconverting.ITERATION%)</parameter>	  
       <parameter name="VPLAN_UCDB">(%DATADIR%)/(%CURRENT_SETUP%).testplan.ucdb</parameter>	  
-      <parameter name="VPLAN_EXCEL_TS" type="tcl">[get_extra_args (%TCSPEC%) (%CURRENT_SETUP%) VPLAN_EXCEL]</parameter>
+      <parameter name="VPLAN_XML_TS" type="tcl">[get_extra_args (%TCSPEC%) (%CURRENT_SETUP%) VPLAN_XML]</parameter>
     </parameters>
     <!-- Need to execute locally due to openoffice -->
     <method>
@@ -124,29 +124,14 @@
       <command>echo DBG: CURRENT_SETUP  =(%CURRENT_SETUP%)</command>
       <command>echo DBG: TCSPEC         =(%TCSPEC%)</command>
       <command>echo DBG: VPLAN_UCDB     =(%VPLAN_UCDB%)</command>
-      <command>echo DBG: VPLAN_EXCEL_TS =(%VPLAN_EXCEL_TS%)</command>
+      <command>echo DBG: VPLAN_XML_TS   =(%VPLAN_XML_TS%)</command>
       <command>echo DBG: ---------------------------------------</command>
-
-      <command>  set vplan_excel="(%VPLAN_EXCEL_TS%)" </command>
-      <command>  if ($vplan_excel != "") then </command>
-      <command>    set vplan_excel="(%VPLAN_EXCEL_TS%)"</command>
-      <command>  else </command>
-      <command>    set vplan_excel="(%EXCEL_VPLAN%)"</command>
-      <command>  endif</command>    
-      <command>  echo "Using excel verification plan:$vplan_excel"</command> 
-
-      <command>  if (-e $vplan_excel) then </command>
-      <command>    echo "Found $vplan_excel - starting soffice"</command> 
-      <command>    (%SOFFICE%) --headless --convert-to xml:"MS Excel 2003 XML" $vplan_excel </command>
-      <command>    if ($status != 0) then </command>    
-      <command>     echo " soffice conversion failed"</command>    
-      <command>     exit 1          </command>    
-      <command>    endif</command>    
       <command>    echo "converting xml to ucdb" </command>  
-      <command>    xml2ucdb -format Excel (%XML2UCDB_DATAFIELDS%) *.xml (%VPLAN_UCDB%) </command>
+      <command>    xml2ucdb -format Excel (%XML2UCDB_DATAFIELDS%) (%VPLAN_XML_TS%) (%VPLAN_UCDB%) </command>
       <command>    if ($status != 0) exit 1          </command>    
       <command>  else </command>
-      <command>    echo "No verification plan was found. Please add $vplan_excel"      </command>
+      <command>    echo "No verification plan was found. Please update (%TCSPEC%) with argument:"      </command>
+      <command>    echo "SETUPNAME:VPLAN_XML=path to vplan in xml"      </command>
       <command>    echo "or do make regression REQUIRE_VPLAN=0"      </command>
       <command> endif</command>    
     </execScript>

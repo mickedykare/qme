@@ -1,5 +1,6 @@
 # This file contains the help text
-help::header help_override help_compile help_simulate
+help::header 
+help_all::header help_override help_compile help_simulate
 
 header::
 	@tput setaf 4;
@@ -8,6 +9,13 @@ header::
 	@echo "# contact email: Mikael_Andersson@mentor.com"
 	@echo "# Documentation can be found at: http://www.github.com/detstorabla/qme"
 	@echo "#"
+	@echo "# Available subjects are:"
+	@echo "#   make help_all"
+	@echo "#   make help_override"
+	@echo "#   make help_compile"
+	@echo "#   make help_simulate"
+
+
 	@tput setaf 9;
 
 
@@ -42,7 +50,7 @@ help_compile::
 	@echo "########################## COMPILATION ##################################################################"
 	@echo "# To compile everything:                                       make compile"
 	@echo "# To compile only the test bench (no opt):                     make compile_tb"
-	@echo "# To compile dut (no opt):                                     make compile_dut"
+	@echo "# To compile dut (no opt):                                     make compile_rtl"
 	@echo "# To optimize (opt) all code:                                  make opt"
 	@echo "# Compilation Options:"
 	@echo "# SETUP=<setup> will compile the code with <setup> defined"

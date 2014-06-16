@@ -1,0 +1,5 @@
+@library work
+${QME_HOME}/examples/vips/fpu_agent/fpu_agent_pkg.sv:+define+SVA+SVA_DUT +incdir+${QME_PROJECT_HOME}/vips/fpu_agent/ +incdir+${QME_PROJECT_HOME}/fpu/tb/src/
+${QME_HOME}/examples/fpu/tb/src/fpu_pkg.sv:+define+SVA+SVA_DUT +incdir+${QME_HOME}/examples/fpu/tb/src +incdir+${QME_HOME}/examples/fpu/tb/tc 
+${QME_HOME}/examples/fpu/tb/src/clock_reset.sv:+define+SVA+SVA_DUT +incdir+${QME_HOME}/examples/fpu/tb/src 
+${QME_HOME}/examples/fpu/tb/src/top.sv:+define+SVA+SVA_DUT  +incdir+${QME_HOME}/examples/fpu/tb/src 
