@@ -30,7 +30,10 @@ class i2c_base_test extends uvm_test;
    i2c_vip_config	m_i2c_vip_config; 
    wb_agent_config	#(WB_AWIDTH, WB_DWIDTH) m_wb_agent_config; 
    simple_irq_agent_config m_irq_agent_config;
+   sli_clk_reset_config m_clk_config;
+   
    typedef i2c_slave_sequence i2c_slave_sequence_t;
+
 
    
    //Pointers to sequencers are always useful
@@ -77,7 +80,8 @@ class i2c_base_test extends uvm_test;
       super.build_phase(phase);
       // Configure irq agent and publish the config to the agent
       m_irq_agent_config=simple_irq_agent_config::type_id::create("m_irq_agent_config");
-      
+
+
       m_irq_agent_config.is_active=UVM_ACTIVE;
       if(!uvm_config_db #(virtual simple_irq_if )::get(this, "", "SIMPLE_IRQ_IF",m_irq_agent_config.vif )) begin
 	 `uvm_error(get_type_name(), "SIMPLE_IRQ_IF not found)")
@@ -105,7 +109,19 @@ class i2c_base_test extends uvm_test;
       do_i2c_slave_config();   
       uvm_config_db #(uvm_object)::set(this,"*",mvc_config_base_id,m_i2c_vip_config);
       
-      
+      m_clk_config = sli_clk_reset_config::type_id::create("m_clk_config");
+
+
+      assert(m_clk_config.randomize() with {m_reset_delay>3;
+                                            m_reset_delay<10;} );
+      m_clk_config.m_clk_period=1us;
+
+      if(!uvm_config_db #(virtual sli_clk_reset_if)::get( this , "", "SLI_CLK_RESET_IF" , m_clk_config.vif )) begin
+         `uvm_error("Config Error" , "uvm_config_db #( bfm_type )::get cannot find resource APB3_IF" )
+      end
+
+      uvm_config_db #(sli_clk_reset_config)::set( this , "m_env.m_clk_agent*" , "sli_clk_reset_config", m_clk_config );
+
       //Create and publish register model  
       
       m_registermodel = default_top_block::type_id::create("m_registermodel");          // create the register model

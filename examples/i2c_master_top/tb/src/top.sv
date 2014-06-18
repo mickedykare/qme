@@ -10,28 +10,15 @@ module top();
    bit  rstn;
    tri1 scl,sda;
    
-   // generate clock
-   initial begin
-      clk = 0;
-      forever begin
-	 #5ns;
-	 clk = ~clk;
-      end
-   end
+   sli_clk_reset_if i_clk_if();
    
-   // Generate reset
-   initial begin
-      rstn<=0;
-      repeat(5) @(posedge clk);
-      rstn<=1;
-   end
    
    // Instantiate the interfaces we need:
    // Wishbone
-   wb_if#(32,8) i_wb_if(.clk(clk),.rstn(rstn));
+   wb_if#(32,8) i_wb_if(.clk(i_clk_if.clk),.rstn(i_clk_if.nreset));
    
    // Instantiate the I2C interface.
-   mgc_i2c    i_i2c_if (.isample_clk(clk));
+   mgc_i2c    i_i2c_if (.isample_clk(i_clk_if.clk));
 
 
    // Instantiate an interrupt handler (used to start ISR)
@@ -40,8 +27,8 @@ module top();
    // We need an interrupt interface to reuse the
    // This is the DUT
    i2c_master_top dut (// wishbone interface
-			   .wb_clk_i(clk),
-			   .nreset_i(rstn),
+			   .wb_clk_i(i_clk_if.clk),
+			   .nreset_i(i_clk_if.nreset),
 			   .wb_adr_i(i_wb_if.adr[2:0]),
 			   .wb_dat_i(i_wb_if.dout),
 			   .wb_dat_o(i_wb_if.din),
@@ -74,10 +61,11 @@ module top();
    
 
    initial begin
-        uvm_config_db #(virtual wb_if #(WB_AWIDTH,WB_DWIDTH))::set( null , "uvm_test_top" , "WB_IF" , i_wb_if);
-        uvm_config_db #(virtual simple_irq_if)::set( null , "uvm_test_top" , "SIMPLE_IRQ_IF" , i_simple_irq_if);
-        uvm_config_db #(virtual mgc_i2c)::set( null , "uvm_test_top" , "I2C_INTERFACE" ,i_i2c_if );
-        run_test("i2c_base_test"); //Default test that is run.
+      uvm_config_db #(virtual wb_if #(WB_AWIDTH,WB_DWIDTH))::set( null , "uvm_test_top" , "WB_IF" , i_wb_if);
+      uvm_config_db #(virtual simple_irq_if)::set( null , "uvm_test_top" , "SIMPLE_IRQ_IF" , i_simple_irq_if);
+      uvm_config_db #(virtual mgc_i2c)::set( null , "uvm_test_top" , "I2C_INTERFACE" ,i_i2c_if );
+      uvm_config_db #(virtual sli_clk_reset_if)::set( null , "*" , "SLI_CLK_RESET_IF" , i_clk_if );
+      run_test("i2c_base_test"); //Default test that is run.
    end
    
    

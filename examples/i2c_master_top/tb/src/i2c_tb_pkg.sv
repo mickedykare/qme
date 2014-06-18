@@ -1,11 +1,12 @@
 package i2c_tb_pkg;
- import uvm_pkg::*;
-import wb_pkg::*; 
-import i2c_master_uvm_reg::*;
+   import uvm_pkg::*;
+   import wb_pkg::*; 
+   import i2c_master_uvm_reg::*;
    import simple_irq_pkg::*;
+   import sli_clk_reset_pkg::*;
    
-import mvc_pkg::*;
-import mgc_i2c_v2_1_pkg::*;
+   import mvc_pkg::*;
+   import mgc_i2c_v2_1_pkg::*;
 
  
  `include "uvm_macros.svh"
@@ -23,7 +24,7 @@ import mgc_i2c_v2_1_pkg::*;
    
    parameter RD      = 1'b1;
    parameter WR      = 1'b0;
-   parameter SADR    = 7'b0010_000;
+   parameter SADR    = 7'b001_0000;
 
    
  `include "i2c_tb_env.svh"

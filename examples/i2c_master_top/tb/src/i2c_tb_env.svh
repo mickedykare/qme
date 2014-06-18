@@ -22,12 +22,14 @@
 `include "uvm_macros.svh"
 
 class i2c_tb_env #(int AWIDTH, DWIDTH) extends uvm_env;
-
    `uvm_component_param_utils(i2c_tb_env#(AWIDTH, DWIDTH))    
    
    wb_agent#(AWIDTH, DWIDTH) m_wb_agent; 
    mvc_agent	m_i2c_slave_agent; 
    simple_irq_agent m_irq_agent;
+   sli_clk_reset_agent m_clk_agent;
+   
+
    reg2wb_adapter m_reg2wb;
    uvm_reg_predictor #(wb_item) m_reg_predictor;
    default_top_block m_registermodel;                        // register model
@@ -43,7 +45,7 @@ class i2c_tb_env #(int AWIDTH, DWIDTH) extends uvm_env;
       m_i2c_slave_agent= mvc_agent::type_id::create("m_i2c_slave_agent", this);
       m_wb_agent= wb_agent#(AWIDTH, DWIDTH)::type_id::create("m_wb_agent", this);
       m_irq_agent=simple_irq_agent::type_id::create("m_irq_agent",this);
-      
+      m_clk_agent=sli_clk_reset_agent::type_id::create("m_clk_agent",this);
       // Adding UVM register package
       m_reg2wb = reg2wb_adapter::type_id::create("m_reg2wb");   // adapter for register bus
       m_reg_predictor = uvm_reg_predictor #(wb_item)::type_id::create("m_reg_predictor", this);  // 

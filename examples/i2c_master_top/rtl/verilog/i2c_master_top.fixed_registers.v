@@ -178,7 +178,10 @@ module i2c_master_top(
    wire        wb_wacc = wb_we_i & wb_ack_o;
    
    // generate acknowledge output signal
-   always @(posedge wb_clk_i)
+   always @(posedge wb_clk_i or negedge nreset_i)
+     if (~nreset_i)
+       wb_ack_o <=0;
+     else
      wb_ack_o <=  wb_cyc_i & wb_stb_i & ~wb_ack_o; // because timing is always honored
    
    // assign DAT_O (Reading)

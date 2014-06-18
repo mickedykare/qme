@@ -137,8 +137,8 @@ module tst_bench_top();
 
 		// wishbone interface
 		.wb_clk_i(clk),
-		.wb_rst_i(1'b0),
-		.arst_i(rstn),
+		.nreset_i(1'b0),
+//		.arstn_i(rstn),
 		.wb_adr_i(adr[2:0]),
 		.wb_dat_i(dat_o),
 		.wb_dat_o(dat0_i),
@@ -160,8 +160,7 @@ module tst_bench_top();
 
 		// wishbone interface
 		.wb_clk_i(clk),
-		.wb_rst_i(1'b0),
-		.arst_i(rstn),
+		.nreset_i(rstn),
 		.wb_adr_i(adr[2:0]),
 		.wb_dat_i(dat_o),
 		.wb_dat_o(dat1_i),

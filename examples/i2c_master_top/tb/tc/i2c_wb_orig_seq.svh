@@ -29,7 +29,7 @@ class i2c_wb_orig_seq extends i2c_wb_base_seq;
       m_registermodel.CR_REG.WR.set(1);
       m_registermodel.CR_REG.STA.set(1);
       m_registermodel.CR_REG.update(status,.parent(this));
-      `uvm_info(get_type_name(),$psprintf("Generate 'start',write cmd 0x%0h (slave address+write)",{slaveaddress,WR}),UVM_MEDIUM);            
+      `uvm_info(get_type_name(),$psprintf("Generate 'start' to slave addr %0h,write cmd 0x%0h (slave address+write)",slaveaddress,{slaveaddress,WR}),UVM_MEDIUM);            
       check_tip();
    endtask // generate_start_write
 

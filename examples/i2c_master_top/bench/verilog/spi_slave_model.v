@@ -54,10 +54,10 @@
 `include "timescale.v"
 
 module spi_slave_model (
-	input  wire csn;
-	input  wire sck
-	input  wire di;
-	output wire do
+	input  wire csn,
+	input  wire sck,
+	input  wire di,
+	output wire dout
 );
 
 	//
@@ -95,7 +95,7 @@ module spi_slave_model (
 	  else
 	    sro <= #1 {sro[6:0],1'bx};
 
-	assign do = sro[7];
+	assign dout = sro[7];
 
 	//generate bit-counter
 	always @(posedge clk, posedge csn)
