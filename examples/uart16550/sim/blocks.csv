@@ -1,0 +1,5 @@
+Block Name,Block Description,Block Coverage,Block Backdoor,Block Component Name,Block Instance Name,Block Instance Description,Block Instance Dimension,Block Instance Type
+"example_block_registers","Register block","UVM_CVR_ADDR_MAP","top.dut.i_example_block_registers","SYSPOR_DBB_RST_N_MASK1_REG","SYSPOR_DBB_RST_N_MASK1","","","register"
+"example_block_registers","Register block","","","SYSPOR_DBB_RST_N_MASK2_REG","SYSPOR_DBB_RST_N_MASK2","","","register"
+"example_block_registers","Register block","","","SYSPOR_DBB_RST_N_MASK3_REG","SYSPOR_DBB_RST_N_MASK3","","","register"
+"example_block_registers","Register block","","","SYSPOR_DBB_RST_N_MASK4_REG","SYSPOR_DBB_RST_N_MASK4","","","register"

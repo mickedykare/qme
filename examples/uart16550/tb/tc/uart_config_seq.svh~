@@ -1,0 +1,32 @@
+class uart_config_seq extends uart_wb_base_seq;
+  `uvm_object_param_utils(uart_config_seq)
+
+   
+   function new(string name = "");
+      super.new(name);
+   endfunction
+
+ task body();
+     bit status;
+    super.body();
+
+/* -----\/----- EXCLUDED -----\/-----
+    assert (m_registermodel.SYSPOR_DBB_RST_N_MASK3.randomize()) else 
+        `uvm_error(get_type_name(), "Control register randomization failed")
+     m_registermodel.SYSPOR_DBB_RST_N_MASK3.update(status, .path(UVM_FRONTDOOR), .parent(this));
+ -----/\----- EXCLUDED -----/\----- */
+    `uvm_info(get_type_name(),"Enabling access to LCR DIVIDER",UVM_MEDIUM);
+    m_registermodel.LCR.SET_DIV_LATCH_ACCESS.set(1);
+    m_registermodel.LCR.update(status, .path(UVM_FRONTDOOR), .parent(this));
+    `uvm_info(get_type_name(),"Set DL to divide by 3 - FIX THIS. Not nice",UVM_MEDIUM); 
+    m_registermodel.RXTXBUF.write(status,2,.parent(this));
+    `uvm_info(get_type_name(),"Disabling access to LCR DIVIDER",UVM_MEDIUM);
+    m_registermodel.LCR.SET_DIV_LATCH_ACCESS.set(0);
+    m_registermodel.LCR.update(status, .path(UVM_FRONTDOOR), .parent(this));
+    `uvm_info(get_type_name(),"Configuration of divider done!",UVM_MEDIUM);
+
+ endtask // body
+   
+
+
+endclass // uart_config_seq

@@ -1,0 +1,12 @@
+QVIP_TARGETS=uart
+XLSFILE=/mnt/hgfs/Documents/uart16550_registers_no_descr.xls
+AUTOCHECK_DUT=uart_top
+VSIM_TIMERES=-t ns
+
+precompile_tb::convert2csv generate_rm
+
+convert2csv:
+	ruvm_xls2csv.pl ${XLSFILE}
+
+generate_rm:
+	${QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin regs.csv -autoinstance -block uart16550_registers -uvmout ${QME_PROJECT_HOME}/uart16550/tb/registers/uart1650_registers_pkg.sv

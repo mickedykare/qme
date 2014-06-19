@@ -1,0 +1,16 @@
+@library vip_lib
+${QME_PROJECT_HOME}/vips/wb_agent/wb_if.sv
+${QME_PROJECT_HOME}/vips/wb_agent/wb_pkg.sv:+incdir+${QME_PROJECT_HOME}/vips/wb_agent/
+
+${QME_PROJECT_HOME}/vips/sli_clk_reset/sv/sli_clk_reset_if.sv
+${QME_PROJECT_HOME}/vips/sli_clk_reset/sv/sli_clk_reset_pkg.sv:+incdir+${QME_PROJECT_HOME}/vips/sli_clk_reset/sv
+
+${QME_PROJECT_HOME}/vips/simple_irq_agent/sv/simple_irq_if.sv
+${QME_PROJECT_HOME}/vips/simple_irq_agent/sv/simple_irq_pkg.sv:+incdir+${QME_PROJECT_HOME}/vips/simple_irq_agent/sv/
+
+
+
+@library work
+${QME_PROJECT_HOME}/uart16550/tb/registers/uart1650_registers_pkg.sv
+${QME_PROJECT_HOME}/uart16550/tb/src/uart_tb_pkg.sv:+incdir+${QME_PROJECT_HOME}/uart16550/tb/src/ +incdir+${QME_PROJECT_HOME}/uart16550/tb/tc
+${QME_PROJECT_HOME}/uart16550/tb/src/top.sv

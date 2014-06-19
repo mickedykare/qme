@@ -1,0 +1,5 @@
+Block Name,BlockMap Name,BlockMap is default,BlockMap Description,BlockMap Instance Name,BlockMap Instance Address
+"example_block_registers","example_block_registers_map","TRUE","","SYSPOR_DBB_RST_N_MASK1","0x00"
+"example_block_registers","example_block_registers_map","","","SYSPOR_DBB_RST_N_MASK2","0x01"
+"example_block_registers","example_block_registers_map","","","SYSPOR_DBB_RST_N_MASK3","0x02"
+"example_block_registers","example_block_registers_map","","","SYSPOR_DBB_RST_N_MASK4","0x03"

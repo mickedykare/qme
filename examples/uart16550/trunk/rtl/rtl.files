@@ -1,0 +1,11 @@
+@library uart16550_lib
+${QME_PROJECT_HOME}/uart16550/rtl/verilog/uart_top.v:+incdir+${QME_PROJECT_HOME}/uart16550/rtl/verilog
+${QME_PROJECT_HOME}/uart16550/rtl/verilog/uart_wb.v:+incdir+${QME_PROJECT_HOME}/uart16550/rtl/verilog
+${QME_PROJECT_HOME}/uart16550/rtl/verilog/uart_transmitter.v:+incdir+${QME_PROJECT_HOME}/uart16550/rtl/verilog -sv
+${QME_PROJECT_HOME}/uart16550/rtl/verilog/uart_receiver.v:+incdir+${QME_PROJECT_HOME}/uart16550/rtl/verilog
+${QME_PROJECT_HOME}/uart16550/rtl/verilog/uart_tfifo.v:+incdir+${QME_PROJECT_HOME}/uart16550/rtl/verilog
+${QME_PROJECT_HOME}/uart16550/rtl/verilog/uart_rfifo.v:+incdir+${QME_PROJECT_HOME}/uart16550/rtl/verilog
+${QME_PROJECT_HOME}/uart16550/rtl/verilog/uart_regs.v:+incdir+${QME_PROJECT_HOME}/uart16550/rtl/verilog
+${QME_PROJECT_HOME}/uart16550/rtl/verilog/uart_debug_if.v:+incdir+${QME_PROJECT_HOME}/uart16550/rtl/verilog
+${QME_PROJECT_HOME}/uart16550/rtl/verilog/raminfr.v:+incdir+${QME_PROJECT_HOME}/uart16550/rtl/verilog
+${QME_PROJECT_HOME}/uart16550/rtl/verilog/uart_sync_flops.v:+incdir+${QME_PROJECT_HOME}/uart16550/rtl/verilog
