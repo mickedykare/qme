@@ -36,7 +36,7 @@ SC_TOP_NAME=sc_main
 #################################################################
 QUESTA_HOME=${QUESTASIM_HOME}
 
-UVM_HOME=${QUESTA_HOME}/verilog_src/${UVM_VERSION}
+UVM_HOME=${QME_HOME}/uvm/${UVM_VERSION}
 
 ###################################################################
 # Naming
@@ -52,6 +52,7 @@ LIBLIST=libs.list
 PROJECT_NAME="SET PROJECT_NAME"
 ORIGIN_MODELSIM_INI=${QUESTA_HOME}/modelsim.ini
 QUESTALIBS_DIR=questa_libs
+QUESTACLIBS_DIR=${QUESTALIBS_DIR}/c_libs
 QVIP_LIB=qvip_lib
 VSIM_COMMON_DO=${QME_HOME}/dofiles/vsim.do 
 VSIM_SCRATCH_USER_DO=./vsim_scratch.do
@@ -380,6 +381,7 @@ info: green_on printvars color_reset
 
 liblist: 
 	@vmap |grep "maps to" | egrep -v ${QUESTA_HOME} |cut -d" " -f1 | sed s/\"/-L\ / | sed s/\"//g |grep -v ^Job > ${LIBLIST}
+	@find ${QUESTACLIBS_DIR} -name '*.so' -print | sed s/\\.so//g | sed s/\^/-sv_lib\ /g >> ${LIBLIST}
 	@echo "Created list of compiled libraries for questa: ${LIBLIST}"
 
 

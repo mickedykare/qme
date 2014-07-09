@@ -41,7 +41,7 @@ compile: clean ${COMPILE_UVM_TARGET} ${COMPILE_UVMC_TARGET} ${COMPILE_SC_TARGET}
 
 
 clean::
-	@rm -rf ${LIBRARY_HOME}
+	@rm -rf ${QUESTALIBS_DIR}
 	@rm -rf ${TESTCASE_DIR}
 	@rm -f *.wlf
 	@rm -f transcript
@@ -59,12 +59,15 @@ clean::
 compile_uvm::
 	@echo "Recompiling uvm library UVM_VERSION ${UVM_VERSION} with timescale VLOG_TIMESCALE=${VLOG_TIMESCALE}";
 	@test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
+	@test -d ${QUESTACLIBS_DIR}||mkdir ${QUESTACLIBS_DIR}
 	@test -d ${QUESTALIBS_DIR}/${UVM_VERSION}||vlib ${QUESTALIBS_DIR}/${UVM_VERSION}
 	@vmap mtiUvm ${PWD}/${QUESTALIBS_DIR}/${UVM_VERSION}
-	${VLOG} -work mtiUvm ${UVM_HOME}/src/uvm_pkg.sv ${UVM_HOME}/src/dpi/uvm_dpi.cc  \
-	${UVM_INC_DIR} ${VLOG_TIMESCALE}  +define+UVM_DEBUGGER ${QUESTA_HOME}/verilog_src/${QUESTA_UVM_DEBUG}/src/questa_uvm_pkg.sv \
-	+incdir+${QUESTA_HOME}/verilog_src/${QUESTA_UVM_DEBUG}/src/
-	${VLOG} -work mtiUvm ${QUESTA_HOME}/verilog_src/${UVM_VERSION}/src/dpi/uvm_dpi.cc -${ARCH} ${DPI_GCC_VERSION}
+	${VLOG} -work mtiUvm ${UVM_HOME}/src/uvm_pkg.sv \
+	${QUESTA_HOME}/verilog_src/${QUESTA_UVM_DEBUG}/src/questa_uvm_pkg.sv \
+	${UVM_INC_DIR} ${VLOG_TIMESCALE} +incdir+${QUESTA_HOME}/verilog_src/${QUESTA_UVM_DEBUG}/src/ \
+	-suppress 2186 -suppress 8688 +define+QUESTA_LOOKUP_SEQ
+	gcc -m$(ARCH) -fPIC -DQUESTA -g -W -shared -x c -I$(QUESTA_HOME)/include ${UVM_HOME}/src/dpi/uvm_dpi.cc -o ${QUESTACLIBS_DIR}/uvm_dpi.so
+
 
 compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 
