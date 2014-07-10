@@ -1,7 +1,0 @@
-class qvip_uart_rx_seq extends mvc_sequence;
-   
-  typedef uart_device_end_data_char                         tx_data_char_t;
-  typedef mvc_facing_end_item # (uart_device_end_data_char) rx_data_char_t;
-
-  `uvm_object_utils( uart_sequence )
-  uart_vip_config vip_config;
