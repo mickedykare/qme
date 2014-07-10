@@ -36,7 +36,7 @@
       <parameter name="USE_XML_VPLAN">0</parameter>
       <parameter name="XML_VPLAN">""</parameter>
       <parameter name="EXCEL_VPLAN">""</parameter>
-      <parameter name="XML2UCDB_DATAFIELDS">-datafields "Section, Title, Description, Link, Type, Weight, Goal, Drop"</parameter>
+      <parameter name="XML2UCDB_DATAFIELDS">"Section, Title, Description, Link, Type, Weight, Goal, Drop"</parameter>
 
 
       <!--parameter name="DEBUG">0</parameter-->      
@@ -61,7 +61,7 @@
       <!-- == Parameters to control the running of the regressions == -->
       <parameter name="INTERACTIVE" export="yes" type="tcl">[TestModeInteractive {(%MODE%)}]</parameter>
       <parameter name="triageoptions">-severity IFEW -rulesfile (%VRUNDIR%)/transformrule.txt -verbose</parameter>
-      <parameter name="tplanoptions">-format Excel -autoweight -verbose -startstoring 1 (%XML2UCDB_DATAFIELDS%)</parameter>
+      <parameter name="tplanoptions">-format Excel -autoweight -verbose -startstoring 1 -datafields (%XML2UCDB_DATAFIELDS%)</parameter>
       <parameter name="mergeoptions">-testassociated</parameter>
     </parameters>
 
@@ -127,7 +127,8 @@
       <command>echo DBG: VPLAN_XML_TS   =(%VPLAN_XML_TS%)</command>
       <command>echo DBG: ---------------------------------------</command>
       <command>    echo "converting xml to ucdb" </command>  
-      <command>    xml2ucdb -format Excel (%XML2UCDB_DATAFIELDS%) (%VPLAN_XML_TS%) (%VPLAN_UCDB%) </command>
+      <!--command>    xml2ucdb -format Excel (%XML2UCDB_DATAFIELDS%) (%VPLAN_XML_TS%) (%VPLAN_UCDB%) </command-->
+      <command>    xml2ucdb (%tplanoptions%) (%VPLAN_XML_TS%) (%VPLAN_UCDB%) </command>
       <command>    if ($status != 0) exit 1          </command>    
       <command>  else </command>
       <command>    echo "No verification plan was found. Please update (%TCSPEC%) with argument:"      </command>

@@ -7,7 +7,6 @@ use Cwd;
 
 my $block;
 my $parent;
-my $project;
 my $simdir;
 my $projhome;
 my $force=0;
@@ -101,7 +100,7 @@ my $usage = <<END;
     --parent=<name>,-p=<name>             If you are using a subblock in the library tree
     --block=<block>,-b=<block>            Specifices then name of the block that we want to simulate
     --force,-f                            Force overwrite of files in the simdir
-    --scratch=<scratch home>              If you want to specify your own location of your simulation directory
+    --location,-l=<scratch home>          If you want to specify your own location of your simulation directory
 END
 
 
@@ -109,8 +108,7 @@ END
 GetOptions ("block=s" => \$block,   
 	    'help|usage|h' => \$help,
 	    "parent=s"   => \$parent,
-	    "project=s" => \$project,
-	    'scratch=s' => \$scratchdir,
+	    'location=s' => \$scratchdir,
 	    "simdir=s" => \$simdir,   
             "force" => \$force)
     or die("Error in command line arguments\n");
@@ -130,6 +128,11 @@ if ($block eq "") {
 }
 
 $block_overrides=$srchome.$block."/sim/Makefile.block.defaults";
+
+&print_note("#################### Questa Makefile Environment (QME) ######################");
+&print_note("# This environment is developed by Mikael Andersson, Mentor Graphics");
+&print_note("# Documentation can be found at: http://www.github.com/detstorabla/qme");
+&print_note("#############################################################################");
 
 ## Check environment variables
 if (-e $ENV{'QME_HOME'}) {
@@ -182,11 +185,9 @@ my $simdir_fp=$ENV{'QME_SCRATCH_HOME'}."/".$simdir;
 
 if (-e $simdir_fp) {
     if ($force == 0) {
-    die("Error: $simdir_fp already exists, add -force to overwrite");
+    die("Error: $simdir_fp already exists, add -force to overwrite Makefile");
     } else {
-    &print_note("Overwriting some files in $simdir_fp");
-#    &system_cmd("rm -rf $simdir_fp");
-#    &system_cmd("mkdir  $simdir_fp");
+    &print_note("Overwriting Makefile in $simdir_fp");
 
     }
 

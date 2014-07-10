@@ -134,7 +134,7 @@ NOTIMEOUT=0
 TIMESTAMP=$(shell date +%G_%m_%d_%H.%M.%S)
 REQUIRE_VPLAN=1
 SEND_EMAIL=1
-XML2UCDB_DATAFIELDS=-datafields "Section, Title, Description, Link, Type, Weight, Goal"
+XML2UCDB_DATAFIELDS="Section,Title,Description,Link,Type,Weight,Goal"
 NOREUSESEEDS=-noreuseseeds 
 
 #LSF STANDARD SETTINGS

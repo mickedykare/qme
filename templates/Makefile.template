@@ -381,7 +381,7 @@ create_project_file::
 	-GTIMESTAMP=${TIMESTAMP} \
 	-GREQUIRE_VPLAN=${REQUIRE_VPLAN} \
 	-GSEND_EMAIL=${SEND_EMAIL} \
-	-GXML2UCDB_DATAFIELDS=${XML2UCDB_DATAFIELDS} \
+	-GXML2UCDB_DATAFIELDS=\"${XML2UCDB_DATAFIELDS}\" \
 	-vrmdata ${SCRATCHDIR}}" >> default.vrm.tmp 
 	@echo "VRMEND" >> default.vrm.tmp;
 	@mv default.vrm.tmp  default.vrm
