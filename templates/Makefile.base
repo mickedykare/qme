@@ -127,6 +127,7 @@ COVERCHECK_WITNESS_WAVEFORM=-witness_waveforms
 # Regression default parameters
 ###################################################################
 GRID_ENGINE=LOCAL # Supports SGE or LSF or LOCAL
+GRID_CONTROL_FILE=${QME_HOME}/templates/grid.rmdb
 MAX_PARALLEL_JOBS=20
 MAX_EXECUTION_TIME=600
 MAX_QUE_TIME=600

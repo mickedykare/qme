@@ -1,0 +1,19 @@
+<!-- This is where you modify you local settings for grid. 
+     To use it. Please override the GRIDSPEC param to point on your version of the file
+     Also GRID can point on LSF,SGE or LOCAL
+-->
+<rmdb>
+    <!-- NOTE! Not tested -->
+    <method name="compute_grid" gridtype="lsf" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LSF}">
+      <command>bsub  -J (%RUNNABLE%) -oo (%TASKDIR%)/(%SCRIPT%).bat.o%J -eo (%TASKDIR%)/(%SCRIPT%).bat.e%J (%LSFARGS%) (%WRAPPER%) </command>
+    </method>   
+    
+    <!-- NOTE! Not tested -->
+    <method name="compute_grid" gridtype="sge" action="execScript" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {SGE}">
+      <command>qsub (%SGEARGS%) -N (%INSTANCE%) (%WRAPPER%)</command> 
+    </method>
+
+    <method name="compute_grid" if="{(%GRID%)} eq {LOCAL}">
+    </method>   
+
+</rmdb>

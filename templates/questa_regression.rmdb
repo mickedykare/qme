@@ -1,8 +1,17 @@
-<?xml version="1.0"?>
-<rmdb loadtcl="mytcl" >
+<?xml version="1.1"?>
+<rmdb loadtcl="mytcl" xmlns:xi="http://www.w3.org/2003/XInclude">
+  <!-- ========================================================== -->
+  <!-- Method definitions -->
+  <!-- ========================================================== -->
+  <!-- Bad to use grid engine for everything, by default all methods will use a grid engine, please override 
+       methods in runnable where you don't want it. -->
+    <method name="local-machine"/>
+
+    
   <!-- ========================================================== -->
   <!-- BASE RUNNABLES- PLEASE EDIT or OVERRIDE -->
   <!-- ========================================================== -->
+
   <runnable name="projectsetup" type="base">
     <parameters>
       
@@ -15,6 +24,7 @@
       <!-- BEHAVIOUR CONTROL -->
       <!-- GRID can be LOCAL,LSF or SGE -->
       <parameter name="GRID">LOCAL</parameter>
+      <parameter name="GRIDSPEC">grid.rmdb</parameter>
       <parameter name="VERIFICATION_LEVEL">BLOCK</parameter>
       <parameter name="DEBUG_LEVEL">LOW</parameter>
       <parameter name="SEND_EMAIL">1</parameter>
@@ -49,7 +59,12 @@
       <parameter name="SOFFICE">libreoffice4.1</parameter>
       <!-- Extracted parameters -->
       <parameter name="DUT_SETUPS" type = "tcl">[get_all_setups (%TCSPEC%)]</parameter>
+
+
    </parameters>
+
+    <xi:include href="grid.rmdb"/>
+
   </runnable>
 
   <!-- ========================================================== -->
@@ -70,14 +85,7 @@
     <!-- GRID settings-->
     <!-- ========================================================== -->
 
-    <method name="grid" gridtype="lsf" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LSF}">
-      <command>bsub  -J (%RUNNABLE%) -oo (%TASKDIR%)/(%SCRIPT%).bat.o%J -eo (%TASKDIR%)/(%SCRIPT%).bat.e%J (%LSFARGS%) (%WRAPPER%) </command>
-    </method>   
-    
-    <!-- NOTE! Not tested -->
-    <method name="grid" gridtype="sge" action="execScript" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {SGE}">
-      <command>qsub (%SGEARGS%) -N (%INSTANCE%) (%WRAPPER%)</command> 
-    </method>
+
   </runnable>
 
   
@@ -152,7 +160,6 @@
       <parameter name="EMAIL_RECIPIENT">`whoami`</parameter>
     </parameters>
     <execScript launch="/bin/bash" mintimeout="300"> 
-      <command> ln -s (%MERGE_HOME%) (%DATADIR%)/merged_ucdbfiles </command>
        <command>EMAILMESSAGE=&quot;(%MESSAGE_FILE%)&quot;</command>
        <command>echo &quot;To: (%EMAIL_RECIPIENT%)&quot; &gt; (%MESSAGE_FILE%)</command> 
        <!--command>echo &quot;Cc: (%EMAIL_CCLIST%)&quot; &gt;&gt; (%MESSAGE_FILE%)</command--> 
@@ -217,6 +224,7 @@
       <parameter name="ALL_COMPILE_ARGS">X_COMP_ARGS=&quot; (%EXTRA_X_COMP_ARGS%) SETUP=(%ACTUAL_SETUP%) (%EXTRA_VLOG_ARGS%) (%EXTRA_VCOM_ARGS%)&quot; SC_ARGS=(%EXTRA_SC_ARGS%)</parameter>
      </parameters>
      <execScript launch="/bin/csh -f">
+      <command> ln -s (%MERGE_HOME%) (%DATADIR%)/merged_ucdbfiles </command>
        <command>unsetenv MODELSIM </command>
        <!-- First we compile the code -->
        <command>  make compile -f (%MAKEFILE%) (%ALL_COMPILE_ARGS%) </command>          
@@ -483,152 +491,7 @@
     </execScript>
   </runnable>    
 
+    <xi:include href="mytcl.rmdb"/>
+
   
-  <!-- ================================================ -->
-  <!-- == Over-ride TCL built-in                     == -->
-  <!-- == Advanced VRM capabilities                  == -->
-  <!-- == The underlying default behaviour of VRM    == -->
-  <!-- == can be modified using the exposed TCL API  == -->
-  <!-- == Usually these defined TCL methods do       == -->
-  <!-- == by default. These methods can be           == -->
-  <!-- == overriden within the usertcl element of    == -->
-  <!-- == RMDB. In addition the user can define TCL  == -->
-  <!-- == procedures that they wish to call in       == -->
-  <!-- == action scripts here also.                  == -->
-  <!-- ================================================ -->
-  <usertcl name="mytcl">
-   <!-- Overriding the VRM procedure StopRunning 
-        In this case, VRM will stop if 1000 errors are generated 
-        during execution of a regression                   -->
-   proc StopRunning {userdata} {
-    upvar $userdata data
-     set result [expr {$data(fail) == 1000}]
-    return $result
-   }
-
-
-    proc TestModeInteractive {MODE} {
-      if {[string match $MODE {interactive}]} {
-        return -gui
-      } else {
-       return -c
-      }
-    }
-
-
-   <!-- expand_testcases: This tcl procedure will expand all the testcases
-        for a certain setup -->
-
-   proc expand_testcases {file_name setup} {
-   set tclist ""
-   set tmp_file [open $file_name r]
-   while {![eof $tmp_file]} {
-         gets $tmp_file line
-         if {[string range $line 0 0] != "#"} {
-	     if {$setup == [lindex $line 0]} {
-               if {[llength $line] != 0} {
-                 if {[llength $line] == 2} {
-                   set num 1
-                 } else {
-                   set num [lindex $line 2]
-                 }
-
-                 set setup [lindex $line 0]
-                 set tc [lindex $line 1]
-                 set max [expr $num+2]
-                 #puts "processing $line - found setup = $setup, tc = $tc, num = $num, max = $max"              
-                 for {set repeat 3} {$repeat &lt;=$max} {incr repeat} {
-                          #xputs "processing repeat = $repeat"
-                   set seed [lindex $line $repeat]
-                   if {$seed == ""} {
-              #       puts "Found no spec of seed, using random"   
-                      set seed random
-                   }
-                #  puts "seed = $seed"
-                   lappend tclist [format "%s:%s:%d" $tc $seed [expr $repeat-2]]
-              }
-            }
-          }
-      }
-
-     }
-
-
-
-      close $tmp_file
-      #xputs "returning $tclist"
-
-      return $tclist
-   }
-
-
-   <!-- get_all_setups: This tcl procedure will extract all setups from the tc spec file -->
-
-
-proc get_all_setups {file_name} {
-     set tclist ""
-      set tmp_file [open $file_name r]
-      while {![eof $tmp_file]} {
-         gets $tmp_file line
-         if {[string range $line 0 0] != "#"} {
-	     # Lines containing ":" are note test cases
-	     if {[string match "*:*" $line]} {
-#		 puts "Found common argument for a setup"
-	     } else {
-            if {[llength $line] != 0} {
-		set setup [lindex $line 0]
-		lappend tclist $setup
-	    }
-	 }
-      }
-      }
-      close $tmp_file
-    set tclist [lsort -u $tclist]
-#    puts "returning $tclist"
-      return $tclist
-   }
-
-
-   <!-- get_setup_from_context: This tcl procedure will extract all setups from the tc spec file -->
-
-proc get_setup_from_context {context} {
-#echo "checking $context"
-set r [lindex [split [lindex [split $context "/"] end-2] "~"] 1]
-#echo "Returning $r"
-return $r
-}
-
-   <!-- get_extra_args: This tcl procedure will extract extra arguments from the tc spec file -->
-# This procedure looks for extra compile arguments 
-# Look for lines starting with
-proc get_extra_args {file_name setup args} {
-   set vlog_args_list ""
-   set tmp_file [open $file_name r]
-   while {![eof $tmp_file]} {
-      gets $tmp_file line
-      if {[regexp "^$setup:$args=(.+)$" $line all vlog_args]} {
-         close $tmp_file
-         return $vlog_args
-      }
-   }
-   close $tmp_file
-   return ""
-}
-
-
-
-<!-- An example of overriding the VRM procedure OkToMerge
-        This example changes the default behavior such that all 
-        ucdbfiles of both passes and failures are merged. 
-        By default only passing ucdbfiles are merged        --> 
-proc OkToMerge {userdata} {
-     upvar $userdata data
-     return 1 ; approve merge.
-   }
-   
-
-
-
-
-  </usertcl>
 </rmdb>

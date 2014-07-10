@@ -5,23 +5,25 @@ use Term::ANSIColor;
 use File::Basename;
 use Cwd;
 
-my $block;
+my $block="";
 my $parent;
-my $simdir;
+my $simdir="";
 my $projhome;
 my $force=0;
 my $help=0;
+my $version=0;
 my $scratchdir=$ENV{'QME_SCRATCH_HOME'};
 my $simsettingsdir=$ENV{'QME_SIM_SETTINGS_DIR'};
 my $makefile = $ENV{'QME_HOME'}."/"."templates/Makefile.template";
 my $block_overrides;
 
 my $srchome=$ENV{'QME_PROJECT_HOME'}."/";
-
+my $qme_version=`git describe`;
+chomp $qme_version;
 # Functions
 sub print_note{
     my $string=pop;
-    print color "bold dark blue";
+    print color "green";
     print "Note: $string\n";
     print color "reset";
 }
@@ -80,6 +82,7 @@ sub update_makefile{
 	s/___REPLACE_THIS_BLOCKNAME/$block/;
 	s/___REPLACE_THIS_BLOCK_OVERRIDES/$block_overrides/;
 	s/___REPLACE_THIS_SRCHOME/$srchome/;
+	s/___REPLACE_THIS_QME_VERSION/$qme_version/;
 	print FILE "$_";
     }
     close FILE;
@@ -93,6 +96,8 @@ sub update_makefile{
 
 
 my $usage = <<END;
+Version:$qme_version
+
  Usage: $0 [options] --name=<simdir name> --block=<blockname>
   Options:
     --help, -h                            This text
@@ -101,6 +106,7 @@ my $usage = <<END;
     --block=<block>,-b=<block>            Specifices then name of the block that we want to simulate
     --force,-f                            Force overwrite of files in the simdir
     --location,-l=<scratch home>          If you want to specify your own location of your simulation directory
+    --version,-v                          Display version of QME
 END
 
 
@@ -110,13 +116,19 @@ GetOptions ("block=s" => \$block,
 	    "parent=s"   => \$parent,
 	    'location=s' => \$scratchdir,
 	    "simdir=s" => \$simdir,   
-            "force" => \$force)
+            "force" => \$force,
+            "version" => \$version)
     or die("Error in command line arguments\n");
 
 if ($help) {
     print color "red";
     print $usage;
     print color "reset";
+    exit 0;
+}
+
+if ($version) {
+    &print_note("You are using $qme_version");
     exit 0;
 }
 
@@ -130,6 +142,7 @@ if ($block eq "") {
 $block_overrides=$srchome.$block."/sim/Makefile.block.defaults";
 
 &print_note("#################### Questa Makefile Environment (QME) ######################");
+&print_note("# Version:$qme_version");
 &print_note("# This environment is developed by Mikael Andersson, Mentor Graphics");
 &print_note("# Documentation can be found at: http://www.github.com/detstorabla/qme");
 &print_note("#############################################################################");
