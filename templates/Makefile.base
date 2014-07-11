@@ -57,7 +57,7 @@ QVIP_LIB=qvip_lib
 VSIM_COMMON_DO=${QME_HOME}/dofiles/vsim.do 
 VSIM_SCRATCH_USER_DO=./vsim_scratch.do
 UCDBFILE=${TEST}.ucdb
-RUNDIR=${TEST}
+RUNDIR=run.${TEST}.${SEED}
 TB_LIB_NAME=work
 TB_TOP_NAME=top
 
@@ -382,7 +382,7 @@ info: green_on printvars color_reset
 
 liblist: 
 	@vmap |grep "maps to" | egrep -v ${QUESTA_HOME} |cut -d" " -f1 | sed s/\"/-L\ / | sed s/\"//g |grep -v ^Job > ${LIBLIST}
-	@find ${QUESTACLIBS_DIR} -name '*.so' -print | sed s/\\.so//g | sed s/\^/-sv_lib\ /g >> ${LIBLIST}
+	@find ${QUESTACLIBS_DIR} -name '*.so' -print | sed s/\\.so//g | sed s/\^/-sv_lib\ /g >> ${LIBLIST} 
 	@echo "Created list of compiled libraries for questa: ${LIBLIST}"
 
 

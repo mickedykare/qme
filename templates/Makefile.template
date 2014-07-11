@@ -73,10 +73,13 @@ compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 
 compile_rtl::precompile_rtl
 	${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
+	mv  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/rtl_liborder.txt
 
 compile_tb::precompile_tb compile_qvips 
 	${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
-
+	@cp  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/tb_liborder.txt
+	@cp ${QUESTALIBS_DIR}/rtl_liborder.txt ${QUESTALIBS_DIR}/liborder.txt
+	@cat ${QUESTALIBS_DIR}/tb_liborder.txt >> ${QUESTALIBS_DIR}/liborder.txt
 no_uvmc::
 	@echo "NOTE! UVMC not enabled. Use UVMC=1 to enable..."
 
@@ -122,6 +125,25 @@ opt_dbg:
 	${DISABLE_VERDI_PLI};${VOPT} -work $(TB_LIB_NAME) ${VOPT_TOP_LEVELS} -l vopt_dbg.log \
 	-o $(TB_TOP_NAME)_dbg -$(ARCH) $(VOPTSWITCHES_BLOCK) ${CC_OPT_ARGS} ${X_OPT_ARGS} -f ${LIBLIST} -time ${DEBUG}
 
+#########################################################
+# prepare recompile
+#########################################################
+create_recompile_in_background::
+#	@test -e ${QUESTALIBS_DIR}/makefile.remake&&echo "${QUESTALIBS_DIR}/makefile.remake already exists"
+	@test -e ${QUESTALIBS_DIR}/makefile.remake||echo "Running generation of remake file in background"
+	@test -e ${QUESTALIBS_DIR}/makefile.remake||create_questa_remake.pl ${QUESTALIBS_DIR}  ${QUESTALIBS_DIR}/liborder.txt  ${QUESTALIBS_DIR}/makefile.remake&
+
+create_recompile::${QUESTALIBS_DIR}/makefile.remake
+
+${QUESTALIBS_DIR}/makefile.remake::
+	create_questa_remake.pl ${QUESTALIBS_DIR}  ${QUESTALIBS_DIR}/liborder.txt  ${QUESTALIBS_DIR}/makefile.remake
+
+recompile:: 
+	@echo "Updating ${QUESTALIBS_DIR}/makefile.remake if it does not exist"
+	@test -e ${QUESTALIBS_DIR}/makefile.remake||create_questa_remake.pl ${QUESTALIBS_DIR}  ${QUESTALIBS_DIR}/liborder.txt  ${QUESTALIBS_DIR}/makefile.remake&
+	@echo "Starting recompile..."
+	@make all -f  ${QUESTALIBS_DIR}/makefile.remake
+
 
 ############  Simulation targets ########################
 # Flow is different for chip level or block level
@@ -158,7 +180,7 @@ clean_rundir:
 # Start a block level simulation, using built in vopt
 #########################################################
 
-gui_block:: liblist clean_rundir presim
+gui_block:: create_recompile_in_background liblist clean_rundir presim
 	@echo "Launching GUI in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  ${VSIM_TOP_LEVELS} -$(ARCH) \
@@ -192,7 +214,7 @@ gui_block:: liblist clean_rundir presim
 # Start a chip level simulation, using vopt separately
 #########################################################
 
-gui_chip:: liblist clean_rundir opt_dbg presim
+gui_chip:: create_recompile_in_background liblist clean_rundir opt_dbg presim
 	@echo "Launching GUI in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_dbg -$(ARCH) \
@@ -225,7 +247,7 @@ gui_chip:: liblist clean_rundir opt_dbg presim
 # Start a block level simulation, using built in vopt
 #########################################################
 
-batch_block:: liblist clean_rundir presim
+batch_block:: create_recompile_in_background liblist clean_rundir presim
 	@echo "Launching batch in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM} ${VSIM_TOP_LEVELS} -$(ARCH) \
@@ -259,7 +281,7 @@ batch_block:: liblist clean_rundir presim
 # Start a chip level simulation, using vopt separately
 #########################################################
 
-batch_chip:: liblist clean_rundir opt_dbg presim
+batch_chip:: create_recompile_in_background liblist clean_rundir opt_dbg presim
 	@echo "Launching batch in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_dbg -$(ARCH) \

@@ -162,6 +162,9 @@ foreach my $l (@indata) {
 @indata=@tmp;
 my $lib=$default_lib;
 
+my $cmd="rm -f $library_home/liborder.txt";
+&system_cmd($cmd);
+
 
 foreach my $f (@indata) {
     if ($f =~ /^\@library/ ) {
@@ -170,15 +173,27 @@ foreach my $f (@indata) {
 	&infomsg("Creating library $lib if does not exists");
 	my $cmd="test -e $library_home||mkdir $library_home";
 	&system_cmd($cmd);
+
+	&infomsg("Creating library $lib/touchfiles if does not exists");
+	my $cmd="test -e $library_home/touchfiles||mkdir $library_home/touchfiles";
+	&system_cmd($cmd);
+	&infomsg("Creating $lib");
 	$cmd="vlib $library_home/$lib";
 	&system_cmd_hl($cmd);
+	&infomsg("Mapping $lib");
 	$cmd="vmap $lib $ENV{'PWD'}/$library_home/$lib";
 	&system_cmd_hl($cmd);
+	my $cmd="echo $lib >> $library_home/liborder.txt";
+	&system_cmd($cmd);
+
     } else {
 	 
 
 
 	&compile_file($f,$lib);
+	my $cmd="touch $library_home/touchfiles/$lib";
+	&system_cmd_hl($cmd);
+
     }
 }
 
