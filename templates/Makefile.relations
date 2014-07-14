@@ -132,6 +132,15 @@ else
 SETUPARGS=-vlogargs=+define+${SETUP}
 endif
 
+ifeq ($(AUTOSTART),0)
+RUNNABLE=-gui
+else
+RUNNABLE=my_run
+endif
+
+
+
+
 
 # Regression timeouts
 ifeq ($(NOTIMEOUT),1)

@@ -72,11 +72,11 @@ compile_uvm::
 compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 
 compile_rtl::precompile_rtl
-	${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
+	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 	mv  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/rtl_liborder.txt
 
 compile_tb::precompile_tb compile_qvips 
-	${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
+	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 	@cp  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/tb_liborder.txt
 	@cp ${QUESTALIBS_DIR}/rtl_liborder.txt ${QUESTALIBS_DIR}/liborder.txt
 	@cat ${QUESTALIBS_DIR}/tb_liborder.txt >> ${QUESTALIBS_DIR}/liborder.txt
@@ -142,7 +142,7 @@ recompile::
 	@echo "Updating ${QUESTALIBS_DIR}/makefile.remake if it does not exist"
 	@test -e ${QUESTALIBS_DIR}/makefile.remake||create_questa_remake.pl ${QUESTALIBS_DIR}  ${QUESTALIBS_DIR}/liborder.txt  ${QUESTALIBS_DIR}/makefile.remake&
 	@echo "Starting recompile..."
-	@make all -f  ${QUESTALIBS_DIR}/makefile.remake
+	@${DISABLE_VERDI_PLI};make all -f  ${QUESTALIBS_DIR}/makefile.remake
 
 
 ############  Simulation targets ########################
@@ -405,6 +405,7 @@ create_project_file::
 	-GREQUIRE_VPLAN=${REQUIRE_VPLAN} \
 	-GSEND_EMAIL=${SEND_EMAIL} \
 	-GXML2UCDB_DATAFIELDS=\"${XML2UCDB_DATAFIELDS}\" \
+	-GEMAIL_RECIPIENT=${EMAIL_RECIPIENT} \
 	-vrmdata ${SCRATCHDIR}}" >> default.vrm.tmp 
 	@echo "VRMEND" >> default.vrm.tmp;
 	@mv default.vrm.tmp  default.vrm
@@ -426,11 +427,15 @@ check_prereq::
 	  echo "DEFAULT_SETUP my_test 10 random" > ${TC_SPEC}; \
 	fi;
 
-
 regression:: check_prereq create_project_file
-	vrun -gui -verbose -project default.vrm -rmdb ${RMDBFILE} ${REGRESSION_ARGS}
+	vrun -project default.vrm -rmdb ${RMDBFILE} ${REGRESSION_ARGS} ${RUNNABLE} -clean -config  ${BLOCKNAME}_regression&
 
+regression_status::
+	vrun -status -rmdb ${RMDBFILE} -vrmdata ${SCRATCHDIR}
 
+regression_kill:
+	@echo "Attempting to kill all processes started on this machine"
+	vrun -kill -rmdb ${RMDBFILE} -vrmdata ${SCRATCHDIR}
 ############# Formal tools ##############################
 
 #########################################################

@@ -18,7 +18,7 @@ my $makefile = $ENV{'QME_HOME'}."/"."templates/Makefile.template";
 my $block_overrides;
 
 my $srchome=$ENV{'QME_PROJECT_HOME'}."/";
-my $qme_version=`git describe`;
+my $qme_version=`cd $ENV{'QME_HOME'};git describe`;
 chomp $qme_version;
 # Functions
 sub print_note{
@@ -29,14 +29,14 @@ sub print_note{
 }
 sub print_error{
     my $string=pop;
-    print color "bold dark red";
+    print color "bold red";
     print "ERROR: $string\n";
     print color "reset";
 }
 
 sub print_warning{
     my $string=pop;
-    print color "bold dark yellow";
+    print color "dark red";
     print "Warning: $string\n";
     print color "reset";
 }
@@ -96,7 +96,7 @@ sub update_makefile{
 
 
 my $usage = <<END;
-Version:$qme_version
+Version:$qme_version 
 
  Usage: $0 [options] --name=<simdir name> --block=<blockname>
   Options:
@@ -142,7 +142,7 @@ if ($block eq "") {
 $block_overrides=$srchome.$block."/sim/Makefile.block.defaults";
 
 &print_note("#################### Questa Makefile Environment (QME) ######################");
-&print_note("# Version:$qme_version");
+&print_note("# Version:$qme_version located at $ENV{'QME_HOME'}");
 &print_note("# This environment is developed by Mikael Andersson, Mentor Graphics");
 &print_note("# Documentation can be found at: http://www.github.com/detstorabla/qme");
 &print_note("#############################################################################");
@@ -167,6 +167,29 @@ if (-e $ENV{'QME_SCRATCH_HOME'}) {
 } else {
     die("Please check QME_SCRATCH_HOME($ENV{'QME_SCRATCH_HOME'}) (ERROR)");
 }
+
+if (-e $ENV{'QUESTA_HOME'}) {
+    &print_note("Checking Environment Variable QUESTA_HOME (OK)");
+} else {
+    die("Please set QUESTA_HOME to point to the location of Questasim (ERROR)");
+}
+
+if (-e $ENV{'QUESTA_MVC_HOME'}) {
+    &print_note("Checking Environment Variable QUESTA_MVC_HOME (OK)");
+} else {
+    &print_warning("Please set QUESTA_MVC_HOME to point to the location of Questa Vip if you intend to use any");
+}
+
+if (-e $ENV{'HOME_0IN'}) {
+    &print_note("Checking Environment Variable HOME_0IN (OK)");
+} else {
+    &print_warning("Please set HOME_0IN to point to the location of Questa Formal tools if you intend to use any of that technology");
+}
+
+
+
+
+
 
 # For simplicity all blocks are considered to be on the same level
 if (-e $projhome."/".$block) {
@@ -198,7 +221,7 @@ my $simdir_fp=$ENV{'QME_SCRATCH_HOME'}."/".$simdir;
 
 if (-e $simdir_fp) {
     if ($force == 0) {
-    die("Error: $simdir_fp already exists, add -force to overwrite Makefile");
+    die("Error: $simdir_fp already exists, add --force/-f to overwrite Makefile");
     } else {
     &print_note("Overwriting Makefile in $simdir_fp");
 

@@ -17,7 +17,7 @@ QUESTA_GCC_VERSION=4.5.0
 VSIM_TIMERES=-t ps
 TIMINGCHECKS=+notimingchecks
 UVM_SIM_ARGS=+UVM_NO_RELNOTES
-UVMCONTROL_REGR=-uvmcontrol=msglog
+UVMCONTROL_REGR=-uvmcontrol=all
 UVM_VERBOSITY=UVM_MEDIUM
 UVM_VERBOSITY_REGR=UVM_NONE
 # LOW,FULL, MEDIUM
@@ -41,6 +41,7 @@ UVM_HOME=${QME_HOME}/uvm/${UVM_VERSION}
 ###################################################################
 # Naming
 #################################################################
+EMAIL_RECIPIENT=`whoami`
 RTLDIR=rtl
 WORKLIB=work
 LIBRARY_HOME=questa_libs
@@ -83,7 +84,6 @@ SETUP=____DEFAULT_SETUP
 # Test specific overrides
 ###################################################################
 TEST=SET_YOUR_TESTNAME
-VERBOSITY=UVM_MEDIUM
 SEED=0
 
 EXTRA_VLOG_ARGS=
@@ -127,7 +127,7 @@ COVERCHECK_WITNESS_WAVEFORM=-witness_waveforms
 # Regression default parameters
 ###################################################################
 GRID_ENGINE=LOCAL # Supports SGE or LSF or LOCAL
-GRID_CONTROL_FILE=${QME_HOME}/templates/grid.rmdb
+AUTOSTART=0
 MAX_PARALLEL_JOBS=20
 MAX_EXECUTION_TIME=600
 MAX_QUE_TIME=600
@@ -179,20 +179,29 @@ QUESTA_VIP_SIM_ARGS=-mvchome $(QUESTA_MVC_HOME)
 QVIP_COMMON=mvc_base
 else
 QUESTA_VIP_SIM_ARGS=
-QVIP_COMMON=mvc_base
+QVIP_COMMON=
 endif
  # Used for checking compilation
-allqvips: mvc_base apb3 ace acelite ahb axi axi4 axi4lite axi4stream axi_lp \
-cec csi2 ddr ddr2 ddr3 digrf dsi eth_1g ethernet hdmi i2c i2s jtag lli mphy ocp pcie smartcard spi spi4 uart USB2_0\
-USB3_0_SS
+ALLQVIPTARGETS=$(shell ls ${QUESTA_MVC_HOME}/questa_mvc_src/sv | grep -v .sv | tr '\n' ' ')
+allqvips: ${ALLQVIPTARGETS}
 
-qvip_default:
+
+
+
+list_qvip::
+	@tput setaf 6;
+	@echo "# Available QVIPs in ${QUESTA_MVC_HOME}"
+	@echo "`ls ${QUESTA_MVC_HOME}/questa_mvc_src/sv | grep -v mvc_base | grep -v .sv `"
+	@tput setaf 9;
+
+
+qvip_default::
 	@tput setaf 6;
 	@echo "NOTE! To compile Questa VIPs, override QVIP_TARGETS"
 	@echo "      e.g. QVIP_TARGETS=\"axi apb3 i2c\""
 	@tput setaf 9;
 
-mvc_base:
+mvc_base::
 	@echo "Compiling infrastructure files"
 	@test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
 	@test -d ${QUESTALIBS_DIR}/${QVIP_LIB}||vlib ${QUESTALIBS_DIR}/${QVIP_LIB}
@@ -200,160 +209,169 @@ mvc_base:
 	${VLOG} -work ${QVIP_LIB} -sv ${QUESTA_MVC_HOME}/include/questa_mvc_svapi.svh 
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${QUESTA_MVC_HOME}/questa_mvc_src/sv/mvc_pkg.sv ${UVM_INC_DIR}
 
-apb3:
+arm11_ahb::
+	@echo "Compiling protocol package $@"
+	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
+	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_arm11_ahb_v2_0_pkg.sv
+
+
+
+
+
+apb3::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_apb3_v1_0_pkg.sv
-ace:
+ace::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_ace_v1_0_pkg.sv
 
-acelite:
+acelite::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_acelite_v1_0_pkg.sv
 
-ahb:
+ahb::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_ahb_v2_0_pkg.sv
 
-axi:
+axi::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi_v1_0_pkg.sv
 
-axi4:
+axi4::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi4_v1_0_pkg.sv
 
-axi4lite:
+axi4lite::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi4lite_v1_0_pkg.sv
 
 
-axi4stream:
+axi4stream::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi4stream_v1_0_pkg.sv
 
-axi_lp:
+axi_lp::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_axi_lp_v1_0_pkg.sv
 
-cec:
+cec::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_pkg.sv
 
-csi2:
+csi2::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_01_pkg.sv
 
-ddr:
+ddr::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_pkg.sv
 
-ddr2:
+ddr2::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 
-ddr3:
+ddr3::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 
-digrf:
+digrf::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@v4_1_2_pkg.sv
 
-dsi:
+dsi::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_02_pkg.sv
-eth_1g:
+eth_1g::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 
-ethernet:
+ethernet::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 
-hdmi:
+hdmi::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_pkg.sv
 
-i2c:
+i2c::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v2_1_pkg.sv
 
-i2s:
+i2s::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 
-jtag:
+jtag::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v2_0_pkg.sv
 
-lli:
+lli::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_00_pkg.sv
 
-mphy:
+mphy::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_4_pkg.sv
 
-ocp:
+ocp::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v2_2_pkg.sv
 
-pcie:
+pcie::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v2_0_pkg.sv
 
-smartcard:
+smartcard::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_pkg.sv
 
-spi:
+spi::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
 
-spi4:
+spi4::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_2_pkg.sv
 
-uart:
+uart::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_$@_v1_0_pkg.sv
-USB2_0:
+USB2_0::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_usb_v2_0_pkg.sv
 
-USB3_0_SS:
+USB3_0_SS::
 	@echo "Compiling protocol package $@"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_usb_ss_v3_0_pkg.sv
@@ -361,26 +379,26 @@ USB3_0_SS:
 ###################################################################
 # Color printouts
 ###################################################################
-green_on:
+green_on::
 	@tput setaf 2;
 	@echo "#############################################################"
 
-blue_on:
+blue_on::
 	@tput setaf 6;
 	@echo "#############################################################"
 
 
-color_reset:
+color_reset::
 	@echo "#############################################################"
 	@tput setaf 9;
 
-printvars: green_on
+printvars:: green_on
 	@$(foreach V,$(sort $(.VARIABLES)), \
 	$(if $(filter-out environment% default automatic, $(origin $V)),$(warning $V=$($V) ($(value $V)))))
 
-info: green_on printvars color_reset
+info:: green_on printvars color_reset
 
-liblist: 
+liblist:: 
 	@vmap |grep "maps to" | egrep -v ${QUESTA_HOME} |cut -d" " -f1 | sed s/\"/-L\ / | sed s/\"//g |grep -v ^Job > ${LIBLIST}
 	@find ${QUESTACLIBS_DIR} -name '*.so' -print | sed s/\\.so//g | sed s/\^/-sv_lib\ /g >> ${LIBLIST} 
 	@echo "Created list of compiled libraries for questa: ${LIBLIST}"
@@ -397,6 +415,14 @@ precompile_rtl::
 precompile_tb::
 	@tput setaf 6;
 	@echo "Extend target precompile_tb to do stuff before compiling TB"
+	@tput setaf 9;
+postcompile_rtl::
+	@tput setaf 6;
+	@echo "Extend target postcompile_rtl to do stuff before compiling RTL"
+	@tput setaf 9;
+postcompile_tb::
+	@tput setaf 6;
+	@echo "Extend target postcompile_tb to do stuff before compiling TB"
 	@tput setaf 9;
 presim::
 	@tput setaf 6;

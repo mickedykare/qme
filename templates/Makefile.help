@@ -2,22 +2,30 @@
 default::header
 help::header 
 
-help_all::header help_override help_compile help_simulate
+help_all::header help_override help_compile help_simulate help_regression
 
 header:
 	@tput setaf 4;
 	@echo "########################## Questa Makefile Environment (QME) ############################################"
+	@echo "# Version: ${QME_VERSION} located at ${QME_HOME}"
+	@echo "#"
 	@echo "# This environment is developed by Mikael Andersson, Mentor Graphics"
 	@echo "# contact email: Mikael_Andersson@mentor.com"
 	@echo "# Documentation can be found at: http://www.github.com/detstorabla/qme"
 	@echo "#"
-	@echo "# Available subjects are:"
+	@echo "### Available subjects are: ###"
 	@echo "#   make help_all"
 	@echo "#   make help_override"
 	@echo "#   make help_compile"
 	@echo "#   make help_simulate"
-	@echo "#   make help_tutorials"
-	@echo "#   make help_getting_started"
+	@echo "#   make help_regression"
+	@echo "#   make help_tutorial"
+	@echo "#   make help_qvip"
+	@echo "#   make help_infact"
+	@echo "#   make help_adding_targets"
+	@echo "#   make help_"
+	@echo "#   make help_"
+
 
 	@tput setaf 9;
 
@@ -29,7 +37,7 @@ help_override::
 	@echo "# 1. Override on command line: make compile SEED=1234 (Override the param SEED with 1234)"
 	@echo "# 2. Add an override just for your block in ${BLOCK_OVERRIDES}:"
 	@echo "#    # enable 64 bit mode:"
-	@echo "#    x32=0"
+	@echo "#    ARCH=64"
 	@echo "# 3. Add an override for your project in ${QME_PROJECT_HOME}/qme_setup/Makefile.project.defaults:"
 	@echo "#    # We don't use verification plans by default:"
 	@echo "#    REQUIRE_VPLAN=0"
@@ -42,10 +50,10 @@ help_override::
 	@echo "#    b. \"make info\" will list all variables and relations (in alphabetical order) "
 	@echo "#    c. \"make print-<variable name> will print value. Example; make print-BLOCK_OVERRIDES"
 	@echo "#"
+	@echo "# Most commonly used overrides are mentioned in each help section"
+	@echo "# Below the general overrides that affects all step are listed"
+	@echo "# ARCH=32/64 (Current value ${ARCH}) 32 or 64 bit mode "
 	@tput setaf 9;
-
-
-
 
 
 help_compile::
@@ -55,16 +63,22 @@ help_compile::
 	@echo "# To compile only the test bench (no opt):                     make compile_tb"
 	@echo "# To compile dut (no opt):                                     make compile_rtl"
 	@echo "# To optimize (opt) all code:                                  make opt"
-	@echo "# Compilation Options:"
-	@echo "# SETUP=<setup> will compile the code with <setup> defined"
-	@echo "#"
-	@echo "# Some Examples:"
+	@echo "# "
+	@echo "### Compilation Overrides: ###"
+	@echo "# SETUP=<setup> 				will compile the code with <setup> defined"
+	@echo "# RECOMPILE_UVM=1 (${RECOMPILE_UVM}		Recompile UVM with actual timescale used"
+	@echo "# EXTRA_VLOG_ARGS=<>			If you want to add an extra vlog argument to all files"
+	@echo "# EXTRA_VCOM_ARGS=<>			If you want to add an extra vcom argument to all files"
+	@echo "# DUT_FILELIST=<path> (${DUT_FILELIST})	If you want to use a different filelist"
+	@echo "# TB_FILELIST=<path>  (${TB_FILELIST})	If you want to use a different filelist"
+	@echo "# "
+	@echo "### Some Examples: ###"
 	@echo "# mybsub make compile"
 	@echo "# mybsub make compile SETUP=SETUP_DL"
-	@echo "# mybsub make compile SETUP=SETUP_DL x32=true"
+	@echo "# mybsub make compile SETUP=SETUP_DL ARCH=64 (run in 64 bit mode)"
 	@echo "# mybsub make recompile (reuses previous setup)"
 	@echo "# mybsub make compile_tb SETUP=SETUP_DL"
-	@echo "# mybsub make compile_tb SETUP=SETUP_DL x32=1"
+	@echo "# mybsub make compile_tb SETUP=SETUP_DL"
 	@echo "#"
 	@tput setaf 9;
 
@@ -73,39 +87,161 @@ help_simulate::
 	@tput setaf 4;
 	@echo "########################## SIMULATION ###################################################################"
 	@echo "# To start simulation in GUI mode (Block level simulation):    make gui TEST=my_test_name "
-	@echo "# To start simulation in GUI mode in chip mode (3-step flow):  make gui TEST=my_test_name CHIP=true"
+	@echo "# To start simulation in GUI mode in chip mode (3-step flow):  make gui TEST=my_test_name VERIFICATION_LEVEL=CHIP"
 	@echo "#"
 	@echo "# To start simulation in batch mode (2-step opt flow):         make batch TEST=my_test_name "
-	@echo "# To start simulation in GUI mode in chip mode (3-step flow):  make batch TEST=my_test_name CHIP=true"
+	@echo "# To start simulation in GUI mode in chip mode (3-step flow):  make batch TEST=my_test_name VERIFICATION_LEVEL=CHIP"
 	@echo "#"
+	@echo "### Simulation Overrides: ###"
+	@echo "# TEST=<testname>						(${TEST})	required to select test"
+	@echo "# DEBUG_LEVEL=LOW|MEDIUM|FULL 					(${DEBUG_LEVEL})		Debug level (affects performance):"
+	@echo "# UVM_VERBOSITY=UVM_MEDIUM|UVM_NONE|UVM_HIGH|UVM_DEFAULT 	(${UVM_VERBOSITY}) 		UVM verbositity"
+	@echo "# VERIFICATION_LEVEL=BLOCK/CHIP  				(${VERIFICATION_LEVEL})			Enable chip level flow (faster) "
+	@echo "# EXTRA_VSIM_ARGS=<>									If you want to add something extra to vsim"
+	@echo "# EXTRA_VOPT_ARGS=<>									If you want to add some extra vopt argument"
+
 	@echo "#"
-	@echo "# Debug level (affects performance):"
-	@echo "# add DEBUG_LEVEL=LOW|MEDIUM(default)|FULL"
-	@echo "#"
-	@echo "# Message verbosity:"
-	@echo "# add UVM_VERBOSITY=UVM_MEDIUM|UVM_NONE|UVM_HIGH|UVM_DEFAULT " 
-	@echo "#"
-	@echo "# Some Examples:"
+	@echo "### Some Examples: ###"
 	@echo "#        make gui TEST=my_test"
 	@echo "#        make gui TEST=my_test FAST=1 UVM_VERBOSITY=UVM_NONE"
 	@echo "#        make gui TEST=my_test DEBUG_LEVEL=FULL UVM_VERBOSITY=UVM_HIGH"
-	@echo "#        make gui TEST=my_test FAST=1 CHIP=1"
-	@echo "#        make compile gui TEST=my_test FAST=1"
+	@echo "#        make gui TEST=my_test VERIFICATION_LEVEL=CHIP"
+	@echo "#        make compile gui TEST=my_test"
 	@echo "#"
 	@tput setaf 9;
 
 
+help_regression::
+	@tput setaf 4;
+	@echo "########################## Running Regressions #########################################"
+	@echo "# QME is set up to assist you with running regressions. To be able to run regressions,"
+	@echo "# the following prerequisites apply:"
+	@echo "#"
+	@echo "# * tc_spec.txt (${TC_SPEC}) must exist:  "
+	@echo "#   This file contains information about verification plan and which tests that should be"
+	@echo "#   run. E.g."
+	@echo "#   a. Define where your XML verification plan is located: "
+	@echo "#      <SETUP>:VPLAN_XML=<path to file"
+	@echo "#   b. Define which tests should be run and how many times and seeds: "
+	@echo "#      <SETUP> <testname> <no of simulations> <list of seeds>"
+	@echo "#      DEFAULT my_test1 100 random"
+	@echo "#      DEFAULT my_test2 100 1124566 -22423423234 random"
+	@echo "#      (The last lines means that two of the simulations have specified seeds, the rest random"
+	@echo "# * You do need a UVM testbench built according to the regressions"
+	@echo "#"
+	@echo "# To launch the regression from GUI"
+	@echo "# make regression"
+	@echo "# Select the \"VRM Cockpit\" tab and highlight $BLOCKNAME_regression, RMP and select \"run\" or \"run special\""
+	@echo "# The latter allows you to use the gui to select and modify stuff before starting the regression"
+	@echo "#"
+	@echo "# To launch the regression in \"batchmode\""
+	@echo "# make regression AUTOSTART=1"
+	@echo "#"
+	@echo "# To view the current status on an existing regression:"
+	@echo "# make regression_status"
+	@echo "#"
+	@echo "# To kill the current regression and all existing jobs"
+	@echo "# make regression_kill"
+	@echo "#"
+	@echo "# To enable automatic rerun of failing simulations CHECK!"
+	@echo "#"
+	@echo "#"
+	@echo "#"
+	@echo "#"
+	@echo "#"
+	@echo "#"
+	@echo "#"
+	@echo "#"
+	@echo "#"
 
-help_tutorials::
+	@tput setaf 9;
+
+
+
+
+
+
+help_qvip::
+	@tput setaf 4;
+	@echo "########################## SETTING UP QUESTA VIP #########################################"
+	@echo "# It is extremly easy to start using the QUESTA VIP in QME. "
+	@echo "#"
+	@echo "# First of all. You need to specify which vips that should be compiled."
+	@echo "# This is done by adding an override in your Makefile.block.overrides file (${BLOCK_OVERRIDES})"
+	@echo "# Example: You need i2c and apb3, add the following line:"
+	@echo "# QVIP_TARGETS=i2c apb3"
+	@echo "#"
+	@echo "#To test it, do make compile_qvips"
+	@echo "#"
+	@echo "#"
+	@echo "#"
+	@echo "#"
+	@echo "#"
+	@echo "#"
+
+	@tput setaf 9;
+
+help_cover::
+	@tput setaf 4;
+	@echo "########################## SETTING UP AND RUNNING QUESTA COVERCHECK ######################"
+	@tput setaf 9;
+
+help_autocheck::
+	@tput setaf 4;
+	@echo "########################## SETTING UP AND RUNNING QUESTA AUTOCHECK #######################"
+	@tput setaf 9;
+
+
+help_tutorial::
 	@tput setaf 4;
 	@echo "########################## SIMULATION TUTORIALS #########################################"
-	@echo "# Here are some very simple tutorials on how to use QME"
-	@echo "#"
-	@echo "# BASIC SIMULATION "
-	@echo "#This tutorial shows how the environment is meant to be used"
-	@echo "# REGRESSION "
-	@echo "# USING QUESTA VIP "
-	@echo "# USING QUESTA VIP "
+	@echo "# Here's a simple tutorial on how to use QME"
+	@echo "# 1. Go to the location of the QME source code."
+	@echo "# 2. do source source_me.sh"
+	@echo "# 3. Create a simulation directory using:"
+	@echo "#    create_questa_simdir.pl -s sim_fpu -b fpu"
+	@echo "# 4. Copy the last line with the chdir command and execute it. Now you should stand in the"
+	@echo "#    simulation directory sim_fpu"
+	@echo "# This is the simulation setup you need to do. before we try the different sections below"
+	@echo "# "
+	@echo "### BASIC SIMULATION ###"
+	@echo "# This part illustrates how you run basic simulation"
+	@echo "# 1. make compile"
+	@echo "# 2. make gui TEST=fpu_test_patternset"
+	@echo "# 3. vsim>run -a;exit -f"
+	@echo "#    Notice that you now got a run directory run.fpu_test_patternset.0 (run.<testname>.<seed>)"
+	@echo "#    In this directory all the logs and output data from this simulation is stored"
+	@echo "#    Try changing one file: touch ${QME_HOME}/examples/fpu/tb/src/top.sv"
+	@echo "# 4. make recompile"
+	@echo "# 5. make gui TEST=fpu_test_patternset"
+	@echo "# Try different debug visibility:"
+	@echo "# 6. make gui TEST=fpu_test_patternset DEBUG_LEVEL=FULL"
+	@echo "# Check out schematic viewer, fsm etc"
+	@echo "# "
+	@echo "### REGRESSION ###"
+	@echo "# This part illustrates how we work with regressions in QME."
+	@echo "# 1. The file ${TC_SPEC} contains the information necessary for regressions like:"
+	@echo "#    Name of verification plan and which tests and how many times we would like to run them."
+	@echo "#    The first column is the name of the parameter setup that we are using"
+	@echo "#    The second column is the name of the test we want to run"
+	@echo "#    The third column contains the number of simulations that you would like to run"
+	@echo "#    The rest of the columns are a list of seeds. random is default"
+
+	@tput setaf 9;
+	@cat ${TC_SPEC}
+	@tput setaf 4;
+	@echo "# 2. Start the regression with:"
+	@echo "#    make regression&"
+	@echo "# Select the \"VRM Cockpit\" tab and highlight fpu_regression, RMP and select \"run\" or \"run special\""
+	@echo "# The latter allows you to use the gui to select and modify stuff before starting the regression"
+	@echo "# Play with the VRM Results window, expand, flat/hier view etc"
+	@echo "# In the  \"VRM Cockpit\", expand until you find merged_ucdbfiles. Double click on the ucdb file with todays date."
+	@echo "# In the  \"Browser\", try different Column Layouts in the drop down list above the window."
+	@echo "# In the  \"Browser\", double click on the UCDB file"
+	@echo "# Open View-> \"Verification Tracker\" and explore the \"Tracker\" "
+	@echo "# Close the Run Manager"
+	@echo "# If you have Questa Formal tools installed and set up, try this:"
+	@echo "# make regression COVER=1&
 	@tput setaf 9;
 
 help_getting_started::
