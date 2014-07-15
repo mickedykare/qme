@@ -5,7 +5,6 @@
 // THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION WHICH IS THE PROPERTY OF
 // MENTOR GRAPHICS CORPORATION OR ITS LICENSORS AND IS SUBJECT TO LICENSE TERMS
 //
-// bugs, enhancement requests to: avidan_efody@mentor.com
 // *************************************************************************************
 
 package sli_clk_reset_pkg;

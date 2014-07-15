@@ -1,3 +1,16 @@
+<!-- **********************************************************************************
+# grid.rmdb
+# Questa Makefile Environment
+#
+# Copyright 2014 Mentor Graphics Corporation
+# All Rights Reserved
+#
+# THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION WHICH IS THE PROPERTY OF
+# MENTOR GRAPHICS CORPORATION OR ITS LICENSORS AND IS SUBJECT TO LICENSE TERMS
+#
+# bugs, enhancment requests to: Mikael_Andersson@mentor.com
+# **********************************************************************************-->
+
 <!-- This is where you modify you local settings for grid. 
      To use it. Please override the GRIDSPEC param to point on your version of the file
      Also GRID can point on LSF,SGE or LOCAL

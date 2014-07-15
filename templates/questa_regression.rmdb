@@ -1,6 +1,19 @@
 <?xml version="1.1"?>
+<!-- **********************************************************************************
+# questa_regression.rmdb
+# Questa Makefile Environment
+#
+# Copyright 2014 Mentor Graphics Corporation
+# All Rights Reserved
+#
+# THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION WHICH IS THE PROPERTY OF
+# MENTOR GRAPHICS CORPORATION OR ITS LICENSORS AND IS SUBJECT TO LICENSE TERMS
+#
+# bugs, enhancment requests to: Mikael_Andersson@mentor.com
+# **********************************************************************************-->
+
+
 <rmdb loadtcl="mytcl" xmlns:xi="http://www.w3.org/2003/XInclude">
-  <!-- ========================================================== -->
   <!-- Method definitions -->
   <!-- ========================================================== -->
   <!-- Bad to use grid engine for everything, by default all methods will use a grid engine, please override 

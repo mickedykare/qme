@@ -1,4 +1,17 @@
 #!/usr/bin/perl -w
+# *************************************************************************************
+# create_questa_remake.pl
+# Questa Makefile Environment
+#
+# Copyright 2014 Mentor Graphics Corporation
+# All Rights Reserved
+#
+# THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION WHICH IS THE PROPERTY OF
+# MENTOR GRAPHICS CORPORATION OR ITS LICENSORS AND IS SUBJECT TO LICENSE TERMS
+#
+# bugs, enhancment requests to: Mikael_Andersson@mentor.com
+# ************************************************************************************
+
 ##################################################################
 # Usage create_questa_remake.pl
 # Script that generates a makefile for all source files for

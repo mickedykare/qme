@@ -1,4 +1,17 @@
 #!/usr/bin/perl -w
+# *************************************************************************************
+# keyword_highlight.pl
+# Questa Makefile Environment
+#
+# Copyright 2014 Mentor Graphics Corporation
+# All Rights Reserved
+#
+# THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION WHICH IS THE PROPERTY OF
+# MENTOR GRAPHICS CORPORATION OR ITS LICENSORS AND IS SUBJECT TO LICENSE TERMS
+#
+# bugs, enhancment requests to: Mikael_Andersson@mentor.com
+# ************************************************************************************
+
 use Term::ANSIColor;
 $disable=pop;
 

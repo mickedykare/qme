@@ -11,3 +11,5 @@
 
 And finally you need to add  $QME_HOME/scripts to your path.
 
+3, QUESTA_HOME needs to point at the Questa installation
+
