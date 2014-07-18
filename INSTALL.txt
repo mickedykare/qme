@@ -6,10 +6,11 @@
    QME_SIM_SETTINGS_DIR : The name of the directory under your block where 
    			  you store all simulation information. 
 			  Normally set to  "sim" 
+   QME_SITE_SETTINGS    : If you need to add site specific overrides
 
    QME_SCRATCH_HOME     : This is where your simulation directories end up
 
 And finally you need to add  $QME_HOME/scripts to your path.
 
-3, QUESTA_HOME needs to point at the Questa installation
+3. QUESTA_HOME needs to point at the Questa installation
 

@@ -15,7 +15,7 @@
 default::header
 help::header 
 
-help_all::header help_override help_compile help_simulate help_regression
+help_all::header help_override help_filelists help_compile help_simulate help_setups help_regression
 
 header:
 	@tput setaf 4;
@@ -27,17 +27,19 @@ header:
 	@echo "# Documentation can be found at: http://www.github.com/detstorabla/qme"
 	@echo "#"
 	@echo "### Available subjects are: ###"
-	@echo "#   make help_all"
-	@echo "#   make help_override"
-	@echo "#   make help_compile"
-	@echo "#   make help_simulate"
-	@echo "#   make help_regression"
-	@echo "#   make help_tutorial"
-	@echo "#   make help_qvip"
-	@echo "#   make help_infact"
-	@echo "#   make help_adding_targets"
-	@echo "#   make help_"
-	@echo "#   make help_"
+	@echo "#   * make help_all"
+	@echo "#   * make help_override"
+	@echo "#   * make help_filelists"
+	@echo "#   * make help_compile"
+	@echo "#   * make help_simulate"
+	@echo "#   * make help_regression"
+	@echo "#   * make help_tutorial"
+	@echo "#   * make help_qvip"
+	@echo "#   * make help_infact"
+	@echo "#   * make help_adding_targets"
+	@echo "#   * make help_setups"
+	@echo "#   * make help_autocheck"
+	@echo "#   * make help_covercheck"
 
 
 	@tput setaf 9;
@@ -72,6 +74,7 @@ help_override::
 help_compile::
 	@tput setaf 4;
 	@echo "########################## COMPILATION ##################################################################"
+	@echo "# Provided that you created filelists according to 'make help_filelists' ...."
 	@echo "# To compile everything:                                       make compile"
 	@echo "# To compile only the test bench (no opt):                     make compile_tb"
 	@echo "# To compile dut (no opt):                                     make compile_rtl"
@@ -186,22 +189,164 @@ help_qvip::
 	@echo "#"
 	@echo "#To test it, do make compile_qvips"
 	@echo "#"
-	@echo "#"
+	@echo "# Next step is to read the documentation and see the examples at ${QUESTA_MVC_HOME}"
 	@echo "#"
 	@echo "#"
 	@echo "#"
 	@echo "#"
 
 	@tput setaf 9;
+
+help_setups::
+	@tput setaf 4;
+	@echo "########################## THE SETUP CONCEPT ######################"
+	@echo "# One design can turn into something different depending on"
+	@echo "# design parameters/generics"
+	@echo "# The only safe way to handle this is to handle each set of "
+	@echo "# parameters/generics as a separate design and still reuse "
+	@echo "# the testbench"
+	@echo "# Example:"
+	@echo "#	 module my_dut #(parameter no_of_channels=1,downlink=1)(....);"
+	@echo "#           ...."
+	@echo "#         endmodule"
+	@echo "#"
+	@echo "# With this project we are going to use my_dut with different parameters."
+	@echo "# So we add the following code in our <block>_tb_pkg.sv:"
+	@echo "# \`ifdef SETUP_DL_8"
+	@echo "#    parameter NO_OF_CHANNELS=8;"
+	@echo "#    parameter DOWNLINK=1;"
+	@echo "# \`elseif SETUP_UL_8"
+	@echo "#    parameter NO_OF_CHANNELS=8;"
+	@echo "#    parameter DOWNLINK=0;"
+	@echo "# \`elseif SETUP_UL_16"
+	@echo "#    parameter NO_OF_CHANNELS=16;"
+	@echo "#    parameter DOWNLINK=1;"
+	@echo "# \`elseif SETUP_UL_16"
+	@echo "#    parameter NO_OF_CHANNELS=16;"
+	@echo "#    parameter DOWNLINK=1;"
+	@echo "# \`else // Default"
+	@echo "#    parameter NO_OF_CHANNELS=1;"
+	@echo "#    parameter DOWNLINK=1;"
+	@echo "# \`endif"
+	@echo "#"
+	@echo "# Now if we want to compile and simulate a specific setup we do:"
+	@echo "# make compile SETUP=SETUP_DL_8"
+	@echo "# make gui TEST=my_test"
+	@echo "#"
+	@echo "# In tc_spec.txt (${TC_SPEC}) we define "
+	@echo "#<SETUP> <TESTNAME> <No of runs> <list of seeds>"
+	@echo "# See more in "
+	@echo "# make help_regression"
+	@tput setaf 9;
+
+
+help_filelist::help_filelists
+
+help_filelists::
+	@tput setaf 4;
+	@echo "########################## FILELISTS ########################"
+	@echo "# QME utilizes two filelists. One for rtl and one for testbench"
+	@echo "# The rtl filelist is located at ${DUT_FILELIST}"
+	@echo "# and the testbench filelist is located at ${TB_FILELIST}"
+	@echo "#"
+	@echo "# QME allowes you to automatically translate your own filelist format"
+	@echo "# to the very simple filelist format that QME uses."
+	@echo "# This is done by providing an implementation of the target precompile_tb and"
+	@echo "# precompile_rtl in the ${QME_SITE_SETTINGS}/Makefile.site.defaults"
+	@echo "# E.g."
+	@echo "# precompile_rtl::"
+	@echo "# 	<script to generate QME filelist for rtl>"
+	@echo "# "
+	@echo "# precompile_tb::"
+	@echo "# 	<script to generate QME filelist for rtl>"
+	@echo "# "
+	@echo "# "
+	@echo "# QME Filelist format"
+	@echo "# @library <library_name>           # This tells us what library the following files should be compiled to"
+	@echo "# <filename>:<options>		   # Filename to be compiled"
+	@echo "# "
+	@echo "# Example:"
+	@echo "# @library fpu_lib"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/fpupack.vhd"
+	@echo "# ${QME_HOME}/examples/fpu//rtl/vhdl/comppack.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/addsub_28.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/fpu.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/mul_24.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/post_norm_addsub.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/post_norm_div.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/post_norm_mul.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/post_norm_sqrt.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/pre_norm_addsub.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/pre_norm_div.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/pre_norm_mul.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/pre_norm_sqrt.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/serial_div.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/serial_mul.vhd"
+	@echo "# ${QME_HOME}/examples/fpu/rtl/vhdl/sqrt.vhd"
+	@echo "# "
+	@echo "# "
+	@echo "# "
+	@echo "# We do not support hierachical filelists"
+	@echo "# "
+
+	@tput setaf 9;
+
+
 
 help_cover::
 	@tput setaf 4;
 	@echo "########################## SETTING UP AND RUNNING QUESTA COVERCHECK ######################"
 	@tput setaf 9;
 
+
+
+
+
 help_autocheck::
 	@tput setaf 4;
 	@echo "########################## SETTING UP AND RUNNING QUESTA AUTOCHECK #######################"
+	@tput setaf 9;
+
+help_infact::
+	@tput setaf 4;
+	@echo "########################## SETTING UP AND RUNNING QUESTA INFACT#######################"
+	@tput setaf 9;
+
+help_adding_targets::
+	@tput setaf 4;
+	@echo "########################## ADDING YOUR OWN TARGETS #######################"
+	@echo "# Let's face it. You will at some point need to add something special to the flow"
+	@echo "# It might be that before you compile the rtl code, you want to auto generate some code."
+	@echo "# Or it might be that you use libreoffice to convert the verification plan from xls to xml "
+	@echo "# before you run a regression"
+	@echo "#"
+	@echo "# QME is very flexible when it comes to adding your own targets"
+	@echo "# The place to do it is in your local Makefile.block.defaults file (${BLOCK_OVERRIDES})"
+	@echo "# You do need to know some Makefile basics. Like how you write a rule etc. "
+	@echo "# Take a look at https://www.gnu.org/software/make/manual/make.html#Introduction"
+	@echo "#"
+	@echo "# Example 1:"
+	@echo "#	We would like to add our own targets for each test."
+	@echo "#	Instead of just writing make gui TEST=my_test we want to do"
+	@echo "#	make my_test"
+	@echo "# 	In ${BLOCK_OVERRIDES} we put"
+	@echo "#        my_test::"
+	@echo "#        <TAB>make gui TEST=my_test"
+	@echo "#        Save and then try make my_test -n (-n will display the command that will be sent out)"
+	@echo "#"
+	@echo "# Example 2:"
+	@echo "#	We would like to generate uvm registers before we compile the tb"
+	@echo "#        This time we use a predefined target named precompile_tb to implement our function"
+	@echo "# 	We like variables so we add:"
+	@echo "# 	XLSFILE=<path to file>"
+	@echo "#	# PLEASE NOTICE THE USE OF ::"
+	@echo "#	precompile_tb::"
+	@echo "#		ruvm_xls2csv.pl dollar{XLSFILE}"
+	@echo "# 		$\{QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin regs.csv blocks.csv \\"
+	@echo "#                maps.csv -block example_block_registers -uvmout $\{QME_PROJECT_HOME}/ra_example/tb/registers/example_block_regs_pkg.sv "
+	@echo "#"
+	@echo "# 	Voila!!!"
+
 	@tput setaf 9;
 
 
@@ -254,7 +399,7 @@ help_tutorial::
 	@echo "# Open View-> \"Verification Tracker\" and explore the \"Tracker\" "
 	@echo "# Close the Run Manager"
 	@echo "# If you have Questa Formal tools installed and set up, try this:"
-	@echo "# make regression COVER=1&
+	@echo "# make regression COVER=1&"
 	@tput setaf 9;
 
 help_getting_started::

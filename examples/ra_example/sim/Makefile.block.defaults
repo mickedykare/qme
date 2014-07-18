@@ -1,45 +1,59 @@
+# *************************************************************************************
+# Example:Makefile.block.defaults for ra_example
+# Questa Makefile Environment
+#
+# Copyright 2014 Mentor Graphics Corporation
+# All Rights Reserved
+#
+# THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION WHICH IS THE PROPERTY OF
+# MENTOR GRAPHICS CORPORATION OR ITS LICENSORS AND IS SUBJECT TO LICENSE TERMS
+#
+# bugs, enhancment requests to: Mikael_Andersson@mentor.com
+# *************************************************************************************
+
 #Define QVIP to be compiled
 QVIP_TARGETS=apb3
 
-# Some settings
+# I do not care about the vplan at this time
 REQUIRE_VPLAN=0
-# Always run covercheck
-#COVERCHECK=1
 # I don't want emails
 SEND_EMAIL=0
-#DEBUG_LEVEL=FULL
-
 
 # Define XLS file for RM (used in this file)
-#XLSFILE=/mnt/hgfs/Documents/kunder/ericsson/milan_registers/RA_test.xls
-XLSFILE=/mnt/hgfs/Documents/kunder/ericsson/milan_registers/ra_example_new_as_I_want_it.xls
+XLSFILE=${QME_HOME}/examples/ra_example/docs/ra_example_regs.xls
 
+#Defined my own variable to decide if we should generate rtl or not
+GENERATE_REGISTERS=1
+
+
+# Extend these targets using ::
 precompile_rtl::convert2csv generate_hdl
 precompile_tb::convert2csv generate_rm
 
+# Convert xls to csv
 convert2csv:
 	ruvm_xls2csv.pl ${XLSFILE}
 
 
-# This is using the extended functionality in register assistant
+ifeq ($(GENERATE_REGISTERS),1) 
+GENERATE_HDL_TARGET=generate_hdl
+else
+GENERATE_HDL_TARGET=dont_generate_hdl
+endif
+
+# This is using the extended functionality in register assistant.I.e. you need hdldesigner 
+dont_generate_hdl::
+	@echo "Use GENERATE_REGISTERS=1 to enable generation of rtl registers" 
+
 generate_hdl:
 	${HDS_HOME}/registerassistant/regassist -f ${QME_PROJECT_HOME}/ra_example/sim/ctrl.rcf -project ra_work
 
 
-# This is using Questa RM
-generate_rm_old:
-	${QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin regs.csv -autoinstance -block example_block_registers -uvmout ${QME_PROJECT_HOME}/ra_example/tb/registers/example_block_regs_pkg.sv 
-
-
+# This is using Questa Register Assistant
 generate_rm:
 	${QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin regs.csv blocks.csv maps.csv -block example_block_registers -uvmout ${QME_PROJECT_HOME}/ra_example/tb/registers/example_block_regs_pkg.sv 
 
 
-#generate_hdl2:
-#	/opt/sw2/hdldesigner/2013.1b/registerassistant/regassist -f ${QME_PROJECT_HOME}/ra_example/sim/ctrl_mark.rcf -project ra_work
 
-
-#generate_rm3:
-#	${QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin /mnt/hgfs/Documents/kunder/ericsson/milan_registers/rsp_regs.csv /mnt/hgfs/Documents/kunder/ericsson/milan_registers/rsp_blocks.csv /mnt/hgfs/Documents/kunder/ericsson/milan_registers/rsp_maps.csv  -block example_block_registers -uvmout ${QME_PROJECT_HOME}/ra_example/tb/registers/example_block_regs_pkg.sv 
-
-
+my_test::
+	make gui TEST=ra_example_smoke_test

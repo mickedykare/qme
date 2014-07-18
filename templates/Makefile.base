@@ -417,10 +417,25 @@ liblist::
 	@echo "Created list of compiled libraries for questa: ${LIBLIST}"
 
 
+check_filelist_rtl::
+	@if test -e  ${DUT_FILELIST}; \
+	then tput setaf 2;echo "OK: Found ${DUT_FILELIST}";tput setaf 9;else \
+	echo "Did not find ${DUT_FILELIST}, aborting..."; exit 1;fi
+
+check_filelist_tb::
+	@if test -e  ${TB_FILELIST}; \
+	then tput setaf 2;echo "OK: Found ${TB_FILELIST}";tput setaf 9;else \
+	echo "Did not find ${TB_FILELIST}, aborting..."; exit 1;fi
+
 
 ###################################################################
 # Some defaults target , meant to be extended
 ###################################################################
+preregression::
+	@tput setaf 6;
+	@echo "Extend target preregression to do stuff before starting regression"
+	@tput setaf 9;
+
 precompile_rtl::
 	@tput setaf 6;
 	@echo "Extend target precompile_rtl to do stuff before compiling RTL"

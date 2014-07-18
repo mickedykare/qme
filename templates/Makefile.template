@@ -89,11 +89,11 @@ compile_uvm::
 
 compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 
-compile_rtl::precompile_rtl
+compile_rtl::precompile_rtl check_filelist_rtl
 	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 	mv  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/rtl_liborder.txt
 
-compile_tb::precompile_tb compile_qvips 
+compile_tb::precompile_tb compile_qvips check_filelist_tb 
 	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 	@cp  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/tb_liborder.txt
 	@cp ${QUESTALIBS_DIR}/rtl_liborder.txt ${QUESTALIBS_DIR}/liborder.txt
@@ -199,7 +199,7 @@ clean_rundir:
 #########################################################
 
 gui_block:: create_recompile_in_background liblist clean_rundir presim
-	@echo "Launching GUI in directory called ${RUNDIR}"
+	@echo "Launching GUI in directory called ${RUNDIR} with DEBUG_LEVEL=${DEBUG_LEVEL}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  ${VSIM_TOP_LEVELS} -$(ARCH) \
 	${VSIM_TIMERES} \
@@ -233,7 +233,7 @@ gui_block:: create_recompile_in_background liblist clean_rundir presim
 #########################################################
 
 gui_chip:: create_recompile_in_background liblist clean_rundir opt_dbg presim
-	@echo "Launching GUI in directory called ${RUNDIR}"
+	@echo "Launching GUI in directory called ${RUNDIR} with DEBUG_LEVEL=${DEBUG_LEVEL}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_dbg -$(ARCH) \
 	${VSIM_TIMERES} \
@@ -445,7 +445,7 @@ check_prereq::
 	  echo "DEFAULT_SETUP my_test 10 random" > ${TC_SPEC}; \
 	fi;
 
-regression:: check_prereq create_project_file
+regression:: check_prereq preregression create_project_file
 	vrun -project default.vrm -rmdb ${RMDBFILE} ${REGRESSION_ARGS} ${RUNNABLE} -clean -config  ${BLOCKNAME}_regression&
 
 regression_status::
