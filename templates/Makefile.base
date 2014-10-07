@@ -92,6 +92,7 @@ FORMAL=0
 
 CDC_STATIC=0
 SETUP=____DEFAULT_SETUP
+VISUALIZER=0
 
 ###################################################################
 # Test specific overrides
@@ -440,32 +441,40 @@ check_filelist_tb::
 ###################################################################
 preregression::
 	@tput setaf 6;
-	@echo "Extend target preregression to do stuff before starting regression"
+	@echo "placeholder for adding task before running a regression"
+	@echo "Extend target preregression"
 	@tput setaf 9;
 
 precompile_rtl::
 	@tput setaf 6;
-	@echo "Extend target precompile_rtl to do stuff before compiling RTL"
+	@echo "placeholder for adding task before compiling RTL"
+	@echo "Extend target precompile_rtl"
 	@tput setaf 9;
 precompile_tb::
 	@tput setaf 6;
-	@echo "Extend target precompile_tb to do stuff before compiling TB"
+	@echo "placeholder for adding task before compiling TB"
+	@echo "Extend target precompile_tb"
 	@tput setaf 9;
 postcompile_rtl::
 	@tput setaf 6;
-	@echo "Extend target postcompile_rtl to do stuff before compiling RTL"
+	@echo "placeholder for adding task after compiling RTL"
+	@echo "Extend target postcompile_rtl"
 	@tput setaf 9;
 postcompile_tb::
 	@tput setaf 6;
-	@echo "Extend target postcompile_tb to do stuff before compiling TB"
+	@echo "placeholder for adding task after compiling TB"
+	@echo "Extend target postcompile_tb"
 	@tput setaf 9;
-presim::
+
+presim_script::
 	@tput setaf 6;
-	@echo "Running script before simulation"
+	@echo "placeholder for running a script before a simulation"
+	@echo "Extend target presim_script"
 	@tput setaf 9;
-postsim::
+postsim_script::
 	@tput setaf 6;
-	@echo "Running script after simulation"
+	@echo "placeholder for running a script after a simulation"
+	@echo "Extend target postsim_script"
 	@tput setaf 9;
 
 print-%:
@@ -474,10 +483,6 @@ print-%:
 	@tput setaf 9;
 
 
-#########################
-
-
-# Enable 64 bit mode
 
 
 ifeq ($(SOLVEFAILDEBUG),1)

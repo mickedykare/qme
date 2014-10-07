@@ -52,11 +52,17 @@ include ${QME_HOME}/templates/Makefile.relations
 # Targets
 ################################################################
 
-# clean out
 
+
+################################################################
+# Compile everything 
+################################################################
 
 compile: clean ${COMPILE_UVM_TARGET} ${COMPILE_UVMC_TARGET} ${COMPILE_SC_TARGET} compile_rtl compile_tb liblist
 
+################################################################
+# Clean out sim dir
+################################################################
 
 clean::
 	@rm -rf ${QUESTALIBS_DIR}
@@ -72,8 +78,9 @@ clean::
 
 
 
-
+################################################################
 # Recompile UVM to catch timescale problem
+################################################################
 compile_uvm::
 	@echo "Recompiling uvm library UVM_VERSION ${UVM_VERSION} with timescale VLOG_TIMESCALE=${VLOG_TIMESCALE}";
 	@test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
@@ -86,33 +93,57 @@ compile_uvm::
 	-suppress 2186 -suppress 8688 +define+QUESTA_LOOKUP_SEQ
 	gcc -m$(ARCH) -fPIC -DQUESTA -g -W -shared -x c -I$(QUESTA_HOME)/include ${UVM_HOME}/src/dpi/uvm_dpi.cc -o ${QUESTACLIBS_DIR}/uvm_dpi.so
 
+################################################################
+# Compile Questa VIP library. You need to override QVIP_TARGETS
+################################################################
 
 compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 
-compile_rtl::precompile_rtl check_filelist_rtl
+################################################################
+# Compile RTL code
+################################################################
+
+compile_rtl::precompile_rtl check_filelist_rtl compile_rtl_script postcompile_rtl
+
+compile_rtl_script::
 	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 	mv  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/rtl_liborder.txt
 
 # This is used for formal verification applications
-compile_rtl_fv::precompile_rtl check_filelist_rtl
+compile_rtl_fv::precompile_rtl check_filelist_rtl compile_rtl_fv_script postcompile_rtl
+
+compile_rtl_fv_script::
 	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS} \
 	${SKIP_SYNTHOFF_REGION}
 	mv  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/rtl_liborder.txt
 
+################################################################
+# Compile TB code
+################################################################
 
-compile_tb::precompile_tb compile_qvips check_filelist_tb 
+compile_tb::remove_opts precompile_tb compile_qvips check_filelist_tb compile_tb_script postcompile_tb
+
+compile_tb_script::
 	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS} ${X_VLOG_ARGS} ${X_VCOM_ARGS}
 	@cp  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/tb_liborder.txt
 	@cp ${QUESTALIBS_DIR}/rtl_liborder.txt ${QUESTALIBS_DIR}/liborder.txt
 	@cat ${QUESTALIBS_DIR}/tb_liborder.txt >> ${QUESTALIBS_DIR}/liborder.txt
+
+################################################################
+# Messages outputs
+################################################################
 no_uvmc::
 	@echo "NOTE! UVMC not enabled. Use UVMC=1 to enable..."
 
 no_uvm::
 	@echo "NOTE! Using built in UVM package. Use RECOMPILE_UVM=1 to recompile UVM with timescale ${VLOG_TIMESCALE}"
+
 no_comp_sc::
 	@echo "NOTE! Not compiling System C TLM models. Use UVMC=1 to enable..."
 
+################################################################
+# Compile UVM Connect Package (UVMC=1)
+################################################################
 
 compile_uvmc::
 	@echo "NOTE! Compiling UVMC Library"
@@ -123,7 +154,9 @@ compile_uvmc::
 	UVM_VERSION=${UVM_VERSION} UVMC_X_ARGS=${UVMC_X_ARGS} UVMC_SC_X_ARGS=${UVMC_SC_X_ARGS} uvmc_pkg
 	vmap uvmc_lib ${PWD}/${QUESTALIBS_DIR}/uvmc_lib
 
-
+################################################################
+# Compile SystemC target if UVM Connect is enabled
+################################################################
 
 compile_sc:: 
 	test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
@@ -150,11 +183,19 @@ opt_dbg:
 	${DISABLE_VERDI_PLI};${VOPT} -work $(TB_LIB_NAME) ${VOPT_TOP_LEVELS} -l vopt_dbg.log \
 	-o $(TB_TOP_NAME)_dbg -$(ARCH) $(VOPTSWITCHES_BLOCK) ${CC_OPT_ARGS} ${X_OPT_ARGS} -f ${LIBLIST} -time ${DEBUG}
 
+remove_opts:
+	@echo "Starting to execute target $@";
+	@if [ -e ${QUESTALIBS_DIR}/$(TB_LIB_NAME)/$(TB_TOP_NAME)_opt ];then vdel -lib $(TB_LIB_NAME) $(TB_TOP_NAME)_opt ;fi
+	@if [ -e ${QUESTALIBS_DIR}/$(TB_LIB_NAME)/$(TB_TOP_NAME)_opt_dbg ];then vdel -lib $(TB_LIB_NAME) $(TB_TOP_NAME)_opt_dbg ;fi
+	@rm -f ${OPT_TOUCHFILE}
+
+
+
+
 #########################################################
 # prepare recompile
 #########################################################
 create_recompile_in_background::
-#	@test -e ${QUESTALIBS_DIR}/makefile.remake&&echo "${QUESTALIBS_DIR}/makefile.remake already exists"
 	@test -e ${QUESTALIBS_DIR}/makefile.remake||echo "Running generation of remake file in background"
 	@test -e ${QUESTALIBS_DIR}/makefile.remake||create_questa_remake.pl ${QUESTALIBS_DIR}  ${QUESTALIBS_DIR}/liborder.txt  ${QUESTALIBS_DIR}/makefile.remake&
 
@@ -175,7 +216,6 @@ recompile::
 #########################################################
 
 ifeq (${VERIFICATION_LEVEL},BLOCK)
-# targets and switches used when you run on block level.
 GUI_TARGET=gui_block postsim
 BATCH_TARGET=batch_block postsim
 else
@@ -198,14 +238,12 @@ clean_rundir:
 	@if test -e ${QUESTALIBS_DIR} ;then cd ${RUNDIR};ln -s ../${QUESTALIBS_DIR};fi
 	@if test -e ${MODELSIM_INI} ;then cd ${RUNDIR};ln -s ../modelsim.ini;fi
 	@if test -e ${LIBLIST} ;then cd ${RUNDIR};ln -s ../${LIBLIST};fi
-#	@if test -e ${VSIM_SCRATCH_USER} ;then cd ${RUNDIR};ln -s ../${VSIM_SCRATCH_USER};fi
-
-
 #########################################################
 # Start a block level simulation, using built in vopt
 #########################################################
 
-gui_block:: create_recompile_in_background liblist clean_rundir presim
+gui_block:: create_recompile_in_background liblist clean_rundir presim_script gui_block_cmd postsim_script
+gui_block_cmd::
 	@echo "Launching GUI in directory called ${RUNDIR} with DEBUG_LEVEL=${DEBUG_LEVEL}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  ${VSIM_TOP_LEVELS} -$(ARCH) \
@@ -239,7 +277,9 @@ gui_block:: create_recompile_in_background liblist clean_rundir presim
 # Start a chip level simulation, using vopt separately
 #########################################################
 
-gui_chip:: create_recompile_in_background liblist clean_rundir opt_dbg presim
+gui_chip:: create_recompile_in_background liblist clean_rundir opt_dbg presim_script gui_chip_cmd postsim_script
+
+gui_chip_cmd::
 	@echo "Launching GUI in directory called ${RUNDIR} with DEBUG_LEVEL=${DEBUG_LEVEL}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_dbg -$(ARCH) \
@@ -272,7 +312,9 @@ gui_chip:: create_recompile_in_background liblist clean_rundir opt_dbg presim
 # Start a block level simulation, using built in vopt
 #########################################################
 
-batch_block:: create_recompile_in_background liblist clean_rundir presim
+batch_block:: create_recompile_in_background liblist clean_rundir presim_script batch_block_cmd postsim_script
+
+batch_block_cmd::
 	@echo "Launching batch in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM} ${VSIM_TOP_LEVELS} -$(ARCH) \
@@ -306,7 +348,9 @@ batch_block:: create_recompile_in_background liblist clean_rundir presim
 # Start a chip level simulation, using vopt separately
 #########################################################
 
-batch_chip:: create_recompile_in_background liblist clean_rundir opt_dbg presim
+batch_chip:: create_recompile_in_background liblist clean_rundir opt_dbg presim_script batch_chip_cmd postsim_script
+
+batch_chip_cmd::
 	@echo "Launching batch in directory called ${RUNDIR}"
 	cd ${RUNDIR};${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_dbg -$(ARCH) \
@@ -342,7 +386,10 @@ batch_chip:: create_recompile_in_background liblist clean_rundir opt_dbg presim
 # Start a simulation in regression, vopt is done before
 #########################################################
 
-batch_regression:: liblist presim
+batch_regression:: liblist presim_script batch_regression_cmd postsim_script
+
+
+batch_regression_cmd::
 	${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_opt -$(ARCH) \
 	${VSIM_TIMERES} \
@@ -372,7 +419,9 @@ batch_regression:: liblist presim
 # Start a simulation in regression with debug, vopt is done before
 #########################################################
 
-batch_regression_dbg:: liblist presim
+batch_regression_dbg:: liblist presim_script batch_regression_dbg_cmd postsim_script
+
+batch_regression_dbg_cmd::
 	${DISABLE_VERDI_PLI};export UCDBFILE=${UCDBFILE}; \
 	${VSIM}  $(TB_LIB_NAME).$(TB_TOP_NAME)_dbg -$(ARCH) \
 	${VSIM_TIMERES} \
@@ -435,6 +484,11 @@ create_project_file::
 	@echo "VRMEND" >> default.vrm.tmp;
 	@mv default.vrm.tmp  default.vrm
 
+
+#########################################################
+# Checking directories and if there exists a tc_spec 
+#########################################################
+
 check_prereq::
 	@test -d transformrule.txt||touch transformrule.txt
 	@test -d ${MERGED_UCDB_HOME}||mkdir -p ${MERGED_UCDB_HOME}	
@@ -443,26 +497,34 @@ check_prereq::
 	  echo "INFO: Found ${TC_SPEC} - (OK)"; \
 	else \
 	  echo ""; \
-	  echo "**************************************************"; \
-	  echo "REGRESSION_SETUP_ERROR: Did not find ${TC_SPEC}, creating one!"; \
-	  echo "Do not forget that you need to update ${TC_SPEC}"; \
-	  echo "with tests to run"; \
-	  echo "**************************************************"; \
-	  echo ""; \
-	  echo "DEFAULT_SETUP my_test 10 random" > ${TC_SPEC}; \
+	  echo "REGRESSION_SETUP_ERROR: Did not find ${TC_SPEC} aborting..."; \
+	  exit 1; \
 	fi;
+
+#########################################################
+# Launch GUI for controlling regressions
+#########################################################
 
 regression:: check_prereq preregression create_project_file
 	vrun -project default.vrm -rmdb ${RMDBFILE} ${REGRESSION_ARGS} ${RUNNABLE} -clean -config  ${BLOCKNAME}_regression&
 
+#########################################################
+# Check status of regression directory
+#########################################################
 regression_status::
 	vrun -status -rmdb ${RMDBFILE} -vrmdata ${SCRATCHDIR}
+
+#########################################################
+# Attempt to kill an ongoing regression
+#########################################################
 
 regression_kill:
 	@echo "Attempting to kill all processes started on this machine"
 	vrun -kill -rmdb ${RMDBFILE} -vrmdata ${SCRATCHDIR}
-############# Formal tools ##############################
 
+
+
+############# Formal tools ##############################
 #########################################################
 # Extract generics for a design. TB can override generics
 # This is necessary for covercheck
@@ -511,16 +573,6 @@ covercheck_only:
 	covercheck_exclude.do ; \
 	exit"
 
-#########################################################
-# Run Questa CDC
-# Can be run as part of regression or interactively
-#########################################################
-
-
-
-
-
-##########################################################
 
 
 

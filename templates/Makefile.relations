@@ -128,6 +128,18 @@ ASSERTION_DBG=-assertdebug
 FSMDEBUG=-fsmdebug
 endif
 
+###################################################################
+# Turn on Visualizer (BETA)
+###################################################################
+ifeq ($(VISUALIZER),1)
+VISUALIZER_ARGS=-qwavedb=+signal+transactions+systemc+report+class+assertion
+VISUALIZER_OPTARGS=+designfile
+endif
+
+
+
+
+
 DUT_FILELIST=${SRCHOME}/${BLOCKNAME}/${RTLDIR}/rtl.files
 TB_FILELIST=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/tb.files
 TC_SPEC=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/tc_spec.txt
@@ -191,9 +203,17 @@ COMPILE_UVMC_TARGET=compile_uvmc
 COMPILE_SC_TARGET=compile_sc
 VSIM_TOP_LEVELS=$(TB_LIB_NAME).$(TB_TOP_NAME) $(TB_LIB_NAME).${SC_TOP_NAME}
 VOPT_TOP_LEVELS=$(TB_TOP_NAME) ${SC_TOP_NAME}
+ifeq ($(UVMC_HOME),)
+$(error "Environment variable UVMC_HOME is not set")
+endif
+
+
+
+
 else
 COMPILE_UVMC_TARGET=no_uvmc
 COMPILE_SC_TARGET=no_comp_sc
 VSIM_TOP_LEVELS=$(TB_LIB_NAME).$(TB_TOP_NAME) 
 VOPT_TOP_LEVELS=$(TB_TOP_NAME) 
 endif
+

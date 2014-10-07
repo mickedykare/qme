@@ -25,137 +25,196 @@
   <!-- == action scripts here also.                  == -->
   <!-- ================================================ -->
   <usertcl name="mytcl">
-   <!-- Overriding the VRM procedure StopRunning 
-        In this case, VRM will stop if 1000 errors are generated 
-        during execution of a regression                   -->
-   proc StopRunning {userdata} {
+
+  proc StopRunning {userdata} {
     upvar $userdata data
-     set result [expr {$data(fail) == 1000}]
+    set result [expr {$data(fail) == 1000}]
     return $result
-   }
+  }
 
-
-    proc TestModeInteractive {MODE} {
-      if {[string match $MODE {interactive}]} {
-        return -gui
-      } else {
-       return -c
-      }
+  <!-- get_rel_path_between: This tcl procedure will return the relative path between a given taskdir and a given runnables taskdir -->
+  proc get_rel_path_between { my_path runnable_parent runnable} {
+    set p ""
+    set tt [split $my_path /]
+    set ll [llength $tt]
+    set li [lsearch $tt $runnable_parent~*]
+    set levels [expr $ll-$li]
+    for {set i 1} {$i &lt; $levels} {incr i} {
+        set p [file join $p ..]
     }
-
-
-   <!-- expand_testcases: This tcl procedure will expand all the testcases
-        for a certain setup -->
-
-   proc expand_testcases {file_name setup} {
-   set tclist ""
-   set tmp_file [open $file_name r]
-   while {![eof $tmp_file]} {
-         gets $tmp_file line
-         if {[string range $line 0 0] != "#"} {
-	     if {$setup == [lindex $line 0]} {
-               if {[llength $line] != 0} {
-                 if {[llength $line] == 2} {
-                   set num 1
-                 } else {
-                   set num [lindex $line 2]
-                 }
-
-                 set setup [lindex $line 0]
-                 set tc [lindex $line 1]
-                 set max [expr $num+2]
-                 #puts "processing $line - found setup = $setup, tc = $tc, num = $num, max = $max"              
-                 for {set repeat 3} {$repeat &lt;=$max} {incr repeat} {
-                          #xputs "processing repeat = $repeat"
-                   set seed [lindex $line $repeat]
-                   if {$seed == ""} {
-              #       puts "Found no spec of seed, using random"   
-                      set seed random
-                   }
-                #  puts "seed = $seed"
-                   lappend tclist [format "%s:%s:%d" $tc $seed [expr $repeat-2]]
-              }
-            }
-          }
-      }
-
-     }
-
-
-
-      close $tmp_file
-      #xputs "returning $tclist"
-
-      return $tclist
-   }
-
+    return [file join $p $runnable]
+  }
 
    <!-- get_all_setups: This tcl procedure will extract all setups from the tc spec file -->
-
-
-proc get_all_setups {file_name} {
-     set tclist ""
+   proc get_all_setups {file_name} {
+      set tclist ""
       set tmp_file [open $file_name r]
       while {![eof $tmp_file]} {
          gets $tmp_file line
          if {[string range $line 0 0] != "#"} {
-	     # Lines containing ":" are note test cases
-	     if {[string match "*:*" $line]} {
-#		 puts "Found common argument for a setup"
-	     } else {
-            if {[llength $line] != 0} {
-		set setup [lindex $line 0]
-		lappend tclist $setup
-	    }
-	 }
-      }
+            # Lines containing ":" are not testnames
+            if {[string match "*:*" $line]} {
+               #puts "Found argument for a setup"
+            } else {
+               if {[llength $line] != 0} {
+                  set setup [lindex $line 0]
+                  lappend tclist $setup
+                }
+            }
+         }
       }
       close $tmp_file
-    set tclist [lsort -u $tclist]
-#    puts "returning $tclist"
+      set tclist [lsort -u $tclist]
+      return $tclist
+   }
+
+   <!-- get_tests_for_setup: This tcl procedure will extract all testnames for a given setup from the tc spec file -->
+   proc get_tests_for_setup {file_name setup} {
+      set tclist ""
+      set tmp_file [open $file_name r]
+      while {![eof $tmp_file]} {
+         gets $tmp_file line
+         if {[string range $line 0 0] != "#"} {
+            if {$setup == [lindex $line 0]} {
+               if {[llength $line] != 0} {
+                  set setup [lindex $line 0]
+                  set tc [lindex $line 1]
+                  lappend tclist $tc
+               }
+            }
+         }
+      }
+      close $tmp_file
+      set tclist [lsort -u $tclist]
+      return $tclist
+   }
+
+   <!-- get_test_seeds: This tcl procedure will extract seeds for a given test/setup from the tc spec file -->
+   proc get_test_seeds {file_name setup test} {
+      set tclist ""
+      set tmp_file [open $file_name r]
+      while {![eof $tmp_file]} {
+         gets $tmp_file line
+         if {[string range $line 0 0] != "#"} {
+            if {$setup == [lindex $line 0]} {
+               if {[llength $line] != 0} {
+                  if {[llength $line] == 2} {
+                     set num 1
+                    } else {
+                     set num [lindex $line 2]
+                    }
+                    set setup [lindex $line 0]
+                    set tc [lindex $line 1]
+                    if {$tc == $test} {
+                       set max [expr $num+2]
+                       #puts "processing $line - found setup = $setup, tc = $tc, num = $num, max = $max"              
+                       for {set repeat 3} {$repeat &lt;=$max} {incr repeat} {
+                        #puts "processing repeat = $repeat"
+                        set seed [lindex $line $repeat]
+                        if {$seed == ""} {
+                             #puts "Found no spec of seed, using random"   
+                           set seed random
+                        }
+                        if {$seed==&quot;random&quot;} {
+                             set ix [lsearch -exact $tclist $tc:$seed:[expr $repeat-2]]
+                        } else {
+                             set ix [lsearch $tclist $tc:$seed:*]
+                        }
+                        if {$ix &lt; 0} {
+                            #  puts "seed = $seed"
+                            lappend tclist [format "%s:%s:%d" $tc $seed [expr $repeat-2]]
+                          } else {
+                           logDebug "Please check $file_name"
+                           logDebug "$setup $tc with seed=$seed and iteration=[expr $repeat-2] is repeated multiple times - Skipping"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+      close $tmp_file
       return $tclist
    }
 
 
-   <!-- get_setup_from_context: This tcl procedure will extract all setups from the tc spec file -->
+  <!-- get_extra_args: This tcl procedure looks for arguments from the tc spec file -->
+  proc get_extra_args {file_name setup args} {
+     set tmp_file [open $file_name r]
+     while {![eof $tmp_file]} {
+        gets $tmp_file line
+        if {[regexp "^$setup:$args=(.+)$" $line all x_args]} {
+           close $tmp_file
+           return $x_args
+        }
+     }
+     close $tmp_file
+     return ""
+  }
 
-proc get_setup_from_context {context} {
-#echo "checking $context"
-set r [lindex [split [lindex [split $context "/"] end-2] "~"] 1]
-#echo "Returning $r"
-return $r
-}
 
-   <!-- get_extra_args: This tcl procedure will extract extra arguments from the tc spec file -->
-# This procedure looks for extra compile arguments 
-# Look for lines starting with
-proc get_extra_args {file_name setup args} {
-   set vlog_args_list ""
-   set tmp_file [open $file_name r]
-   while {![eof $tmp_file]} {
+  <!-- get_extra_vlog_args: This tcl procedure looks for extra vlog arguments from the tc spec file -->
+  proc get_extra_vlog_args {file_name setup} {
+    set vlog_args_list ""
+    set tmp_file [open $file_name r]
+    while {![eof $tmp_file]} {
       gets $tmp_file line
-      if {[regexp "^$setup:$args=(.+)$" $line all vlog_args]} {
-         close $tmp_file
-         return $vlog_args
+      if {[string match "$setup:*vlog*" $line]} {
+        if {[llength $line] != 0} {
+          #puts "debug:$line"
+          set vlog_args [lindex [split [lindex [split $line ":"]  1] "="] 1]
+          lappend vlog_args_list $vlog_args
+        }
       }
-   }
-   close $tmp_file
-   return ""
-}
+    }
+    set res [join $vlog_args_list " "]
+    set l [string length $res]
+    if { $l > 0} {
+      return "--questa_vlogopt=\'$res\'"
+    } else {
+      return ""
+    }
+  }
 
+  <!-- get_extra_vcom_args: This tcl procedure looks for extra vcom arguments from the tc spec file -->
+  proc get_extra_vcom_args {file_name setup} {
+    set vcom_args_list ""
+    set tmp_file [open $file_name r]
+    while {![eof $tmp_file]} {
+    gets $tmp_file line
+      if {[string match "$setup:*vcom=*" $line]} {
+        if {[llength $line] != 0} {
+          #puts "debug:$line"
+          set vcom_args [lindex [split [lindex [split $line ":"]  1] "="] 1]
+          lappend vcom_args_list $vcom_args
+        }
+      }
+    }
+    set res [join $vcom_args_list " "]
+    set l [string length $res]
+    if { $l > 0} {
+      return "--questa_vcomopt=\'$res\'"
+    } else {
+       return ""
+    }
+  }
 
-
-<!-- An example of overriding the VRM procedure OkToMerge
-        This example changes the default behavior such that all 
-        ucdbfiles of both passes and failures are merged. 
-        By default only passing ucdbfiles are merged        --> 
-proc OkToMerge {userdata} {
-     upvar $userdata data
-     return 1 ; approve merge.
-   }
-   
-
-
+  <!-- get_extra_vsim_args: This tcl procedure looks for extra vsim arguments from the tc spec file -->
+  proc get_extra_vsim_args {file_name setup} {
+    set vsim_args_list ""
+    set tmp_file [open $file_name r]
+    while {![eof $tmp_file]} {
+      gets $tmp_file line
+      if {[string match "$setup:*vsim=*" $line]} {
+        if {[llength $line] != 0} {
+          #puts "debug:$line"
+          set vsim_args [lindex [split [lindex [split $line ":"]  1] "="] 1]
+          lappend vsim_args_list $vsim_args
+        }
+      }
+    }
+    return [join $vsim_args_list " "]
+  }
 
 
   </usertcl>

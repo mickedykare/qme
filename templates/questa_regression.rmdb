@@ -1,33 +1,29 @@
-<?xml version="1.1"?>
+<?xml version="1.0"?>
 <!-- **********************************************************************************
-# questa_regression.rmdb
-# Questa Makefile Environment
-#
-# Copyright 2014 Mentor Graphics Corporation
-# All Rights Reserved
-#
-# THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION WHICH IS THE PROPERTY OF
-# MENTOR GRAPHICS CORPORATION OR ITS LICENSORS AND IS SUBJECT TO LICENSE TERMS
-#
-# bugs, enhancment requests to: Mikael_Andersson@mentor.com
-# **********************************************************************************-->
-
-
+     # questa_regression.rmdb
+     # Questa Makefile Environment
+     #
+     # Copyright 2014 Mentor Graphics Corporation
+     # All Rights Reserved
+     #
+     # THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION WHICH IS THE PROPERTY OF
+     # MENTOR GRAPHICS CORPORATION OR ITS LICENSORS AND IS SUBJECT TO LICENSE TERMS
+     #
+     # bugs, enhancment requests to: Mikael_Andersson@mentor.com
+     # **********************************************************************************-->
 <rmdb loadtcl="mytcl" xmlns:xi="http://www.w3.org/2003/XInclude">
   <!-- Method definitions -->
   <!-- ========================================================== -->
   <!-- Bad to use grid engine for everything, by default all methods will use a grid engine, please override 
        methods in runnable where you don't want it. -->
-    <method name="local-machine"/>
 
-    
-  <!-- ========================================================== -->
-  <!-- BASE RUNNABLES- PLEASE EDIT or OVERRIDE -->
-  <!-- ========================================================== -->
+  <method name="local-machine"/>
 
+  <!-- ========================================================== -->
+  <!-- BASE RUNNABLES- PLEASE OVERRIDE -->
+  <!-- ========================================================== -->
   <runnable name="projectsetup" type="base">
     <parameters>
-      
       <parameter name="BLOCKNAME">replace_with_blockname</parameter>
       <parameter name="MAKEFILE"> (%VRUNDIR%)/Makefile</parameter>
 
@@ -41,8 +37,13 @@
       <parameter name="VERIFICATION_LEVEL">BLOCK</parameter>
       <parameter name="DEBUG_LEVEL">LOW</parameter>
       <parameter name="SEND_EMAIL">1</parameter>
+
       <parameter name="VCOVER_OPTIONS">-32</parameter>
-      <parameter name="MODE">batch</parameter>
+
+      <parameter name="VSIM_DO">(%VRUNDIR%)/vsim.do</parameter>
+      <parameter name="CLIBLIST">(%CLIBLIST%)</parameter>
+      <parameter name="LIBLIST">(%LIBLIST%)</parameter>
+      <parameter name="DEBUG">0</parameter>      
       <parameter name="RANKING">0</parameter>
       <parameter name="COVERCHECK">0</parameter>
       <parameter name="AUTOCHECK">0</parameter>
@@ -54,116 +55,44 @@
       <parameter name="REQUIRE_VPLAN">0</parameter>
       <parameter name="RERUN_FAILING_TESTS">1</parameter>
       <parameter name="TIMESTAMP">0</parameter>
-
-      <!-- Verification plan settings -->
-      <parameter name="USE_XML_VPLAN">0</parameter>
-      <parameter name="XML_VPLAN">""</parameter>
       <parameter name="EXCEL_VPLAN">""</parameter>
-      <parameter name="XML2UCDB_DATAFIELDS">"Section, Title, Description, Link, Type, Weight, Goal, Drop"</parameter>
-
-
-      <!--parameter name="DEBUG">0</parameter-->      
-      <!-- LSF PARAMETERS Suitable to override -->
-      <parameter name="LSFARGS">-I</parameter>
-      <!-- Sun Grid PARAMETERS Suitable to override -->
-       <parameter name="SGEARGS"></parameter>
-      <!-- Path do different SW -->
-      <parameter name="SENDMAIL">/usr/lib/sendmail</parameter>
-      <parameter name="SOFFICE">libreoffice4.1</parameter>
-      <!-- Extracted parameters -->
       <parameter name="DUT_SETUPS" type = "tcl">[get_all_setups (%TCSPEC%)]</parameter>
-
-
-   </parameters>
-
+      <parameter name="CHIP">0</parameter>
+      <parameter name="XML2UCDB_DATAFIELDS">-datafields "Section, Title, Description, Link, Type, Weight, Goal, Drop"</parameter>
+      <parameter name="BITS">64</parameter>
+    </parameters>
     <xi:include href="grid.rmdb"/>
-
   </runnable>
 
   <!-- ========================================================== -->
-  <!-- BASE RUNNABLE -->
+  <!-- BASE RUNNABLE that should not be necessary to edit -->
   <!-- ========================================================== -->
-
   <runnable name="testsetup" type="base" base="projectsetup" >
     <parameters>
       <!-- == Parameters to control the running of the regressions == -->
-      <parameter name="INTERACTIVE" export="yes" type="tcl">[TestModeInteractive {(%MODE%)}]</parameter>
       <parameter name="triageoptions">-severity IFEW -rulesfile (%VRUNDIR%)/transformrule.txt -verbose</parameter>
-      <parameter name="tplanoptions">-format Excel -autoweight -verbose -startstoring 1 -datafields (%XML2UCDB_DATAFIELDS%)</parameter>
+      <parameter name="tplanoptions">-format Excel -autoweight -verbose -startstoring 1 (%XML2UCDB_DATAFIELDS%)</parameter>
       <parameter name="mergeoptions">-testassociated</parameter>
     </parameters>
-
-
-    <!-- ========================================================== -->
-    <!-- GRID settings-->
-    <!-- ========================================================== -->
-
-
   </runnable>
 
-  
   <!-- ================================================ -->
   <!-- == Top Level Group Runnable  =================== -->
   <!-- ================================================ -->
   <runnable name="my_run" type="group" sequential="yes" base="testsetup">
     <members>
-      <member>preconverting</member>
+      <member>convert_vplans_to_ucdb</member>
       <member>all_setups</member>
       <member>finalize_ranking</member>
       <member>send_email</member>
     </members>
   </runnable>
 
-  <!-- ================================================================================= -->
-  <!-- == preconverting and it's children                                 ============== -->
-  <!-- == We use openoffice to pick up xls files and convert them to ucdb ============== -->
-  <!-- ================================================================================= -->
-
-  <!-- Due to problems if you run multiple instances of openoffice at the same time, we 
-       need to run converting sequentially -->
-      
-  <runnable name="preconverting" foreach="(%DUT_SETUPS%)" base="testsetup" type="group" sequential="yes" if="(%REQUIRE_VPLAN%) eq {1}">
-    <members>
-      <member>convert_vplan_to_ucdb</member>
-    </members>
-  </runnable>
-
-
-  
-  <runnable name="convert_vplan_to_ucdb"  base="projectsetup" type="task"  if="(%REQUIRE_VPLAN%) eq {1}">
-    <parameters>
-      <parameter name="CURRENT_SETUP">(%preconverting.ITERATION%)</parameter>	  
-      <parameter name="VPLAN_UCDB">(%DATADIR%)/(%CURRENT_SETUP%).testplan.ucdb</parameter>	  
-      <parameter name="VPLAN_XML_TS" type="tcl">[get_extra_args (%TCSPEC%) (%CURRENT_SETUP%) VPLAN_XML]</parameter>
-    </parameters>
-    <!-- Need to execute locally due to openoffice -->
-    <method>
-    </method>
-    <execScript launch="/bin/csh -f">
-      <command>unsetenv MODELSIM </command>
-      <command>echo DBG: ---------------------------------------</command>
-      <command>echo DBG: CURRENT_SETUP  =(%CURRENT_SETUP%)</command>
-      <command>echo DBG: TCSPEC         =(%TCSPEC%)</command>
-      <command>echo DBG: VPLAN_UCDB     =(%VPLAN_UCDB%)</command>
-      <command>echo DBG: VPLAN_XML_TS   =(%VPLAN_XML_TS%)</command>
-      <command>echo DBG: ---------------------------------------</command>
-      <command>    echo "converting xml to ucdb" </command>  
-      <!--command>    xml2ucdb -format Excel (%XML2UCDB_DATAFIELDS%) (%VPLAN_XML_TS%) (%VPLAN_UCDB%) </command-->
-      <command>    xml2ucdb (%tplanoptions%) (%VPLAN_XML_TS%) (%VPLAN_UCDB%) </command>
-      <command>    if ($status != 0) exit 1          </command>    
-      <command>  else </command>
-      <command>    echo "No verification plan was found. Please update (%TCSPEC%) with argument:"      </command>
-      <command>    echo "SETUPNAME:VPLAN_XML=path to vplan in xml"      </command>
-      <command>    echo "or do make regression REQUIRE_VPLAN=0"      </command>
-      <command> endif</command>    
-    </execScript>
-  </runnable>
-
-
-
-
+  <!-- ================================================ -->
+  <!-- == Email report at the end   =================== -->
+  <!-- ================================================ -->
   <runnable name="send_email" type="task" if="(%SEND_EMAIL%)">
-    <!-- Don't run on GRID-->
+    <!-- No need to run this on queu -->
     <method>
     </method>
     <parameters>
@@ -173,301 +102,112 @@
       <parameter name="EMAIL_RECIPIENT">`whoami`</parameter>
     </parameters>
     <execScript launch="/bin/bash" mintimeout="300"> 
-       <command>EMAILMESSAGE=&quot;(%MESSAGE_FILE%)&quot;</command>
-       <command>echo &quot;To: (%EMAIL_RECIPIENT%)&quot; &gt; (%MESSAGE_FILE%)</command> 
-       <!--command>echo &quot;Cc: (%EMAIL_CCLIST%)&quot; &gt;&gt; (%MESSAGE_FILE%)</command--> 
-       <command>echo &quot;Subject: (%EMAIL_SUBJECT%)&quot; &gt;&gt; (%MESSAGE_FILE%)</command>; 
-       <command>echo &quot;Regression on (%BLOCKNAME%) Done!&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>echo &quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>echo &quot;Time:      `date`&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>echo &quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>echo &quot;Machine Name :      `hostname`&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>echo &quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>echo &quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>printf "##                        REGRESSION RESULTS                           ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>printf "########################################\\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>printf "\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>printf "Regression run dir: (%SCRATCH%)\n\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>printf "Summary below:\n\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>vrun -status -filter status!=Empty -columns action,status,datetime -vrmdata (%DATADIR%) &gt;&gt; (%MESSAGE_FILE%)</command>
-       <command>(%SENDMAIL%)  (%EMAIL_RECIPIENT%) &lt; $EMAILMESSAGE</command>
-       <command>echo "Regression complete and email report sent to (%EMAIL_RECIPIENT%)"</command>
+      <command>EMAILMESSAGE=&quot;(%MESSAGE_FILE%)&quot;</command>
+      <!--HEADER -->
+      <command>echo &quot;To: (%EMAIL_RECIPIENT%)&quot; &gt; (%MESSAGE_FILE%)</command> 
+      <!--command>echo &quot;Cc: (%EMAIL_CCLIST%)&quot; &gt;&gt; (%MESSAGE_FILE%)</command--> 
+      <command>echo &quot;Subject: (%EMAIL_SUBJECT%)&quot; &gt;&gt; (%MESSAGE_FILE%)</command>; 
+
+      <command>echo &quot;MIME-Version: 1.0&quot; &gt;&gt; (%MESSAGE_FILE%)</command>;
+      <command>echo &quot;Content-Type: text/html; charset=&quot;us-ascii&quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>;
+      <command>echo &quot;Content-Disposition: inline&quot; &gt;&gt; (%MESSAGE_FILE%)</command>;
+      <!--BODY -->
+      <command>echo &quot;&lt;HTML&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo &quot;&lt;body&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo &quot;&lt;pre style="font: monospace"&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+
+      <command>echo &quot;Regression on (%BLOCKNAME%) Done!&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo &quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo &quot;Time:      `date`&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo &quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo &quot;Machine Name :      `hostname`&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo &quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo &quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "## REGRESSION RESULTS                 ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "PAY ATTENTION!!! THE FOLLOWING FILES ARE CHECKED OUT:\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>/usr/atria/bin/cleartool lsco -avobs -cview &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "\nRegression run directory: (%SCRATCH%)\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "Regression HTML reports: (%HTML_REPORTDIR%)\n\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+
+      <command>printf "SUMMARY:\n\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>vrun -status -summary -vrmdata (%DATADIR%)|grep -v "^\/\/" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "DETAILS ON ALL TASKS:\n\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <!--command>vrun -status -filter status!=Empty -columns action,status,datetime -vrmdata (%DATADIR%) &gt;&gt; (%MESSAGE_FILE%)</command-->
+      <command>vrun -status -filter status!=Empty -columns datetime/-30,runnable/-21,RMDB:ACTUAL_SETUP/-20,RMDB:ITERATION/-40,seed/-20,status/-20,reason/-50 -nosummary -vrmdata (%DATADIR%)|grep -v "^\/\/" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "## To do results analysis (BETA):      ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "## cd (%DATADIR%)                      ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "## Copy command below                  ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>vrun -status -filter runnable=data_collection -columns RMDB:TRIAGECOMMAND -notruncate -nosummary  -vrmdata  (%DATADIR%)|grep -v "^\/\/" &gt;&gt; (%MESSAGE_FILE%)</command>
+
+      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "## To run failing tests interactive (BETA):  ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>vrun -status -filter status!=Passed -filter status!=Empty -filter runnable=Simulate -columns RMDB:MAKEARGS/-100 -nosummary  -vrmdata  (%DATADIR%)|grep -v "^\/\/" &gt;&gt; (%MESSAGE_FILE%)</command>
+
+      <!-- Config spec information -->
+      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "## CONFIG SPEC BEGIN                  ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command> /usr/atria/bin/cleartool catcs &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "## CONFIG SPEC END                    ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+
+      <command>echo &quot;&lt;/pre&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo &quot;&lt;/body&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo &quot;&lt;/HTML&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+
+      <command>/usr/lib/sendmail  (%EMAIL_RECIPIENT%) &lt; $EMAILMESSAGE</command>
+      <command> /usr/atria/bin/cleartool catcs > (%CS_HOME%)/regression_cs_(%TIMESTAMP%) </command>
+      <command>echo "Regression complete and email report sent to (%EMAIL_RECIPIENT%)"</command>
     </execScript>
   </runnable>
 
-  <!-- ================================================================================= -->
-  <!-- == all setups: We need to handle each setup separatly              ============== -->
-  <!-- == Below is "all_setups" and it's children                         ============== -->
-  <!-- ================================================================================= -->
 
+  <!-- ================================================ -->
+  <!-- == Handle each setup as it own  ================ -->
+  <!-- == All setups run in parallel   ================ -->
+  <!-- ================================================ -->
   <runnable name="all_setups" type="group" sequential="no" base="testsetup">
     <parameters>
     </parameters>
     <members>
-      <member>exec</member>
+      <member>setup</member>
     </members>
   </runnable>
 
-  <!-- == exec: This is what we do for each setup ============== -->
-  <runnable name="exec" type="group" foreach="(%DUT_SETUPS%)" sequential="yes" base="testsetup">
-    <parameters>
-      <parameter name = "ACTUAL_SETUP">(%exec.ITERATION%)</parameter>      
-      <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
-      <parameter name="triagefile">(%ACTUAL_SETUP%).(%BLOCKNAME%).tdb</parameter>
-    </parameters>
-    <members>
-      <member>compile_all</member>
-      <member>cdc_static</member>
-      <member>all_sims</member>
-      <member>vm</member>
-    </members>
-  </runnable>
-  
-  <!-- == compile_all: we need to compile all the hdl code  ============== -->
-   <runnable name="compile_all" type="task" base = "testsetup" >
-     <parameters>
-      <parameter name = "ACTUAL_SETUP">(%exec.ITERATION%)</parameter>      
-      <!-- We do allow you to add extra arguments in the tc spec file -->
-      <parameter name="EXTRA_VLOG_ARGS" type="tcl">[get_extra_args (%TCSPEC%) (%ACTUAL_SETUP%) vlog] </parameter>
-      <parameter name="EXTRA_VCOM_ARGS" type="tcl">[get_extra_args (%TCSPEC%) (%ACTUAL_SETUP%) vcom] </parameter>
-      <parameter name="EXTRA_OPT_ARGS" type="tcl">[get_extra_args (%TCSPEC%) (%ACTUAL_SETUP%) vopt] </parameter>
-      <parameter name="EXTRA_X_COMP_ARGS" type="tcl">[get_extra_args (%TCSPEC%) (%CURRENT_SETUP%) X_COMP_ARGS]</parameter>
-      <parameter name="EXTRA_SC_ARGS"    type="tcl">[get_extra_args (%TCSPEC%) (%CURRENT_SETUP%) SC_ARGS]</parameter>
-      <parameter name="ALL_COMPILE_ARGS">X_COMP_ARGS=&quot; (%EXTRA_X_COMP_ARGS%) SETUP=(%ACTUAL_SETUP%) (%EXTRA_VLOG_ARGS%) (%EXTRA_VCOM_ARGS%)&quot; SC_ARGS=(%EXTRA_SC_ARGS%)</parameter>
-     </parameters>
-     <execScript launch="/bin/csh -f">
-      <command> ln -s (%MERGE_HOME%) (%DATADIR%)/merged_ucdbfiles </command>
-       <command>unsetenv MODELSIM </command>
-       <!-- First we compile the code -->
-       <command>  make compile -f (%MAKEFILE%) (%ALL_COMPILE_ARGS%) </command>          
-       <command>  if ($status != 0) exit 1 </command>
-       <!-- After compiling, we optimize the design -->
-       <command>echo "Starting to optimize" </command>
+  <!-- ================================================ -->
+  <!-- == Put all ranked simulations as part of a new tc spec  ================ -->
+  <!-- ================================================ -->
 
-       <!-- In chip mode, we have less visibility and no coverage-->
-       <command>if ((%VERIFICATION_LEVEL%) == "CHIP") then</command>
-       <command>   make opt_fast -f (%MAKEFILE%) CHIP=1 X_OPT_ARGS=(%EXTRA_OPT_ARGS%)</command>
-       <command>   if ($status != 0) exit 1 </command>
-
-       <!-- If we want to automatically rerun failing tests,we create a dbg opt with more vis. -->       
-       <command>   if ((%RERUN_FAILING_TESTS%) == 1) then</command>
-       <command>     make opt_dbg -f (%MAKEFILE%) CHIP=1 X_OPT_ARGS=(%EXTRA_OPT_ARGS%)</command>
-       <command>     if ($status != 0) exit 1 </command>
-       <command>   endif </command>
-
-       <command>else </command>
-       <!-- Block mode -->
-       <command>   make opt_fast -f (%MAKEFILE%) COVER=true  X_OPT_ARGS=(%EXTRA_OPT_ARGS%) FAST=true</command>
-       <command>   if ($status != 0) exit 1 </command>
-       <!-- If we want to automatically rerun failing tests,we create a dbg opt with more vis. -->       
-       <command>   if ((%RERUN_FAILING_TESTS%) == 1) then</command>
-       <command>     make opt_dbg -f (%MAKEFILE%) COVER=true  X_OPT_ARGS=(%EXTRA_OPT_ARGS%) FAST=true</command>
-       <command>     if ($status != 0) exit 1 </command>
-       <command>   endif </command>
-
-       <command> endif </command>
-     </execScript>
-   </runnable>
-
-  <!-- == cdc_static: Running formal app cdc static  ============== -->
-  <runnable name="cdc_static" type="task" base="exec" if="(%CDC_STATIC%) eq {1}">
+  <runnable name="finalize_ranking" type="task" base = "testsetup" if="(%RANKING%) eq {1}">
     <execScript launch="/bin/csh -f">
-      <command> echo "Static CDC in regression not yet implemented" </command>
+      <command>cat (%SCRATCH%)/*(%TIMESTAMP%)_ranked_tc_spec.list >> (%SCRATCH%)/(%TIMESTAMP%)_ranked_tc_spec.txt</command>
     </execScript>
-  </runnable>
+  </runnable>    
 
-  <!-- == all_sims: Running all simulations and formal apps in parallell  ============== -->
+  <!-- ================================================ -->
+  <!-- == Create ranking if necessary                   -->
+  <!-- ================================================ -->
 
-  <runnable name="all_sims" type="group" sequential="no" base="testsetup">
-    <parameters>
-      <parameter name = "ACTUAL_SETUP">(%exec.ITERATION%)</parameter>      
-      <parameter name="VALID_TESTCASES" type="tcl">[expand_testcases (%TCSPEC%) [get_setup_from_context (%CONTEXT%)]]</parameter>
-      <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
-    </parameters>
-    <members>
-      <member>simulate</member>
-      <member>formal</member>
-      <member>autocheck</member>
-      <member>xprop</member>
-    </members>
-  </runnable>
-
-  <!-- == simulate: Launching all simulations  ============== -->
-  <!-- == DEBUGMODE is an automatic variable from vrun -->
-  <runnable name="simulate"  type="task"  foreach="(%VALID_TESTCASES%)" base="testsetup" >
-    <parameters>
-      <parameter name="TESTNAME" type="tcl">[lindex [split [lindex [split [file tail (%CONTEXT%)] ":"] 0] "~"] 1]</parameter>
-      <parameter name="ACTUAL_SETUP">(%exec.ITERATION%)</parameter>
-      <parameter name="EXTRA_VSIM_ARGS" type="tcl">[get_extra_args (%TCSPEC%) (%ACTUAL_SETUP%) vsim] </parameter>
-      <parameter name="seed" type="tcl">[lindex [split [file tail  (%CONTEXT%)] ":"] 1]</parameter>
-      <parameter name="ucdbfile">(%ACTUAL_SETUP%)_(%ITERATION%).ucdb</parameter>
-      <parameter name="ucdbtestname">(%ACTUAL_SETUP%)_(%ITERATION%)</parameter>
-      <parameter name="UCDBFILE" export="yes">(%ucdbfile%)</parameter>
-    </parameters>
-    <localfile type="link" src="(%TASKDIR%)/../../compile_all/modelsim.ini"/>
-    <execScript launch="/bin/csh -f">
-      <command>echo mergelist=(%mergelist%) </command>
-      <command>unsetenv MODELSIM </command>
-      <command>echo "The current DEBUGMODE value is: (%DEBUGMODE:0%)"</command>
-      <!-- First time we run DEBUGMODE is 0 -->
-      <command>if (("(%DEBUGMODE%)" == 0)) then  </command>
-      <command>   echo "Running simulation with minimum visibilty"</command>      
-      <command>   if ($status != 0) exit 1 </command>
-      <command>   ln -s 	../../compile_all/c_libs</command>
-      <command>   if ($status != 0) exit 1 </command>
-      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  UVM_VERBOSITY=UVM_NONE COVER=true</command>
-      <command>   if ($status != 0) exit 1 </command>
-      <command>else </command>
-      <!-- If we fail and have activated rerun mode, DEBUGMODE will be set to 1 -->
-      <command>  echo "The current DEBUGMODE value is: (%DEBUGMODE:0%)"</command>
-      <command>  echo "rerunning simulation with all full debug for postdebug" </command>
-      <command>  if ($status != 0) exit 1 </command>
-      <command>  ln -s 	../../compile_all/c_libs</command>
-      <command>  if ($status != 0) exit 1 </command>
-      <command>  ln -s 	../../compile_all/vsim.dbg</command>
-      <command>  if ($status != 0) exit 1 </command>
-      <command>  make batch_regression_dbg  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%) COVER=true</command>
-      <command>  if ($status != 0) exit 1 </command>
-      <command> endif </command>
-    </execScript>
-  </runnable>
-
-  <!-- == formal: Launching formal property  ============== -->
-  <runnable name="formal" type="task" base="exec" if="(%FORMAL%) eq {1}">
-    <localfile type="link" src="(%TASKDIR%)/../../compile_all/modelsim.ini"/>
-    <execScript launch="/bin/csh -f">
-      <command> echo "formal in regression not yet implemented" </command>
-    </execScript>
-  </runnable>
-
-  <!-- == formal: Launching formal app xprop  ============== -->
-  <runnable name="xprop" type="task" base="exec" if="(%XPROP%) eq {1}">
-    <localfile type="link" src="(%TASKDIR%)/../../compile_all/modelsim.ini"/>
-    <execScript launch="/bin/csh -f">
-      <command> echo "xprop in regression not yet implemented" </command>
-    </execScript>
-  </runnable>
-
-  <!-- == autocheck: Launching formal app autocheck  ============== -->
-  <!-- NOTE! add ucdb storage of results -->
-  <runnable name="autocheck" type="task" base="exec" if="(%AUTOCHECK%) eq {1}">
-    <localfile type="link" src="(%TASKDIR%)/../../compile_all/modelsim.ini"/>
-    <execScript launch="/bin/csh -f">
-      <command> echo "autocheck in regression not yet implemented" </command>
-      <command> echo "Missing ucdb from autocheck" </command>
-      <command> exit 1 		</command>      
-      <command>unsetenv MODELSIM </command>
-      <command>if ($status != 0) exit 1 		</command>      
-      <command>make liblist get_generics_only autocheck_only  -f (%MAKEFILE%) AUTOCHECK_GENERICS="-f generics.txt" </command>
-      <command>if ($status != 0) exit 1 		</command>      
-    </execScript>
-  </runnable>
-  
-
-  <!-- == vm: this is doing all the verification management  ============== -->
-  <runnable name="vm" type="group" sequential="yes">
-    <parameters>
-      <parameter name="CURRENT_SETUP">(%exec.ITERATION%)</parameter>	  
-      <parameter name="mergelist">(%DATADIR%)/(%CURRENT_SETUP%).mergelist</parameter>
-      <parameter name="mymergefile" >(%MERGE_HOME%)/(%CURRENT_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.ucdb</parameter>
-      <parameter name="triagefile">(%DATADIR%)/(%CURRENT_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).tdb</parameter>
-    </parameters>
-    <members>
-      <member>merge_ucdb_files</member>
-      <member>covercheck</member>
-      <member>vm_finish</member>
-    </members>
-  </runnable>
-
-  <!-- == merge_ucdb_files: We decided to use the mergelist and do merge in our own step  ============== -->
-  <runnable name="merge_ucdb_files" type="task" base="exec">
-    <parameters>
-      <parameter name="CURRENT_SETUP">(%exec.ITERATION%)</parameter>	  
-      <parameter name="VPLAN_UCDB">(%DATADIR%)/(%CURRENT_SETUP%).testplan.ucdb</parameter>	  
-    </parameters>
-    <execScript launch="/bin/csh -f">
-      <command> echo (%CURRENT_SETUP%) and (%mymergefile%) and (%mergelist%) </command>
-      <command> unsetenv MODELSIM</command>
-      <command> if (-e (%mergelist%)) then </command>
-      <command>   if (-e (%VPLAN_UCDB%)) then </command>
-      <command>     vcover merge (%VCOVER_OPTIONS%) -out (%mymergefile%) -inputs (%mergelist%) (%mergeoptions%) (%VPLAN_UCDB%) </command>
-      <command>     if ($status != 0) exit 1 		</command>      
-      <command>   else </command>
-      <command>     vcover merge  (%VCOVER_OPTIONS%) -out (%mymergefile%) -inputs (%mergelist%) (%mergeoptions%)</command>
-      <command>     if ($status != 0) exit 1 		</command>      
-      <command>   endif </command>
-      <command>  else </command>
-      <command>   echo "No (%mergelist%) was found. Could be because no simulation passed -no idea to do anything more..." </command>
-      <command>  exit 1 </command>
-      <command> rm -f (%MERGE_HOME%)</command>
-      <command>     if ($status != 0) exit 1 		</command>      
-      <command> endif </command>
-    </execScript>
-  </runnable>
-
-  <!-- == covercheck: We use formal app to target unreached code coverage == -->
-  <runnable name="covercheck" type="task" base="exec" if="(%COVERCHECK%) eq {1}">
-    <localfile type="link" src="(%TASKDIR%)/../../compile_all/modelsim.ini"/>
-    <execScript launch="/bin/csh -f">
-      <command>unsetenv MODELSIM </command>
-      <command>   if ($status != 0) exit 1 		</command>      
-      <command>   make liblist get_generics_only covercheck_only  -f (%MAKEFILE%) COVERCHECK_UCDB=(%mymergefile%) COVERCHECK_RESULTS=. </command>
-      <command>   if ($status != 0) exit 1 		</command>      
-      <command>   vsim -viewcov (%mymergefile%) -do "coverage report -code ecsfb -totals -file before_exclusions.rpt;do covercheck_exclude.do;coverage save (%mymergefile%);coverage report -code ecsfb -totals -file after_exclusions.rpt;exit -f" -c </command>
-      <command>   if ($status != 0) exit 1 		</command>      
-    </execScript>
-  </runnable>
-
-  <!-- == vm_finish: Finish up all the verification management tasks== -->
-  <runnable name="vm_finish" type="group" sequential="no">
-    <parameters>
-      <parameter name="CURRENT_SETUP">(%exec.ITERATION%)</parameter>	  
-      <parameter name="mergelist">(%DATADIR%)/(%CURRENT_SETUP%).mergelist</parameter>
-      <parameter name="mymergefile" >(%MERGE_HOME%)/(%CURRENT_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.ucdb</parameter>
-      <parameter name="triagefile">(%DATADIR%)/(%CURRENT_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).tdb</parameter>
-    </parameters>
-    <members>
-      <member>coverage_html_report</member>
-      <member>coverage_trend_report</member>
-      <member>create_rankfile</member>
-    </members>
-  </runnable>
-
-  <!-- == coverage_html_report: Generate html report == -->
-  <runnable name="coverage_html_report" type="task" base="testsetup">
-    <execScript>
-      <command> echo "Creating HTML report for (%mymergefile%)"                               </command>
-      <command> vcover report -html -nosource -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_coverage_report (%mymergefile%)</command>
-    </execScript>
-  </runnable>
-
-  <!-- == coverage_trend_report: Generate trend html report == -->
-  <runnable name="coverage_trend_report" type="task" base = "testsetup">
-    <execScript launch="/bin/csh -f">
-      <command>vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.ucdb </command>
-      <command> if ($status != 0) exit 1 </command>
-      <command>vcover report -trend -csv (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb -file (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend_report.csv -bydu </command>
-      <command> if ($status != 0) exit 1 </command>
-      <command>vcover report -trend -html (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb -nodetails -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_trend_report </command> >
-      <command> if ($status != 0) exit 1 </command>
-    </execScript>
-  </runnable>
-
-  <!-- == create_rankfile: If ranking is enabled, we rank and create a ranked tc spec file == -->
   <runnable name="create_rankfile" type="task" if="(%RANKING%) eq {1}" >
     <parameters>
-      <parameter name = "ACTUAL_SETUP">(%exec.ITERATION%)</parameter>      
+      <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>      
       <parameter name="mymergefile" >(%MERGE_HOME%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.ucdb</parameter>
     </parameters>
-    
     <execScript>
       <command>if [catch {open (%SCRATCH%)/(%ACTUAL_SETUP%)_(%TIMESTAMP%)_ranked_tc_spec.list w} ranked_spec_file] { </command>
       <command>  puts stderr "Cannot create file (%SCRATCH%)/(%ACTUAL_SETUP%)_(%TIMESTAMP%)_ranked_tc_spec.list\n"  </command>
       <command>  exit                                                            </command>
       <command>}                                                                 </command>
       <command>set f (%mymergefile%)                                               </command>
-      <command> echo "Ranking: $f" 	                                             </command>
+      <command> echo "Ranking: $f"                                                </command>
       <command> set test [lindex [split [file rootname [file tail $f]] "."] 0 ]  </command>
       <command> set t [lindex [split $test _] 0]                                 </command>
       <command> vcover ranktest -concise -rankfile (%SCRATCH%)/$t.rank $f        </command>
@@ -479,9 +219,14 @@
       <command>  # Read and close the file                                       </command>
       <command>  foreach line [split [read $contrib_file] \n] {                  </command>
       <command>    if {[regexp {.ucdb} $line]} {                                 </command>
+      <!--      # Get the seed'nr                                      
+                # get it by issuing the command vcover attribute -seed ucdb_file_name
+                # it returns the seed with this syntax:                     
+                # TESTNAME = fpu_test_sequence_fair_996513213               
+                #     SEED                = 996513213                       -->
       <command>      set tmp [split [vcover attribute -seed $line]]              </command>
       <command>      set testname [lindex [ split [lindex $tmp 2 ] : ] 0 ]       </command>
-      <command>      set testname [string map {(%ACTUAL_SETUP%)_ ""} $testname] </command>
+       <command>      set testname [string map {(%ACTUAL_SETUP%)_ ""} $testname] </command>
       <command>      set seed [lindex $tmp [expr [llength $tmp] - 2] ]           </command>
       <command>      lappend test_seed($testname) $seed                          </command>
       <command>    }                                                             </command>
@@ -497,14 +242,613 @@
     </execScript>
   </runnable>
 
-  <!-- == finalize_ranking: If ranking is enabled, we need to merge tests for all setups to one rankked tc spec file== -->
-  <runnable name="finalize_ranking" type="task" base = "testsetup" if="(%RANKING%) eq {1}">
-    <execScript launch="/bin/csh -f">
-      <command>cat (%SCRATCH%)/*(%TIMESTAMP%)_ranked_tc_spec.list >> (%SCRATCH%)/(%TIMESTAMP%)_ranked_tc_spec.txt</command>
-    </execScript>
-  </runnable>    
+  <!-- ================================================ -->
+  <!-- == Run CDC static - NOT IMPLEMENTED YET          -->
+  <!-- ================================================ -->
 
-    <xi:include href="mytcl.rmdb"/>
+  <runnable name="cdc_static" type="task" base="setup" if="(%CDC_STATIC%) eq {1}">
+    <execScript launch="/bin/csh -f">
+      <command> echo "Static CDC in regression not yet implemented" </command>
+    </execScript>
+  </runnable>
+
+  <!-- ================================================ -->
+  <!-- == Run For each setup, compile,simulate and gather data          -->
+  <!-- ================================================ -->
+
+  <runnable name="setup" type="group" foreach="(%DUT_SETUPS%)" sequential="yes" base="testsetup">
+    <parameters>
+      <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>      
+      <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
+      <parameter name="triagefile">(%ACTUAL_SETUP%).(%BLOCKNAME%).tdb</parameter>
+      <parameter name="TRIAGECOMMAND">"vrun -vrmdata regression_data -gui -do triage view (%triagefile%) -question all"</parameter>
+    </parameters>
+    <members>
+      <member>compile_all</member>
+      <member>cdc_static</member>
+      <member>tests</member>
+      <member>data_collection</member>
+    </members>
+  </runnable>
+
+  <!-- == test: Running all simulations and formal apps in parallell  ============== -->
+  <runnable name="tests" type="group" sequential="no" base="testsetup">
+    <members>
+      <member>test</member>
+    </members>
+  </runnable>
+
+
+  <!-- == test: Running all simulations and formal apps in parallell  ============== -->
+  <runnable name="test" type="group" sequential="no" base="testsetup" foreach="(%VALID_TESTS%)">
+    <parameters>
+      <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>      
+      <parameter name="VALID_TESTS" type="tcl">[get_tests_for_setup (%TCSPEC%) (%ACTUAL_SETUP%)]</parameter>
+    </parameters>
+    <members>
+      <member>all_sims</member>
+    </members>
+  </runnable>
+
+  <!-- ================================================ -->
+  <!-- == Compile group Runnable                     == -->
+  <!-- == This group is sequential. A failure in any == -->
+  <!-- == member of this group will cause the entire == -->
+  <!-- == group and downstream operations to be      == -->
+  <!-- == abandoned. Runnables are being used here   == -->
+  <!-- == for more control over specification of     == -->
+  <!-- == dependencies                               == -->  
+  <!-- ================================================ -->
+  <runnable name="compile_all" type="task" base = "testsetup" >
+    <parameters>
+      <!--parameter name="ACTUAL_SETUP" type="tcl">[lindex [split [lindex [split (%CONTEXT%) "/"] end-1] "~"] 1]</parameter-->
+      <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>      
+      <parameter name="EXTRA_VLOG_ARGS" type="tcl">[get_extra_vlog_args (%TCSPEC%) (%ACTUAL_SETUP%)] </parameter>
+      <parameter name="EXTRA_VCOM_ARGS" type="tcl">[get_extra_vcom_args (%TCSPEC%) (%ACTUAL_SETUP%)] </parameter>
+      <parameter name="EXTRA_OPT_ARGS" type="tcl">[get_extra_args (%TCSPEC%) (%ACTUAL_SETUP%) vopt] </parameter>
+      <parameter name="EXTRA_X_COMP_ARGS" type="tcl">[get_extra_args (%TCSPEC%) (%CURRENT_SETUP%) X_COMP_ARGS]</parameter>
+      <parameter name="EXTRA_SC_ARGS"    type="tcl">[get_extra_args (%TCSPEC%) (%CURRENT_SETUP%) SC_ARGS]</parameter>
+      <parameter name="ALL_COMPILE_ARGS">X_COMP_ARGS=&quot; (%EXTRA_X_COMP_ARGS%) --define FLTVAR_COMPILE_SETUP=(%ACTUAL_SETUP%) (%EXTRA_VLOG_ARGS%) (%EXTRA_VCOM_ARGS%)&quot; SC_ARGS=(%EXTRA_SC_ARGS%)</parameter>
+    </parameters>
+    <execScript launch="/bin/csh -f">
+      <command>unsetenv MODELSIM </command>
+      <command>if ((%CHIP%) == 1) then</command>
+      <command>  make compile -f (%MAKEFILE%)  CHIP=true (%ALL_COMPILE_ARGS%) NOCOLOR=--nocolor BITS=(%BITS%)</command>          
+      <command>  if ($status != 0) exit 1 </command>
+      <command>else </command>
+      <command>  make compile -f (%MAKEFILE%) COVER=true (%ALL_COMPILE_ARGS%) NOCOLOR=--nocolor  BITS=(%BITS%)</command>
+      <command>  if ($status != 0) exit 1 </command>
+      <command>endif </command>
+      <command>echo "Starting to optimize" </command>
+      <command>if ((%CHIP%) == 1) then</command>
+      <command>   make opt_fast -f (%MAKEFILE%) CHIP=true X_OPT_ARGS=(%EXTRA_OPT_ARGS%)  BITS=(%BITS%)</command>
+      <command>   if ($status != 0) exit 1 </command>
+      <command>   if ((%RERUN_FAILING_TESTS%) == 1) then</command>
+      <command>     make opt_dbg -f (%MAKEFILE%) CHIP=true X_OPT_ARGS=(%EXTRA_OPT_ARGS%)  BITS=(%BITS%)</command>
+      <command>     if ($status != 0) exit 1 </command>
+      <command>   endif </command>
+      <command>else </command>
+      <command>   make opt_fast -f (%MAKEFILE%) COVER=true  X_OPT_ARGS=(%EXTRA_OPT_ARGS%)  BITS=(%BITS%) FAST=true</command>
+      <command>   if ($status != 0) exit 1 </command>
+      <command>   if ((%RERUN_FAILING_TESTS%) == 1) then</command>
+      <command>     make opt_dbg -f (%MAKEFILE%) COVER=true  X_OPT_ARGS=(%EXTRA_OPT_ARGS%) FAST=true  BITS=(%BITS%)</command>
+      <command>     if ($status != 0) exit 1 </command>
+      <command>   endif </command>
+      <command> endif </command>
+    </execScript>
+  </runnable>
 
   
+  <!-- ================================================ -->
+  <!-- == Simulate group Runnable                    == -->
+  <!-- == This group is run in parallell. The number == -->  
+  <!-- == of parallell jobs are controlled by the    == -->
+  <!-- == switch -j <nbr>                            == -->
+  <!-- ================================================ -->
+  <runnable name="all_sims" type="group" sequential="no" base="testsetup">
+    <parameters>
+      <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>      
+      <parameter name="TEST_SEEDS" type="tcl">[get_test_seeds (%TCSPEC%) (%ACTUAL_SETUP%) (%test.ITERATION%)]</parameter>
+      <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
+    </parameters>
+    <members>
+      <member>Simulate</member>
+      <member>formal</member>
+      <member>autocheck</member>
+      <member>xprop</member>
+    </members>
+  </runnable>
+
+  <runnable name="autocheck" type="task" base="setup" if="(%AUTOCHECK%) eq {1}">
+    <parameters>
+      <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
+    </parameters>
+    <execScript launch="/bin/csh -f">
+      <command>unsetenv MODELSIM </command>
+      <command>ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
+      <command>ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
+      <command>if ($status != 0) exit 1     </command>      
+      <command>make create_liblists get_generics autocheck_only  -f (%MAKEFILE%)  BITS=(%BITS%)</command>
+      <command>if ($status != 0) exit 1     </command>      
+    </execScript>
+  </runnable>
+
+  <runnable name="formal" type="task" base="setup" if="(%FORMAL%) eq {1}">
+    <parameters>
+      <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
+    </parameters>
+    <execScript launch="/bin/csh -f">
+      <command> echo "formal in regression not yet implemented" </command>
+      <command>ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
+    </execScript>
+  </runnable>
+
+  <runnable name="xprop" type="task" base="setup" if="(%XPROP%) eq {1}">
+    <parameters>
+      <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
+    </parameters>
+    <execScript launch="/bin/csh -f">
+      <command> echo "xprop in regression not yet implemented" </command>
+      <command>ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
+    </execScript>
+  </runnable>
+
+      
+  <runnable name="Simulate"  type="task"  foreach="(%TEST_SEEDS%)" base="testsetup">
+    <parameters>
+      <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
+      <parameter name="TESTNAME" type="tcl">[lindex [split [lindex [split [file tail (%CONTEXT%)] ":"] 0] "~"] 1]</parameter>
+      <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>
+      <parameter name="EXTRA_VSIM_ARGS" type="tcl">[get_extra_args (%TCSPEC%) (%ACTUAL_SETUP%) vsim] </parameter>
+      <parameter name="seed" type="tcl">[lindex [split [file tail  (%CONTEXT%)] ":"] 1]</parameter>
+      <parameter name="ucdbfile">(%ACTUAL_SETUP%)_(%ITERATION%).ucdb</parameter>
+      <parameter name="ucdbtestname">(%ACTUAL_SETUP%)_(%ITERATION%)</parameter>
+      <parameter name="UCDBFILE" export="yes">(%ucdbfile%)</parameter>
+      <parameter name="MAKEARGS">"make compile gui TEST=(%TESTNAME%) SEED=(%seed%) SETUP=(%ACTUAL_SETUP%)"</parameter>
+    </parameters>
+    <execScript launch="/bin/csh -f">
+      <command>echo mergelist=(%mergelist%) </command>
+      <command>unsetenv MODELSIM </command>
+      <command>echo "The current DEBUGMODE value is: (%DEBUGMODE:0%)"</command>
+      <!--command> if (("(%DEBUGMODE%)" == 0)|("(%RERUN_FAILING_TESTS%))" == 0)) then  </command-->
+      <command> if (("(%DEBUGMODE%)" == 0)) then  </command>
+      <command>   echo "Running simulation with minimum visibilty"</command>      
+      <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
+      <command>   ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
+      <command>   ln -s   (%PATH_TO_COMPDIR%)/c_libs</command>
+      <command>   cp (%VRUNDIR%)/vsim.do .</command>
+      <command>   make batch_regression postsim_script -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  UVM_VERBOSITY=UVM_NONE OVM_VERBOSITY=OVM_NONE COVER=true  BITS=(%BITS%)</command>
+      <command>   if ($status != 0) then </command>
+      <command>     if ( `grep -c "# FATAL ERROR: License connection lost and unable to reconnect after multiple attempts." execScript.log` > 0 ) then  </command>
+      <command>       bhist -l `cut -d"&lt;" -f2 execScript.stdout | cut -d"&gt;" -f1` &gt; debug.log </command>
+      <command>       cat execScript.log &gt;&gt; debug.log </command>
+      <command>       env &gt;&gt; debug.log </command>       
+      <command>       mail -s  "Simulation failed due to license error" qmikand &lt; debug.log </command>
+      <command>       exit(1)</command>
+      <command>     else </command>
+      <command>       exit(1)</command>
+      <command>     endif </command>
+      <command>   endif </command>
+      <!--command> if (-e c_libs) rm c_libs</command-->
+      <command> else </command>
+      <command>   echo "The current DEBUGMODE value is: (%DEBUGMODE:0%)"</command>
+      <command>   echo "rerunning simulation with all full debug for postdebug" </command>
+      <command>   ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
+      <command>   if ($status != 0) exit 1 </command>
+      <command>     ln -s   (%PATH_TO_COMPDIR%)/c_libs</command>
+      <command>   if ($status != 0) exit 1 </command>
+      <command>     ln -s   (%PATH_TO_COMPDIR%)/vsim.dbg</command>
+      <command>   if ($status != 0) exit 1 </command>
+      <command>     make batch_regression_dbg postsim_script -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%) COVER=true  BITS=(%BITS%)</command>
+      <command>   if ($status != 0) exit 1 </command>
+      <command> endif </command>
+    </execScript>
+  </runnable>
+
+
+  <!-- ================================================ -->
+  <!-- == Reporting Runables  ========================= -->
+  <!-- == This section merges all the UCDB files and == -->
+  <!-- == generates HTML reports + creates the       == -->
+  <!-- == triage file                                == -->
+  <!-- ================================================ -->
+  <runnable name="coverage_trend_report" type="task" base = "testsetup">
+    <execScript launch="/bin/csh -f">
+      <command> if ( (%REQUIRE_VPLAN%) != 0) then </command>
+      <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.ucdb        </command>
+      <command> else </command>
+      <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.noplan.ucdb      </command>
+      <command> endif </command>
+      <command> if ($status != 0) exit 1 </command>
+      <command>vcover report -trend -csv (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb -file (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend_report.csv -bydu  </command>
+      <command> if ($status != 0) exit 1 </command>
+      <command>vcover report -trend -html (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb -nodetails -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_trend_report  </command> -->
+      <command> if ($status != 0) exit 1 </command>
+    </execScript>
+  </runnable>
+
+  <runnable name="merge_ucdb_files" type="task" base="setup">
+    <parameters>
+       <parameter name="CURRENT_SETUP">(%setup.ITERATION%)</parameter>    
+       <parameter name="VPLAN_UCDB">(%DATADIR%)/(%CURRENT_SETUP%).testplan.ucdb</parameter>    
+    </parameters>
+    <execScript launch="/bin/csh -f">
+      <command> echo (%CURRENT_SETUP%) and (%mymergefile%) and (%mymergefile_noplan%) and (%mergelist%) </command>
+      <command>ln -s (%MERGE_HOME%) (%DATADIR%)/merged_ucdbfiles </command>
+      <command> unsetenv MODELSIM</command>
+      <command> if (-e (%mergelist%)) then </command>
+      <command>   if (-e (%VPLAN_UCDB%)) then </command>
+      <command>     vcover merge (%VCOVER_OPTIONS%) -out (%mymergefile%) -inputs (%mergelist%) (%mergeoptions%) (%VPLAN_UCDB%) </command>
+      <command>     vcover merge (%VCOVER_OPTIONS%) -out (%mymergefile_noplan%) -inputs (%mergelist%) (%mergeoptions%)</command>
+      <command>     if ($status != 0) exit 1     </command>      
+      <command>   else </command>
+      <command>     vcover merge  (%VCOVER_OPTIONS%) -out (%mymergefile_noplan%) -inputs (%mergelist%) (%mergeoptions%)</command>
+      <command>     if ($status != 0) exit 1     </command>      
+      <command>   endif </command>
+      <command>  else </command>
+      <command>   echo "No (%mergelist%) was found. Could be because no simulation passed -no idea to do anything more..." </command>
+      <command>  exit 1 </command>
+      <command> rm -f (%MERGE_HOME%)</command>
+      <command>     if ($status != 0) exit 1     </command>      
+      <command> endif </command>
+    </execScript>
+  </runnable>
+
+
+  <runnable name="covercheck" type="task" base="setup" if="(%COVERCHECK%) eq {1}">
+    <parameters>
+      <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
+    </parameters>
+    <execScript launch="/bin/csh -f">
+      <command>unsetenv MODELSIM </command>
+      <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
+      <command>   ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
+      <command>   if ($status != 0) exit 1     </command>      
+      <command>   make create_liblists get_generics covercheck_only  -f (%MAKEFILE%) MERGED_UCDB=(%mymergefile%)  </command>
+      <command>   if ($status != 0) exit 1     </command>      
+      <command>   vsim -viewcov (%mymergefile%) -do "coverage report -code ecsfb -totals -file before_exclusions.rpt;do Output_Results/covercheck_exclude.do;coverage save (%mymergefile%);coverage report -code ecsfb -totals -file after_exclusions.rpt;exit -f" -c</command>
+    </execScript>
+  </runnable>
+
+  <runnable name="generate_reports" type="group" sequential="no">
+    <parameters>
+      <parameter name="CURRENT_SETUP">(%setup.ITERATION%)</parameter>    
+      <parameter name="mergelist">(%DATADIR%)/(%CURRENT_SETUP%).mergelist</parameter>
+      <parameter name="mymergefile" >(%MERGE_HOME%)/(%CURRENT_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.ucdb</parameter>
+      <parameter name="triagefile">(%DATADIR%)/(%CURRENT_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).tdb</parameter>
+    </parameters>
+    <members>
+      <member>coverage_html_report</member>
+      <member>coverage_trend_report</member>
+      <member>create_rankfile</member>
+    </members>
+  </runnable>
+
+
+  <runnable name="data_collection" type="group" sequential="yes">
+    <parameters>
+      <parameter name="CURRENT_SETUP">(%setup.ITERATION%)</parameter>    
+      <parameter name="mergelist">(%DATADIR%)/(%CURRENT_SETUP%).mergelist</parameter>
+      <parameter name="mymergefile" >(%MERGE_HOME%)/(%CURRENT_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.ucdb</parameter>
+      <parameter name="mymergefile_noplan" >(%MERGE_HOME%)/(%CURRENT_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.noplan.ucdb</parameter>
+      <parameter name="triagefile">(%DATADIR%)/(%CURRENT_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).tdb</parameter>
+    </parameters>
+    <members>
+      <member>merge_ucdb_files</member>
+      <member>covercheck</member>
+      <member>generate_reports</member>
+    </members>
+  </runnable>
+
+  <runnable name="convert_vplans_to_ucdb" type="group" sequential="yes" if="(%REQUIRE_VPLAN%) eq {1}">
+      <method>
+      </method>
+    <preScript launch="/bin/csh -f">
+      <command> if  ("(%DUT_SETUPS%)" == "") then  </command>
+      <command> echo "Check your (%TCSPEC%), did not find any setups"</command> 
+      <command> exit 1 </command>
+      <command> endif </command>
+    </preScript>
+    <members>
+      <member>convert_vplan_to_ucdb</member>
+    </members>
+  </runnable>
+
+  <runnable name="convert_vplan_to_ucdb"  foreach="(%DUT_SETUPS%)" base="testsetup"  type="task"  if="(%REQUIRE_VPLAN%) eq {1}">
+    <parameters>
+      <parameter name="CURRENT_SETUP">(%convert_vplan_to_ucdb.ITERATION%)</parameter>    
+      <parameter name="VPLAN_UCDB">(%DATADIR%)/(%CURRENT_SETUP%).testplan.ucdb</parameter>    
+      <parameter name="VPLAN_XML_TS" type="tcl">[get_extra_args (%TCSPEC%) (%CURRENT_SETUP%) VPLAN_XML]</parameter>
+      <parameter name="VPLAN_EXCEL_TS" type="tcl">[get_extra_args (%TCSPEC%) (%CURRENT_SETUP%) VPLAN_EXCEL]</parameter>
+    </parameters>
+  <!-- Need to execute locally due to openoffice -->
+      <method>
+      </method>
+    <execScript launch="/bin/csh -f">
+      <command>unsetenv MODELSIM </command>
+      <command>echo DBG: ---------------------------------------</command>
+      <command>echo DBG: CURRENT_SETUP  =(%CURRENT_SETUP%)</command>
+      <command>echo DBG: TCSPEC         =(%TCSPEC%)</command>
+      <command>echo DBG: VPLAN_UCDB     =(%VPLAN_UCDB%)</command>
+      <command>echo DBG: VPLAN_XML_TS   =(%VPLAN_XML_TS%)</command>
+      <command>echo DBG: VPLAN_EXCEL_TS =(%VPLAN_EXCEL_TS%)</command>
+      <command>echo DBG: ---------------------------------------</command>
+      <command>set foundplan=0 </command>
+      <command>set vplan_xml="(%VPLAN_XML_TS%)" </command>
+      <command>if ((%USE_XML_VPLAN%) != 0) then </command>    
+      <command>  echo "USE_XML_VPLAN=(%USE_XML_VPLAN%) tells us to use xml verification plan"</command> 
+  
+      <command>  if ($vplan_xml != "") then </command>
+      <command>    set vplan_xml="(%VPLAN_XML_TS%)"  </command>
+      <command>    echo "Fuond xml vplan specified in (%TCSPEC%):$vplan_xml"</command> 
+      <command>  else </command>
+      <command>    set vplan_xml=(%XML_VPLAN%)  </command>
+      <command>    echo "using xml vplan specified in  Makefile:$vplan_xml"</command> 
+      <command>  endif</command>  
+  
+      <command>  if (-e $vplan_xml) then </command>
+      <command>     echo "Converting..."</command>
+      <command>     xml2ucdb -format Excel -datafields (%XML2UCDB_DATAFIELDS%) $vplan_xml (%VPLAN_UCDB%) </command>
+      <command>     if ($status != 0) exit 1          </command>    
+      <command>     set foundplan=1</command>
+      <command>  endif</command>    
+
+      <command>  if ($foundplan != 1) then </command>
+      <command>    echo "No verification plan was found."</command>
+      <command>    echo "Please add $vplan_xml or update (%TCSPEC%)"      </command>
+      <command>    echo "with (%CURRENT_SETUP%):VPLAN_XML=&lt;file&gt;"      </command>
+      <command>    echo "or do make regression REQUIRE_VPLAN=0"      </command>
+      <command>    if ((%REQUIRE_VPLAN%) != 0)  then </command>
+      <command>      echo "Exiting..." </command>
+      <command>      exit 1 </command>
+      <command>    endif</command>
+      <command>  endif</command>
+      <!-- not USE_XML_VPLAN -->
+      <command>  else </command>
+
+      <command>  set vplan_excel="(%VPLAN_EXCEL_TS%)" </command>
+      <command>  if ($vplan_excel != "") then </command>
+      <command>    set vplan_excel="(%VPLAN_EXCEL_TS%)"</command>
+      <command>  else </command>
+      <command>    set vplan_excel="(%EXCEL_VPLAN%)"</command>
+      <command>  endif</command>    
+      <command>  echo "Using excel verification plan:$vplan_excel"</command> 
+
+      <command>  if (-e $vplan_excel) then </command>
+      <command>    echo "Found $vplan_excel - starting soffice"</command> 
+      <command>    soffice --headless --convert-to xml:"MS Excel 2003 XML" $vplan_excel </command>
+      <command>    if ($status != 0) then </command>    
+      <command>      echo " soffice conversion failed"</command>    
+      <command>      exit 1          </command>    
+      <command>    endif</command>    
+      <command>    echo "converting xml to ucdb" </command>  
+      <command>    xml2ucdb -format Excel -datafields (%XML2UCDB_DATAFIELDS%) *.xml (%VPLAN_UCDB%) </command>
+      <command>    if ($status != 0) exit 1          </command>    
+      <command>    else </command>
+      <command>      echo "No verification plan was found. Please add $vplan_excel"      </command>
+      <command>      echo "or do make regression REQUIRE_VPLAN=0"      </command>
+      <command>      if ((%REQUIRE_VPLAN%) != 0)  then</command>
+      <command>        exit 1 </command> 
+      <command>      endif</command>    
+      <command>  endif</command>    
+      <command>endif</command>    
+    </execScript>
+  </runnable>
+
+
+  <runnable name="coverage_html_report" type="task" base="testsetup">
+    <execScript>
+      <command> echo "Creating HTML report for (%mymergefile%)"                               </command>
+      <command> vcover report -html -nosource -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_coverage_report (%mymergefile%)</command>
+    </execScript>
+  </runnable>
+
+
+  <usertcl name="mytcl">
+  <!-- ================================================ -->
+  <!-- == Over-ride TCL built-in                     == -->
+  <!-- == Advanced VRM capabilities                  == -->
+  <!-- == The underlying default behaviour of VRM    == -->
+  <!-- == can be modified using the exposed TCL API  == -->
+  <!-- == Usually these defined TCL methods do       == -->
+  <!-- == by default. These methods can be           == -->
+  <!-- == overriden within the usertcl element of    == -->
+  <!-- == RMDB. In addition the user can define TCL  == -->
+  <!-- == procedures that they wish to call in       == -->
+  <!-- == action scripts here also.                  == -->
+  <!-- ================================================ -->
+  <!-- An example of overriding the VRM procedure StopRunning 
+        In this case, VRM will stop if 1000 errors are generated 
+        during execution of a regression                   -->
+  proc StopRunning {userdata} {
+    upvar $userdata data
+    set result [expr {$data(fail) == 1000}]
+    return $result
+  }
+
+  <!-- get_rel_path_between: This tcl procedure will return the relative path between a given taskdir and a given runnables taskdir -->
+  proc get_rel_path_between { my_path runnable_parent runnable} {
+    set p ""
+    set tt [split $my_path /]
+    set ll [llength $tt]
+    set li [lsearch $tt $runnable_parent~*]
+    set levels [expr $ll-$li]
+    for {set i 1} {$i &lt; $levels} {incr i} {
+        set p [file join $p ..]
+    }
+    return [file join $p $runnable]
+  }
+
+   <!-- get_all_setups: This tcl procedure will extract all setups from the tc spec file -->
+   proc get_all_setups {file_name} {
+      set tclist ""
+      set tmp_file [open $file_name r]
+      while {![eof $tmp_file]} {
+         gets $tmp_file line
+         if {[string range $line 0 0] != "#"} {
+            # Lines containing ":" are not testnames
+            if {[string match "*:*" $line]} {
+               #puts "Found argument for a setup"
+            } else {
+               if {[llength $line] != 0} {
+                  set setup [lindex $line 0]
+                  lappend tclist $setup
+                }
+            }
+         }
+      }
+      close $tmp_file
+      set tclist [lsort -u $tclist]
+      return $tclist
+   }
+
+   <!-- get_tests_for_setup: This tcl procedure will extract all testnames for a given setup from the tc spec file -->
+   proc get_tests_for_setup {file_name setup} {
+      set tclist ""
+      set tmp_file [open $file_name r]
+      while {![eof $tmp_file]} {
+         gets $tmp_file line
+         if {[string range $line 0 0] != "#"} {
+            if {$setup == [lindex $line 0]} {
+               if {[llength $line] != 0} {
+                  set setup [lindex $line 0]
+                  set tc [lindex $line 1]
+                  lappend tclist $tc
+               }
+            }
+         }
+      }
+      close $tmp_file
+      set tclist [lsort -u $tclist]
+      return $tclist
+   }
+
+   <!-- get_test_seeds: This tcl procedure will extract seeds for a given test/setup from the tc spec file -->
+   proc get_test_seeds {file_name setup test} {
+      set tclist ""
+      set tmp_file [open $file_name r]
+      while {![eof $tmp_file]} {
+         gets $tmp_file line
+         if {[string range $line 0 0] != "#"} {
+            if {$setup == [lindex $line 0]} {
+               if {[llength $line] != 0} {
+                  if {[llength $line] == 2} {
+                     set num 1
+                    } else {
+                     set num [lindex $line 2]
+                    }
+                    set setup [lindex $line 0]
+                    set tc [lindex $line 1]
+                    if {$tc == $test} {
+                       set max [expr $num+2]
+                       #puts "processing $line - found setup = $setup, tc = $tc, num = $num, max = $max"              
+                       for {set repeat 3} {$repeat &lt;=$max} {incr repeat} {
+                        #puts "processing repeat = $repeat"
+                        set seed [lindex $line $repeat]
+                        if {$seed == ""} {
+                             #puts "Found no spec of seed, using random"   
+                           set seed random
+                        }
+                        if {$seed==&quot;random&quot;} {
+                             set ix [lsearch -exact $tclist $tc:$seed:[expr $repeat-2]]
+                        } else {
+                             set ix [lsearch $tclist $tc:$seed:*]
+                        }
+                        if {$ix &lt; 0} {
+                            #  puts "seed = $seed"
+                            lappend tclist [format "%s:%s:%d" $tc $seed [expr $repeat-2]]
+                          } else {
+                           logDebug "Please check $file_name"
+                           logDebug "$setup $tc with seed=$seed and iteration=[expr $repeat-2] is repeated multiple times - Skipping"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+      close $tmp_file
+      return $tclist
+   }
+
+
+  <!-- get_extra_args: This tcl procedure looks for arguments from the tc spec file -->
+  proc get_extra_args {file_name setup args} {
+     set tmp_file [open $file_name r]
+     while {![eof $tmp_file]} {
+        gets $tmp_file line
+        if {[regexp "^$setup:$args=(.+)$" $line all x_args]} {
+           close $tmp_file
+           return $x_args
+        }
+     }
+     close $tmp_file
+     return ""
+  }
+
+
+  <!-- get_extra_vlog_args: This tcl procedure looks for extra vlog arguments from the tc spec file -->
+  proc get_extra_vlog_args {file_name setup} {
+    set vlog_args_list ""
+    set tmp_file [open $file_name r]
+    while {![eof $tmp_file]} {
+      gets $tmp_file line
+      if {[string match "$setup:*vlog*" $line]} {
+        if {[llength $line] != 0} {
+          #puts "debug:$line"
+          set vlog_args [lindex [split [lindex [split $line ":"]  1] "="] 1]
+          lappend vlog_args_list $vlog_args
+        }
+      }
+    }
+    set res [join $vlog_args_list " "]
+    set l [string length $res]
+    if { $l > 0} {
+      return "--questa_vlogopt=\'$res\'"
+    } else {
+      return ""
+    }
+  }
+
+  <!-- get_extra_vcom_args: This tcl procedure looks for extra vcom arguments from the tc spec file -->
+  proc get_extra_vcom_args {file_name setup} {
+    set vcom_args_list ""
+    set tmp_file [open $file_name r]
+    while {![eof $tmp_file]} {
+    gets $tmp_file line
+      if {[string match "$setup:*vcom=*" $line]} {
+        if {[llength $line] != 0} {
+          #puts "debug:$line"
+          set vcom_args [lindex [split [lindex [split $line ":"]  1] "="] 1]
+          lappend vcom_args_list $vcom_args
+        }
+      }
+    }
+    set res [join $vcom_args_list " "]
+    set l [string length $res]
+    if { $l > 0} {
+      return "--questa_vcomopt=\'$res\'"
+    } else {
+       return ""
+    }
+  }
+
+  <!-- get_extra_vsim_args: This tcl procedure looks for extra vsim arguments from the tc spec file -->
+  proc get_extra_vsim_args {file_name setup} {
+    set vsim_args_list ""
+    set tmp_file [open $file_name r]
+    while {![eof $tmp_file]} {
+      gets $tmp_file line
+      if {[string match "$setup:*vsim=*" $line]} {
+        if {[llength $line] != 0} {
+          #puts "debug:$line"
+          set vsim_args [lindex [split [lindex [split $line ":"]  1] "="] 1]
+          lappend vsim_args_list $vsim_args
+        }
+      }
+    }
+    return [join $vsim_args_list " "]
+  }
+
+  </usertcl>
 </rmdb>
