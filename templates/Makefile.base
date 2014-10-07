@@ -104,6 +104,11 @@ EXTRA_VCOM_ARGS=
 EXTRA_VOPT_ARGS=
 EXTRA_VSIM_ARGS=
 ###################################################################
+# Common formal stuff
+###################################################################
+SKIP_SYNTHOFF_REGION=-vlogargs=-skipsynthoffregion -vcomargs=-skipsynthoffregion
+
+###################################################################
 # Autocheck defaults
 ###################################################################
 AUTOCHECK=0
@@ -190,14 +195,16 @@ QVIP_TARGETS=qvip_default
 ifneq ($(QUESTA_MVC_HOME),) # If QUESTAMVC_HOME is set use this!
 QUESTA_VIP_SIM_ARGS=-mvchome $(QUESTA_MVC_HOME)
 QVIP_COMMON=mvc_base
+ALLQVIPTARGETS=$(shell ls ${QUESTA_MVC_HOME}/questa_mvc_src/sv | grep -v .sv | tr '\n' ' ')
 else
 QUESTA_VIP_SIM_ARGS=
 QVIP_COMMON=
+ALLQVIPTARGETS=no_qvip
 endif
  # Used for checking compilation
-ALLQVIPTARGETS=$(shell ls ${QUESTA_MVC_HOME}/questa_mvc_src/sv | grep -v .sv | tr '\n' ' ')
 allqvips: ${ALLQVIPTARGETS}
-
+noqvip:
+	@echo "no Questa VIP installation detected"
 
 
 

@@ -12,7 +12,7 @@
 # bugs, enhancment requests to: Mikael_Andersson@mentor.com
 # ************************************************************************************
 
-BEGIN {push @INC,$ENV{'QME_HOME'}."perlmodules/lib/perl5"}
+BEGIN {push @INC,$ENV{'QME_HOME'}."/perlmodules/lib/perl5/"}
 use strict;
 use Spreadsheet::ParseExcel;
 my $excel_file=pop;
