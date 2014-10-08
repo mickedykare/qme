@@ -34,18 +34,24 @@ my $default_lib="";
 my $library_home="questa_libs";
 my $arch="32";
 my $gcc_version="4.3.3";
-
+my $nocolor=0;
 # Let's find out the path to vmap
 # Since we can use any variable for questa we do the following
 
-my $model_tech_path=$ENV{"QUESTASIM_HOME"};
+my $model_tech_path=$ENV{"QUESTA_HOME"};
 
 
 sub infomsg{
+    my $nocolor=pop;
     my $s = pop;
-    print color 'bold dark blue';
-    print "Note: $s\n";
-    print color 'reset';
+
+    if ($nocolor==0) {
+	print color 'bold dark blue';
+	print "Note: $s\n";
+	print color 'reset';
+    } else {
+	print "Note: $s\n";
+    }
 }
 
 
@@ -89,7 +95,7 @@ sub compile_file{
     } elsif (($flist[0] =~ /\.c$/)|($flist[0] =~ /\.cpp$/)) {
 	$type="c"; 
     } else {
-	&infomsg("Unknown filetype:$flist[0]");
+	&infomsg("Unknown filetype:$flist[0]",$nocolor);
 	exit(1);
     }
 
@@ -98,40 +104,40 @@ sub compile_file{
 #    print "DEBUG:$args\n";
     if ($type eq "vhdl") {
 	$cmd = "vcom -$arch -work $lib $tmp $args $vcomargs";
-	&infomsg("Launching: $cmd");
+	&infomsg("Launching: $cmd",$nocolor);
 	&system_cmd_hl($cmd);
 
     } elsif ($type eq "verilog") {
 	$cmd = "vlog -$arch -work $lib $tmp $args $vlogargs $mapped_libs";
 
-	&infomsg("Launching: $cmd");
+	&infomsg("Launching: $cmd",$nocolor);
 	&system_cmd_hl($cmd);
     } elsif ($type eq "c") {
 	if ($usegcc) {
 	    my @x=split "/",$tmp;
 	    my $basename = pop @x;
-	    &infomsg("####################################################################################################");
-	    &infomsg("Using old way of compililing and linking c-code. Please refer to DPI Use Flow in Questa Users manual");
-	    &infomsg("####################################################################################################");
+	    &infomsg("####################################################################################################",$nocolor);
+	    &infomsg("Using old way of compililing and linking c-code. Please refer to DPI Use Flow in Questa Users manual",$nocolor);
+	    &infomsg("####################################################################################################",$nocolor);
 
 	    &system_cmd("test -e c_libs/$lib||mkdir -p c_libs/$lib");
 	    $cmd="gcc -m$arch $args $cflags $tmp -o ./c_libs/$lib/$basename".".o";
-	    &infomsg("Launching: $cmd");
+	    &infomsg("Launching: $cmd",$nocolor);
 	    &system_cmd($cmd);
 	    $cmd="g++ -m$arch $ldflags `find ./c_libs/$lib/ -name *.o -print` -o ./c_libs/$lib".".so";
-	    &infomsg("Launching: $cmd");
+	    &infomsg("Launching: $cmd",$nocolor);
 	    &system_cmd($cmd);
 	    
 
 	} else {
 	$cmd = "vlog -$arch -work $lib $tmp -ccflags \"$args $cflags\" -dpicppinstall $gcc_version -";
-	&infomsg("Launching: $cmd");
+	&infomsg("Launching: $cmd",$nocolor);
 	&system_cmd_hl($cmd);
 	}
 
 
     } else {
-	&infomsg("Unknown filetype:$type");
+	&infomsg("Unknown filetype:$type",$nocolor);
 	exit(1);
 
     }
@@ -150,13 +156,14 @@ GetOptions ("cflags=s" => \$cflags,    # numeric
 	    "usegcc"  => \$usegcc,
 	    "ldflags=s" => \$ldflags,
 	    "gccversion=s" => \$gcc_version,
+	    "nocolor"  => \$nocolor,   # flag
 	    "verbose"  => \$verbose)   # flag
     or die("Error in command line arguments\n");
 
 
 
 
-&infomsg("Parsing $fltfile");
+&infomsg("Parsing $fltfile",$nocolor);
 open(FHIN, "<", $fltfile) 
     or die "cannot open $fltfile\n";
 # First remove all lines starting with "#"
@@ -183,17 +190,17 @@ foreach my $f (@indata) {
     if ($f =~ /^\@library/ ) {
 	my @line=split " ",$f;
 	$lib=pop @line;
-	&infomsg("Creating library $lib if does not exists");
+	&infomsg("Creating library $lib if does not exists",$nocolor);
 	my $cmd="test -e $library_home||mkdir $library_home";
 	&system_cmd($cmd);
 
-	&infomsg("Creating library $lib/touchfiles if does not exists");
+	&infomsg("Creating library $lib/touchfiles if does not exists",$nocolor);
 	my $cmd="test -e $library_home/touchfiles||mkdir $library_home/touchfiles";
 	&system_cmd($cmd);
-	&infomsg("Creating $lib");
+	&infomsg("Creating $lib",$nocolor);
 	$cmd="vlib $library_home/$lib";
 	&system_cmd_hl($cmd);
-	&infomsg("Mapping $lib");
+	&infomsg("Mapping $lib",$nocolor);
 	$cmd="vmap $lib $ENV{'PWD'}/$library_home/$lib";
 	&system_cmd_hl($cmd);
 	my $cmd="echo $lib >> $library_home/liborder.txt";

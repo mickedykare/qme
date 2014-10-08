@@ -17,7 +17,6 @@
   <!-- Bad to use grid engine for everything, by default all methods will use a grid engine, please override 
        methods in runnable where you don't want it. -->
 
-  <method name="local-machine"/>
 
   <!-- ========================================================== -->
   <!-- BASE RUNNABLES- PLEASE OVERRIDE -->
@@ -33,7 +32,7 @@
       <!-- BEHAVIOUR CONTROL -->
       <!-- GRID can be LOCAL,LSF or SGE -->
       <parameter name="GRID">LOCAL</parameter>
-      <parameter name="GRIDSPEC">grid.rmdb</parameter>
+      <parameter name="GRIDQUEUE">asic_batch</parameter>
       <parameter name="VERIFICATION_LEVEL">BLOCK</parameter>
       <parameter name="DEBUG_LEVEL">LOW</parameter>
       <parameter name="SEND_EMAIL">1</parameter>
@@ -61,7 +60,21 @@
       <parameter name="XML2UCDB_DATAFIELDS">-datafields "Section, Title, Description, Link, Type, Weight, Goal, Drop"</parameter>
       <parameter name="BITS">64</parameter>
     </parameters>
-    <xi:include href="grid.rmdb"/>
+
+    <!-- NOTE! Not tested -->
+    <method name="compute_grid" gridtype="lsf" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LSF}">
+      <command>bsub -q (%GRIDQUEU%) -J (%RUNNABLE%) -oo (%TASKDIR%)/(%SCRIPT%).bat.o%J -eo (%TASKDIR%)/(%SCRIPT%).bat.e%J \
+	(%LSFARGS%) (%WRAPPER%)    </command>
+    </method>   
+    
+    <!-- NOTE! Not tested -->
+    <method name="compute_grid" gridtype="sge" action="execScript" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {SGE}">
+      <command>qsub (%SGEARGS%) -N (%INSTANCE%) (%WRAPPER%)</command> 
+    </method>
+
+    <method  name="compute_grid" if="{(%GRID%)} eq {LOCAL}">
+    </method>   
+
   </runnable>
 
   <!-- ========================================================== -->
@@ -80,6 +93,7 @@
   <!-- == Top Level Group Runnable  =================== -->
   <!-- ================================================ -->
   <runnable name="my_run" type="group" sequential="yes" base="testsetup">
+    <method base="compute_grid"/>
     <members>
       <member>convert_vplans_to_ucdb</member>
       <member>all_setups</member>
@@ -167,6 +181,7 @@
   <!-- == All setups run in parallel   ================ -->
   <!-- ================================================ -->
   <runnable name="all_setups" type="group" sequential="no" base="testsetup">
+
     <parameters>
     </parameters>
     <members>
@@ -302,6 +317,7 @@
       <parameter name="EXTRA_SC_ARGS"    type="tcl">[get_extra_args (%TCSPEC%) (%CURRENT_SETUP%) SC_ARGS]</parameter>
       <parameter name="ALL_COMPILE_ARGS">X_COMP_ARGS=&quot; (%EXTRA_X_COMP_ARGS%) --define FLTVAR_COMPILE_SETUP=(%ACTUAL_SETUP%) (%EXTRA_VLOG_ARGS%) (%EXTRA_VCOM_ARGS%)&quot; SC_ARGS=(%EXTRA_SC_ARGS%)</parameter>
     </parameters>
+
     <execScript launch="/bin/csh -f">
       <command>unsetenv MODELSIM </command>
       <command>if ((%CHIP%) == 1) then</command>

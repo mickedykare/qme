@@ -47,7 +47,7 @@ SC_TOP_NAME=sc_main
 ###################################################################
 # Tool pointers  
 #################################################################
-QUESTA_HOME=${QUESTASIM_HOME}
+#QUESTA_HOME=${QUESTASIM_HOME}
 
 UVM_HOME=${QME_HOME}/uvm/${UVM_VERSION}
 
@@ -78,6 +78,12 @@ TB_TOP_NAME=top
 LOWER_DUT_NAME=$(shell echo ${BLOCKNAME} | tr '[:upper:]' '[:lower:]')
 DESIGN_LIB=${LOWER_DUT_NAME}_lib
 
+DUT_FILELIST=${SRCHOME}/${BLOCKNAME}/${RTLDIR}/rtl.files
+TB_FILELIST=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/tb.files
+TC_SPEC=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/tc_spec.txt
+MERGED_UCDB_HOME=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/merged_ucdb_files
+HTML_REPORTS_HOME=${SRCHOME}/${BLOCKNAME}/${QME_SIM_SETTINGS_DIR}/html_reports
+SC_MAKEFILE=${SRCHOME}/${BLOCKNAME}/tb/c/Makefile
 
 
 ###################################################################
@@ -145,7 +151,9 @@ COVERCHECK_WITNESS_WAVEFORM=-witness_waveforms
 ###################################################################
 # Regression default parameters
 ###################################################################
-GRID_ENGINE=LOCAL # Supports SGE or LSF or LOCAL
+# Supports SGE or LSF or LOCAL:
+GRID_ENGINE=LOCAL   
+GRID_QUEUE=define_queue_name   
 AUTOSTART=0
 MAX_PARALLEL_JOBS=20
 MAX_EXECUTION_TIME=600
@@ -210,20 +218,22 @@ noqvip:
 
 
 list_qvip::
-	@tput setaf 6;
-	@echo "# Available QVIPs in ${QUESTA_MVC_HOME}"
+	@echo "-------------------------------------------------------------"
+	@echo "INFO: Available QVIPs in ${QUESTA_MVC_HOME}"
 	@echo "`ls ${QUESTA_MVC_HOME}/questa_mvc_src/sv | grep -v mvc_base | grep -v .sv `"
-	@tput setaf 9;
+	@echo "-------------------------------------------------------------"
 
 
 qvip_default::
-	@tput setaf 6;
+	@echo "-------------------------------------------------------------"
 	@echo "NOTE! To compile Questa VIPs, override QVIP_TARGETS"
 	@echo "      e.g. QVIP_TARGETS=\"axi apb3 i2c\""
-	@tput setaf 9;
+	@echo "-------------------------------------------------------------"
 
 mvc_base::
-	@echo "Compiling infrastructure files"
+	@echo "-------------------------------------------------------------"
+	@echo "INFO:Compiling infrastructure files"
+	@echo "-------------------------------------------------------------"
 	@test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
 	@test -d ${QUESTALIBS_DIR}/${QVIP_LIB}||vlib ${QUESTALIBS_DIR}/${QVIP_LIB}
 	@vmap ${QVIP_LIB} ${PWD}/${QUESTALIBS_DIR}/${QVIP_LIB}
@@ -231,7 +241,9 @@ mvc_base::
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${QUESTA_MVC_HOME}/questa_mvc_src/sv/mvc_pkg.sv ${UVM_INC_DIR}
 
 arm11_ahb::
-	@echo "Compiling protocol package $@"
+	@echo "-------------------------------------------------------------"
+	@echo "INFO:Compiling protocol package $@"
+	@echo "-------------------------------------------------------------"
 	${VLOG} -work ${QVIP_LIB} +incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv ${UVM_INC_DIR} \
 	+incdir+${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@ ${QUESTA_MVC_HOME}/questa_mvc_src/sv/$@/mgc_arm11_ahb_v2_0_pkg.sv
 
@@ -421,18 +433,19 @@ info:: green_on printvars color_reset
 
 liblist:: 
 	@vmap |grep "maps to" | egrep -v ${QUESTA_HOME} |cut -d" " -f1 | sed s/\"/-L\ / | sed s/\"//g |grep -v ^Job > ${LIBLIST}
+	@test -e ${QUESTACLIBS_DIR} || mkdir ${QUESTACLIBS_DIR}
 	@find ${QUESTACLIBS_DIR} -name '*.so' -print | sed s/\\.so//g | sed s/\^/-sv_lib\ /g >> ${LIBLIST} 
 	@echo "Created list of compiled libraries for questa: ${LIBLIST}"
 
 
 check_filelist_rtl::
 	@if test -e  ${DUT_FILELIST}; \
-	then tput setaf 2;echo "OK: Found ${DUT_FILELIST}";tput setaf 9;else \
+	then echo "OK: Found ${DUT_FILELIST}"; else \
 	echo "Did not find ${DUT_FILELIST}, aborting..."; exit 1;fi
 
 check_filelist_tb::
 	@if test -e  ${TB_FILELIST}; \
-	then tput setaf 2;echo "OK: Found ${TB_FILELIST}";tput setaf 9;else \
+	then echo "OK: Found ${TB_FILELIST}";else \
 	echo "Did not find ${TB_FILELIST}, aborting..."; exit 1;fi
 
 
@@ -440,42 +453,48 @@ check_filelist_tb::
 # Some defaults target , meant to be extended
 ###################################################################
 preregression::
-	@tput setaf 6;
-	@echo "placeholder for adding task before running a regression"
-	@echo "Extend target preregression"
-	@tput setaf 9;
+	@echo "-------------------------------------------------------------"
+	@echo "INFO:placeholder for adding task before running a regression"
+	@echo "INFO:Extend target preregression"
+	@echo "-------------------------------------------------------------"
 
 precompile_rtl::
-	@tput setaf 6;
-	@echo "placeholder for adding task before compiling RTL"
-	@echo "Extend target precompile_rtl"
-	@tput setaf 9;
+	@echo "-------------------------------------------------------------"
+	@echo "INFO:placeholder for adding task before compiling RTL"
+	@echo "INFO:Extend target precompile_rtl"
+	@echo "-------------------------------------------------------------"
+
+
 precompile_tb::
-	@tput setaf 6;
-	@echo "placeholder for adding task before compiling TB"
-	@echo "Extend target precompile_tb"
-	@tput setaf 9;
+	@echo "-------------------------------------------------------------"
+	@echo "INFO:placeholder for adding task before compiling TB"
+	@echo "INFO:Extend target precompile_tb"
+	@echo "-------------------------------------------------------------"
+
 postcompile_rtl::
-	@tput setaf 6;
-	@echo "placeholder for adding task after compiling RTL"
-	@echo "Extend target postcompile_rtl"
-	@tput setaf 9;
+	@echo "-------------------------------------------------------------"
+	@echo "INFO:placeholder for adding task after compiling RTL"
+	@echo "INFO:Extend target postcompile_rtl"
+	@echo "-------------------------------------------------------------"
+
 postcompile_tb::
-	@tput setaf 6;
-	@echo "placeholder for adding task after compiling TB"
-	@echo "Extend target postcompile_tb"
-	@tput setaf 9;
+	@echo "-------------------------------------------------------------"
+	@echo "INFO:placeholder for adding task after compiling TB"
+	@echo "INFO:Extend target postcompile_tb"
+	@echo "-------------------------------------------------------------"
 
 presim_script::
-	@tput setaf 6;
-	@echo "placeholder for running a script before a simulation"
-	@echo "Extend target presim_script"
-	@tput setaf 9;
+	@echo "-------------------------------------------------------------"
+	@echo "INFO:placeholder for running a script before a simulation"
+	@echo "INFO:Extend target presim_script"
+	@echo "-------------------------------------------------------------"
+
 postsim_script::
-	@tput setaf 6;
-	@echo "placeholder for running a script after a simulation"
-	@echo "Extend target postsim_script"
-	@tput setaf 9;
+	@echo "-------------------------------------------------------------"
+	@echo "INFO:placeholder for running a script after a simulation"
+	@echo "INFO:Extend target postsim_script"
+	@echo "-------------------------------------------------------------"
+
 
 print-%:
 	@tput setaf 2;
