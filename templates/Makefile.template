@@ -58,8 +58,10 @@ include ${QME_HOME}/templates/Makefile.relations
 # Compile everything 
 ################################################################
 
-compile: clean ${COMPILE_UVM_TARGET} ${COMPILE_UVMC_TARGET} ${COMPILE_SC_TARGET} compile_rtl compile_tb liblist
+compile:: clean copy_modelsimini ${COMPILE_UVM_TARGET} ${COMPILE_UVMC_TARGET} ${COMPILE_SC_TARGET} compile_rtl compile_tb liblist
 
+copy_modelsimini::
+	cp -f ${ORIGIN_MODELSIM_INI} .
 ################################################################
 # Clean out sim dir
 ################################################################

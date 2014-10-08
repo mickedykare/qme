@@ -177,10 +177,10 @@ SCRATCHDIR=regression_data
 ###################################################################
 # Default visibility settings
 ###################################################################
-VOPTSWITCHES_FAST_CHIP=+acc=rn
-VOPTSWITCHES_CHIP=+acc=npr 
-VOPTSWITCHES_BLOCK=+acc
-VOPTSWITCHES_FAST_BLOCK=+acc=rn +acc+mgc_*
+VOPTSWITCHES_FAST_CHIP="+acc=rn ${VLOG_TIMESCALE}"
+VOPTSWITCHES_CHIP="+acc=npr ${VLOG_TIMESCALE}" 
+VOPTSWITCHES_BLOCK="+acc ${VLOG_TIMESCALE}"
+VOPTSWITCHES_FAST_BLOCK="+acc=rn +acc+mgc_* ${VLOG_TIMESCALE}"
 CODECOVERAGE=+cover=fbecst
 
 ###################################################################
@@ -428,8 +428,7 @@ color_reset::
 	@tput setaf 9;
 
 printvars:: green_on
-	@$(foreach V,$(sort $(.VARIABLES)), \
-	$(if $(filter-out environment% default automatic, $(origin $V)),$(warning $V=$($V) ($(value $V)))))
+	gmake -pn | grep -A1 "^# makefile"| grep -v "^#\|^--" | sort | uniq
 
 info:: green_on printvars color_reset
 
