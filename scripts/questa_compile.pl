@@ -195,7 +195,7 @@ foreach my $f (@indata) {
 	&system_cmd($cmd);
 
 	&infomsg("Creating library $lib/touchfiles if does not exists",$nocolor);
-	my $cmd="test -e $library_home/touchfiles||mkdir $library_home/touchfiles";
+	$cmd="test -e $library_home/touchfiles||mkdir $library_home/touchfiles";
 	&system_cmd($cmd);
 	&infomsg("Creating $lib",$nocolor);
 	$cmd="vlib $library_home/$lib";
@@ -203,7 +203,7 @@ foreach my $f (@indata) {
 	&infomsg("Mapping $lib",$nocolor);
 	$cmd="vmap $lib $ENV{'PWD'}/$library_home/$lib";
 	&system_cmd_hl($cmd);
-	my $cmd="echo $lib >> $library_home/liborder.txt";
+	$cmd="echo $lib >> $library_home/liborder.txt";
 	&system_cmd($cmd);
 
     } else {
