@@ -20,5 +20,6 @@ import fpu_agent_pkg::*;
 `include "fpu_test_neg_sqr_sequence.svh";
 `include "fpu_test_simple_sanity.svh";
 `include "fpu_test_patternset.svh";
+`include "fpu_test_failing.svh";
 
 endpackage // fpu_pkg

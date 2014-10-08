@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.1"?>
 <!-- **********************************************************************************
      # questa_regression.rmdb
      # Questa Makefile Environment
@@ -52,7 +52,7 @@
       <parameter name="FORMAL">0</parameter>
       <parameter name="XPROP">0</parameter>
       <parameter name="REQUIRE_VPLAN">0</parameter>
-      <parameter name="RERUN_FAILING_TESTS">1</parameter>
+      <parameter name="RERUN_FAILING_TESTS">0</parameter>
       <parameter name="TIMESTAMP">0</parameter>
       <parameter name="EXCEL_VPLAN">""</parameter>
       <parameter name="DUT_SETUPS" type = "tcl">[get_all_setups (%TCSPEC%)]</parameter>
@@ -63,7 +63,7 @@
 
     <!-- NOTE! Not tested -->
     <method name="compute_grid" gridtype="lsf" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LSF}">
-      <command>bsub -q (%GRIDQUEU%) -J (%RUNNABLE%) -oo (%TASKDIR%)/(%SCRIPT%).bat.o%J -eo (%TASKDIR%)/(%SCRIPT%).bat.e%J \
+      <command>bsub -q (%GRIDQUEUE%) -J (%RUNNABLE%) -oo (%TASKDIR%)/(%SCRIPT%).bat.o%J -eo (%TASKDIR%)/(%SCRIPT%).bat.e%J \
 	(%LSFARGS%) (%WRAPPER%)    </command>
     </method>   
     
@@ -417,29 +417,23 @@
     <execScript launch="/bin/csh -f">
       <command>echo mergelist=(%mergelist%) </command>
       <command>unsetenv MODELSIM </command>
-      <command>echo "The current DEBUGMODE value is: (%DEBUGMODE:0%)"</command>
-      <!--command> if (("(%DEBUGMODE%)" == 0)|("(%RERUN_FAILING_TESTS%))" == 0)) then  </command-->
-      <command> if (("(%DEBUGMODE%)" == 0)) then  </command>
-      <command>   echo "Running simulation with minimum visibilty"</command>      
+      <!--command>echo "The current DEBUGMODE value is: (%DEBUGMODE:0%)"</command-->
+
+      <command> if (("(%DEBUGMODE%)" == 0)|( "(%RERUN_FAILING_TESTS%)" == 0)) then  </command>
+      <command>echo "Running the simulation for the first time, DEBUG_MODE=(%DEBUGMODE%)"</command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
-      <command>   ln -s   (%PATH_TO_COMPDIR%)/c_libs</command>
-      <command>   cp (%VRUNDIR%)/vsim.do .</command>
-      <command>   make batch_regression postsim_script -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  UVM_VERBOSITY=UVM_NONE OVM_VERBOSITY=OVM_NONE COVER=true  BITS=(%BITS%)</command>
+      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  UVM_VERBOSITY=UVM_NONE OVM_VERBOSITY=OVM_NONE COVER=true  BITS=(%BITS%)</command>
       <command>   if ($status != 0) then </command>
       <command>       exit(1)</command>
       <command>   endif </command>
       <!--command> if (-e c_libs) rm c_libs</command-->
       <command> else </command>
-      <command>   echo "The current DEBUGMODE value is: (%DEBUGMODE:0%)"</command>
-      <command>   echo "rerunning simulation with all full debug for postdebug" </command>
-      <command>   ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
-      <command>   if ($status != 0) exit 1 </command>
-      <command>     ln -s   (%PATH_TO_COMPDIR%)/c_libs</command>
-      <command>   if ($status != 0) exit 1 </command>
-      <command>     ln -s   (%PATH_TO_COMPDIR%)/vsim.dbg</command>
-      <command>   if ($status != 0) exit 1 </command>
-      <command>     make batch_regression_dbg postsim_script -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%) COVER=true  BITS=(%BITS%)</command>
+      <command>  echo "Running the simulation for the second time,with full vis, DEBUG_MODE=(%DEBUGMODE%)"</command>
+      <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
+      <command>  ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
+      <command>  ln -s   (%PATH_TO_COMPDIR%)/vsim.dbg</command>
+      <command>  make batch_regression_dbg  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%) COVER=true  BITS=(%BITS%)</command>
       <command>   if ($status != 0) exit 1 </command>
       <command> endif </command>
     </execScript>

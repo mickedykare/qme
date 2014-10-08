@@ -107,6 +107,7 @@ compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 compile_rtl::precompile_rtl check_filelist_rtl compile_rtl_script postcompile_rtl
 
 compile_rtl_script::
+	@test -d ${QUESTACLIBS_DIR}||mkdir ${QUESTACLIBS_DIR}
 	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS} ${NOCOLOR}
 	mv  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/rtl_liborder.txt
 
@@ -114,6 +115,7 @@ compile_rtl_script::
 compile_rtl_fv::precompile_rtl check_filelist_rtl compile_rtl_fv_script postcompile_rtl
 
 compile_rtl_fv_script::
+	@test -d ${QUESTACLIBS_DIR}||mkdir ${QUESTACLIBS_DIR}
 	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS} \
 	${SKIP_SYNTHOFF_REGION} ${NOCOLOR}
 	mv  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/rtl_liborder.txt
@@ -412,6 +414,7 @@ batch_regression_cmd::
 	${EXTRA_VSIM_ARGS}  \
 	${CC_COLLECT} \
 	-assertdebug \
+	-wlf ${TEST}.wlf \
 	+UVM_TESTNAME=${TEST} \
 	+UVM_VERBOSITY=${UVM_VERBOSITY_REGR}
 #########################################################
@@ -448,6 +451,7 @@ batch_regression_dbg_cmd::
 	${DEBUG} \
 	+UVM_TESTNAME=${TEST} \
 	${FSMDEBUG} \
+	-wlf ${TEST}.wlf \
 	+UVM_VERBOSITY=${UVM_VERBOSITY}
 
 #########################################################
@@ -481,6 +485,7 @@ create_project_file::
 	-GSEND_EMAIL=${SEND_EMAIL} \
 	-GXML2UCDB_DATAFIELDS=\"${XML2UCDB_DATAFIELDS}\" \
 	-GEMAIL_RECIPIENT=${EMAIL_RECIPIENT} \
+	-GRERUN_FAILING_TESTS=${RERUN_FAILING_TESTS} \
 	-vrmdata ${SCRATCHDIR}}" >> default.vrm.tmp 
 	@echo "VRMEND" >> default.vrm.tmp;
 	@mv default.vrm.tmp  default.vrm

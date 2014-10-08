@@ -2,5 +2,6 @@ DEFAULT:VPLAN_XML=$QME_PROJECT_HOME/fpu/vplan/fpu_vplan_excel.xml
 DEFAULT fpu_test_patternset 1 0
 DEFAULT fpu_test_neg_sqr_sequence 5 random
 DEFAULT fpu_test_simple_sanity 5 random
+DEFAULT fpu_test_failing 5 random
 
 

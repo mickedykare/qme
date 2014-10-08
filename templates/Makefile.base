@@ -44,6 +44,7 @@ COMPILE_UVMC_TARGET=no_uvmc
 COMPILE_SC_TARGET=no_comp_sc
 SC_MAKE_TARGET=comp_link
 SC_TOP_NAME=sc_main
+RERUN_FAILING_TESTS=0
 ###################################################################
 # Tool pointers  
 #################################################################
@@ -163,7 +164,8 @@ TIMESTAMP=$(shell date +%G_%m_%d_%H.%M.%S)
 REQUIRE_VPLAN=1
 SEND_EMAIL=1
 XML2UCDB_DATAFIELDS="Section,Title,Description,Link,Type,Weight,Goal"
-NOREUSESEEDS=-noreuseseeds 
+#NOREUSESEEDS=-noreuseseeds 
+NOREUSESEEDS=
 
 #LSF STANDARD SETTINGS
 LSFARGS="-q asic -I" 
@@ -433,7 +435,6 @@ info:: green_on printvars color_reset
 
 liblist:: 
 	@vmap |grep "maps to" | egrep -v ${QUESTA_HOME} |cut -d" " -f1 | sed s/\"/-L\ / | sed s/\"//g |grep -v ^Job > ${LIBLIST}
-	@test -e ${QUESTACLIBS_DIR} || mkdir ${QUESTACLIBS_DIR}
 	@find ${QUESTACLIBS_DIR} -name '*.so' -print | sed s/\\.so//g | sed s/\^/-sv_lib\ /g >> ${LIBLIST} 
 	@echo "Created list of compiled libraries for questa: ${LIBLIST}"
 
