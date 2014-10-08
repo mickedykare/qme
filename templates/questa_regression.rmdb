@@ -10,7 +10,7 @@
      # MENTOR GRAPHICS CORPORATION OR ITS LICENSORS AND IS SUBJECT TO LICENSE TERMS
      #
      # bugs, enhancment requests to: Mikael_Andersson@mentor.com
-     # **********************************************************************************-->
+     # ******************************************************************************tc****-->
 <rmdb loadtcl="mytcl" xmlns:xi="http://www.w3.org/2003/XInclude">
   <!-- Method definitions -->
   <!-- ========================================================== -->
@@ -127,8 +127,6 @@
       <command>printf "## REGRESSION RESULTS                 ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
       <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
       <command>printf "\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "PAY ATTENTION!!! THE FOLLOWING FILES ARE CHECKED OUT:\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>/usr/atria/bin/cleartool lsco -avobs -cview &gt;&gt; (%MESSAGE_FILE%)</command>
       <command>printf "\nRegression run directory: (%SCRATCH%)\n" &gt;&gt; (%MESSAGE_FILE%)</command>
       <command>printf "Regression HTML reports: (%HTML_REPORTDIR%)\n\n" &gt;&gt; (%MESSAGE_FILE%)</command>
 
@@ -148,23 +146,17 @@
       <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
       <command>printf "## To run failing tests interactive (BETA):  ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
       <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+
+      <command>printf "NOTE NEEDS TO BE FIXED!!!!:  ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+
       <command>vrun -status -filter status!=Passed -filter status!=Empty -filter runnable=Simulate -columns RMDB:MAKEARGS/-100 -nosummary  -vrmdata  (%DATADIR%)|grep -v "^\/\/" &gt;&gt; (%MESSAGE_FILE%)</command>
 
-      <!-- Config spec information -->
-      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "## CONFIG SPEC BEGIN                  ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command> /usr/atria/bin/cleartool catcs &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "## CONFIG SPEC END                    ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
 
       <command>echo &quot;&lt;/pre&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
       <command>echo &quot;&lt;/body&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
       <command>echo &quot;&lt;/HTML&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
 
       <command>/usr/lib/sendmail  (%EMAIL_RECIPIENT%) &lt; $EMAILMESSAGE</command>
-      <command> /usr/atria/bin/cleartool catcs > (%CS_HOME%)/regression_cs_(%TIMESTAMP%) </command>
       <command>echo "Regression complete and email report sent to (%EMAIL_RECIPIENT%)"</command>
     </execScript>
   </runnable>
@@ -419,15 +411,7 @@
       <command>   cp (%VRUNDIR%)/vsim.do .</command>
       <command>   make batch_regression postsim_script -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  UVM_VERBOSITY=UVM_NONE OVM_VERBOSITY=OVM_NONE COVER=true  BITS=(%BITS%)</command>
       <command>   if ($status != 0) then </command>
-      <command>     if ( `grep -c "# FATAL ERROR: License connection lost and unable to reconnect after multiple attempts." execScript.log` > 0 ) then  </command>
-      <command>       bhist -l `cut -d"&lt;" -f2 execScript.stdout | cut -d"&gt;" -f1` &gt; debug.log </command>
-      <command>       cat execScript.log &gt;&gt; debug.log </command>
-      <command>       env &gt;&gt; debug.log </command>       
-      <command>       mail -s  "Simulation failed due to license error" qmikand &lt; debug.log </command>
       <command>       exit(1)</command>
-      <command>     else </command>
-      <command>       exit(1)</command>
-      <command>     endif </command>
       <command>   endif </command>
       <!--command> if (-e c_libs) rm c_libs</command-->
       <command> else </command>
@@ -580,7 +564,7 @@
   
       <command>  if ($vplan_xml != "") then </command>
       <command>    set vplan_xml="(%VPLAN_XML_TS%)"  </command>
-      <command>    echo "Fuond xml vplan specified in (%TCSPEC%):$vplan_xml"</command> 
+      <command>    echo "Found xml vplan specified in (%TCSPEC%):$vplan_xml"</command> 
       <command>  else </command>
       <command>    set vplan_xml=(%XML_VPLAN%)  </command>
       <command>    echo "using xml vplan specified in  Makefile:$vplan_xml"</command> 
@@ -642,213 +626,7 @@
       <command> vcover report -html -nosource -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_coverage_report (%mymergefile%)</command>
     </execScript>
   </runnable>
+    <xi:include href="mytcl.rmdb"/>
 
 
-  <usertcl name="mytcl">
-  <!-- ================================================ -->
-  <!-- == Over-ride TCL built-in                     == -->
-  <!-- == Advanced VRM capabilities                  == -->
-  <!-- == The underlying default behaviour of VRM    == -->
-  <!-- == can be modified using the exposed TCL API  == -->
-  <!-- == Usually these defined TCL methods do       == -->
-  <!-- == by default. These methods can be           == -->
-  <!-- == overriden within the usertcl element of    == -->
-  <!-- == RMDB. In addition the user can define TCL  == -->
-  <!-- == procedures that they wish to call in       == -->
-  <!-- == action scripts here also.                  == -->
-  <!-- ================================================ -->
-  <!-- An example of overriding the VRM procedure StopRunning 
-        In this case, VRM will stop if 1000 errors are generated 
-        during execution of a regression                   -->
-  proc StopRunning {userdata} {
-    upvar $userdata data
-    set result [expr {$data(fail) == 1000}]
-    return $result
-  }
-
-  <!-- get_rel_path_between: This tcl procedure will return the relative path between a given taskdir and a given runnables taskdir -->
-  proc get_rel_path_between { my_path runnable_parent runnable} {
-    set p ""
-    set tt [split $my_path /]
-    set ll [llength $tt]
-    set li [lsearch $tt $runnable_parent~*]
-    set levels [expr $ll-$li]
-    for {set i 1} {$i &lt; $levels} {incr i} {
-        set p [file join $p ..]
-    }
-    return [file join $p $runnable]
-  }
-
-   <!-- get_all_setups: This tcl procedure will extract all setups from the tc spec file -->
-   proc get_all_setups {file_name} {
-      set tclist ""
-      set tmp_file [open $file_name r]
-      while {![eof $tmp_file]} {
-         gets $tmp_file line
-         if {[string range $line 0 0] != "#"} {
-            # Lines containing ":" are not testnames
-            if {[string match "*:*" $line]} {
-               #puts "Found argument for a setup"
-            } else {
-               if {[llength $line] != 0} {
-                  set setup [lindex $line 0]
-                  lappend tclist $setup
-                }
-            }
-         }
-      }
-      close $tmp_file
-      set tclist [lsort -u $tclist]
-      return $tclist
-   }
-
-   <!-- get_tests_for_setup: This tcl procedure will extract all testnames for a given setup from the tc spec file -->
-   proc get_tests_for_setup {file_name setup} {
-      set tclist ""
-      set tmp_file [open $file_name r]
-      while {![eof $tmp_file]} {
-         gets $tmp_file line
-         if {[string range $line 0 0] != "#"} {
-            if {$setup == [lindex $line 0]} {
-               if {[llength $line] != 0} {
-                  set setup [lindex $line 0]
-                  set tc [lindex $line 1]
-                  lappend tclist $tc
-               }
-            }
-         }
-      }
-      close $tmp_file
-      set tclist [lsort -u $tclist]
-      return $tclist
-   }
-
-   <!-- get_test_seeds: This tcl procedure will extract seeds for a given test/setup from the tc spec file -->
-   proc get_test_seeds {file_name setup test} {
-      set tclist ""
-      set tmp_file [open $file_name r]
-      while {![eof $tmp_file]} {
-         gets $tmp_file line
-         if {[string range $line 0 0] != "#"} {
-            if {$setup == [lindex $line 0]} {
-               if {[llength $line] != 0} {
-                  if {[llength $line] == 2} {
-                     set num 1
-                    } else {
-                     set num [lindex $line 2]
-                    }
-                    set setup [lindex $line 0]
-                    set tc [lindex $line 1]
-                    if {$tc == $test} {
-                       set max [expr $num+2]
-                       #puts "processing $line - found setup = $setup, tc = $tc, num = $num, max = $max"              
-                       for {set repeat 3} {$repeat &lt;=$max} {incr repeat} {
-                        #puts "processing repeat = $repeat"
-                        set seed [lindex $line $repeat]
-                        if {$seed == ""} {
-                             #puts "Found no spec of seed, using random"   
-                           set seed random
-                        }
-                        if {$seed==&quot;random&quot;} {
-                             set ix [lsearch -exact $tclist $tc:$seed:[expr $repeat-2]]
-                        } else {
-                             set ix [lsearch $tclist $tc:$seed:*]
-                        }
-                        if {$ix &lt; 0} {
-                            #  puts "seed = $seed"
-                            lappend tclist [format "%s:%s:%d" $tc $seed [expr $repeat-2]]
-                          } else {
-                           logDebug "Please check $file_name"
-                           logDebug "$setup $tc with seed=$seed and iteration=[expr $repeat-2] is repeated multiple times - Skipping"
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-      close $tmp_file
-      return $tclist
-   }
-
-
-  <!-- get_extra_args: This tcl procedure looks for arguments from the tc spec file -->
-  proc get_extra_args {file_name setup args} {
-     set tmp_file [open $file_name r]
-     while {![eof $tmp_file]} {
-        gets $tmp_file line
-        if {[regexp "^$setup:$args=(.+)$" $line all x_args]} {
-           close $tmp_file
-           return $x_args
-        }
-     }
-     close $tmp_file
-     return ""
-  }
-
-
-  <!-- get_extra_vlog_args: This tcl procedure looks for extra vlog arguments from the tc spec file -->
-  proc get_extra_vlog_args {file_name setup} {
-    set vlog_args_list ""
-    set tmp_file [open $file_name r]
-    while {![eof $tmp_file]} {
-      gets $tmp_file line
-      if {[string match "$setup:*vlog*" $line]} {
-        if {[llength $line] != 0} {
-          #puts "debug:$line"
-          set vlog_args [lindex [split [lindex [split $line ":"]  1] "="] 1]
-          lappend vlog_args_list $vlog_args
-        }
-      }
-    }
-    set res [join $vlog_args_list " "]
-    set l [string length $res]
-    if { $l > 0} {
-      return "--questa_vlogopt=\'$res\'"
-    } else {
-      return ""
-    }
-  }
-
-  <!-- get_extra_vcom_args: This tcl procedure looks for extra vcom arguments from the tc spec file -->
-  proc get_extra_vcom_args {file_name setup} {
-    set vcom_args_list ""
-    set tmp_file [open $file_name r]
-    while {![eof $tmp_file]} {
-    gets $tmp_file line
-      if {[string match "$setup:*vcom=*" $line]} {
-        if {[llength $line] != 0} {
-          #puts "debug:$line"
-          set vcom_args [lindex [split [lindex [split $line ":"]  1] "="] 1]
-          lappend vcom_args_list $vcom_args
-        }
-      }
-    }
-    set res [join $vcom_args_list " "]
-    set l [string length $res]
-    if { $l > 0} {
-      return "--questa_vcomopt=\'$res\'"
-    } else {
-       return ""
-    }
-  }
-
-  <!-- get_extra_vsim_args: This tcl procedure looks for extra vsim arguments from the tc spec file -->
-  proc get_extra_vsim_args {file_name setup} {
-    set vsim_args_list ""
-    set tmp_file [open $file_name r]
-    while {![eof $tmp_file]} {
-      gets $tmp_file line
-      if {[string match "$setup:*vsim=*" $line]} {
-        if {[llength $line] != 0} {
-          #puts "debug:$line"
-          set vsim_args [lindex [split [lindex [split $line ":"]  1] "="] 1]
-          lappend vsim_args_list $vsim_args
-        }
-      }
-    }
-    return [join $vsim_args_list " "]
-  }
-
-  </usertcl>
 </rmdb>

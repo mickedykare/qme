@@ -1,4 +1,4 @@
-SEND_EMAIL=0
+SEND_EMAIL=1
 EMAIL_RECIPIENT=Mikael_Andersson@mentor.com
 UVMC=1
 EXTRA_VSIM_ARGS=+PATTERNSET_FILENAME=${QME_PROJECT_HOME}/fpu/tb/golden/pattern_set_ultra_small.pat +PATTERNSET_MAXCOUNT=-1
