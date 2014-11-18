@@ -56,7 +56,7 @@
       <parameter name="TIMESTAMP">0</parameter>
       <parameter name="EXCEL_VPLAN">""</parameter>
       <parameter name="DUT_SETUPS" type = "tcl">[get_all_setups (%TCSPEC%)]</parameter>
-      <parameter name="CHIP">0</parameter>
+      <parameter name="VERIFICATION_LEVEL">BLOCK</parameter>
       <parameter name="XML2UCDB_DATAFIELDS">-datafields "Section, Title, Description, Link, Type, Weight, Goal, Drop"</parameter>
       <parameter name="BITS">64</parameter>
     </parameters>
@@ -321,29 +321,15 @@
 
     <execScript launch="/bin/csh -f">
       <command>unsetenv MODELSIM </command>
-      <command>if ((%CHIP%) == 1) then</command>
-      <command>  make compile -f (%MAKEFILE%)  CHIP=true (%ALL_COMPILE_ARGS%) NOCOLOR=--nocolor BITS=(%BITS%)</command>          
-      <command>  if ($status != 0) exit 1 </command>
-      <command>else </command>
-      <command>  make compile -f (%MAKEFILE%) COVER=true (%ALL_COMPILE_ARGS%) NOCOLOR=--nocolor  BITS=(%BITS%)</command>
+      <command>make compile -f (%MAKEFILE%)  VERIFICATION_LEVEL=(%VERIFICATION_LEVEL%) (%ALL_COMPILE_ARGS%) NOCOLOR=--nocolor BITS=(%BITS%)</command> 
+      <command>if ($status != 0) exit 1 </command>
+      <command>echo "Starting to optimize" </command>
+      <command>make opt_fast -f (%MAKEFILE%) VERIFICATION_LEVEL=(%VERIFICATION_LEVEL%) X_OPT_ARGS=(%EXTRA_OPT_ARGS%)  BITS=(%BITS%)</command>
+      <command>if ($status != 0) exit 1 </command>
+      <command>if ((%RERUN_FAILING_TESTS%) == 1) then</command>
+      <command>  make opt_dbg -f (%MAKEFILE%) VERIFICATION_LEVEL=(%VERIFICATION_LEVEL%) X_OPT_ARGS=(%EXTRA_OPT_ARGS%)  BITS=(%BITS%)</command>
       <command>  if ($status != 0) exit 1 </command>
       <command>endif </command>
-      <command>echo "Starting to optimize" </command>
-      <command>if ((%CHIP%) == 1) then</command>
-      <command>   make opt_fast -f (%MAKEFILE%) CHIP=true X_OPT_ARGS=(%EXTRA_OPT_ARGS%)  BITS=(%BITS%)</command>
-      <command>   if ($status != 0) exit 1 </command>
-      <command>   if ((%RERUN_FAILING_TESTS%) == 1) then</command>
-      <command>     make opt_dbg -f (%MAKEFILE%) CHIP=true X_OPT_ARGS=(%EXTRA_OPT_ARGS%)  BITS=(%BITS%)</command>
-      <command>     if ($status != 0) exit 1 </command>
-      <command>   endif </command>
-      <command>else </command>
-      <command>   make opt_fast -f (%MAKEFILE%) COVER=true  X_OPT_ARGS=(%EXTRA_OPT_ARGS%)  BITS=(%BITS%) FAST=true</command>
-      <command>   if ($status != 0) exit 1 </command>
-      <command>   if ((%RERUN_FAILING_TESTS%) == 1) then</command>
-      <command>     make opt_dbg -f (%MAKEFILE%) COVER=true  X_OPT_ARGS=(%EXTRA_OPT_ARGS%) FAST=true  BITS=(%BITS%)</command>
-      <command>     if ($status != 0) exit 1 </command>
-      <command>   endif </command>
-      <command> endif </command>
     </execScript>
   </runnable>
 
@@ -424,7 +410,7 @@
       <command>echo "Running the simulation only once since we did not activate rerun failing tests"</command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
-      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  UVM_VERBOSITY=UVM_NONE OVM_VERBOSITY=OVM_NONE COVER=true  BITS=(%BITS%)</command>
+      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  COVER=1  BITS=(%BITS%)</command>
       <command>   if ($status != 0) then </command>
       <command>       exit(1)</command>
       <command>   endif </command>
@@ -435,7 +421,7 @@
       <command>   touch ~/one.txt </command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
-      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  UVM_VERBOSITY=UVM_NONE OVM_VERBOSITY=OVM_NONE COVER=true  BITS=(%BITS%)</command>
+      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  COVER=1  BITS=(%BITS%)</command>
       <command>   if ($status != 0) then </command>
       <command>       exit(1)</command>
       <command>   endif </command>
@@ -445,7 +431,7 @@
       <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
       <command>  ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
       <command>  ln -s   (%PATH_TO_COMPDIR%)/vsim.dbg</command>
-      <command>  make batch_regression_dbg  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%) COVER=true  BITS=(%BITS%)</command>
+      <command>  make batch_regression_dbg  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%) COVER=1  BITS=(%BITS%)</command>
       <command>   if ($status != 0) exit 1 </command>
       <command> endif </command>
       <command> endif </command>
@@ -485,8 +471,8 @@
       <command> unsetenv MODELSIM</command>
       <command> if (-e (%mergelist%)) then </command>
       <command>   if (-e (%VPLAN_UCDB%)) then </command>
-      <command>     vcover merge (%VCOVER_OPTIONS%) -out (%mymergefile%) -inputs (%mergelist%) (%mergeoptions%) (%VPLAN_UCDB%) </command>
       <command>     vcover merge (%VCOVER_OPTIONS%) -out (%mymergefile_noplan%) -inputs (%mergelist%) (%mergeoptions%)</command>
+      <command>     vcover merge (%VCOVER_OPTIONS%) -out (%mymergefile%) (%mergeoptions%)  (%mymergefile_noplan%) (%VPLAN_UCDB%) </command>
       <command>     if ($status != 0) exit 1     </command>      
       <command>   else </command>
       <command>     vcover merge  (%VCOVER_OPTIONS%) -out (%mymergefile_noplan%) -inputs (%mergelist%) (%mergeoptions%)</command>
