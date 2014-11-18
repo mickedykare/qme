@@ -98,6 +98,7 @@
       <member>convert_vplans_to_ucdb</member>
       <member>all_setups</member>
       <member>finalize_ranking</member>
+      <member>regression_summary</member>
       <member>send_email</member>
     </members>
   </runnable>
@@ -267,7 +268,7 @@
     <parameters>
       <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>      
       <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
-      <parameter name="triagefile">(%ACTUAL_SETUP%).(%BLOCKNAME%).tdb</parameter>
+      <parameter name="triagefile">(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).tdb</parameter>
       <parameter name="TRIAGECOMMAND">"vrun -vrmdata regression_data -gui -do triage view (%triagefile%) -question all"</parameter>
     </parameters>
     <members>
@@ -417,24 +418,36 @@
     <execScript launch="/bin/csh -f">
       <command>echo mergelist=(%mergelist%) </command>
       <command>unsetenv MODELSIM </command>
-      <!--command>echo "The current DEBUGMODE value is: (%DEBUGMODE:0%)"</command-->
-
-      <command> if (("(%DEBUGMODE%)" == 0)|( "(%RERUN_FAILING_TESTS%)" == 0)) then  </command>
-      <command>echo "Running the simulation for the first time, DEBUG_MODE=(%DEBUGMODE%)"</command>
+      <!--No local rerun -->
+      <command> if ("(%RERUN_FAILING_TESTS%)" == "0") then  </command>
+      <command>echo "The current DEBUGMODE value is: (%DEBUGMODE:0%)"</command>
+      <command>echo "Running the simulation only once since we did not activate rerun failing tests"</command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
       <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  UVM_VERBOSITY=UVM_NONE OVM_VERBOSITY=OVM_NONE COVER=true  BITS=(%BITS%)</command>
       <command>   if ($status != 0) then </command>
       <command>       exit(1)</command>
       <command>   endif </command>
-      <!--command> if (-e c_libs) rm c_libs</command-->
       <command> else </command>
-      <command>  echo "Running the simulation for the second time,with full vis, DEBUG_MODE=(%DEBUGMODE%)"</command>
+      <!--Local rerun  first attempt-->
+      <command> if ("(%DEBUGMODE:0%)" == "0") then  </command>
+      <command>   echo "Running the simulation for the first time, DEBUG_MODE=(%DEBUGMODE:0%)"</command>
+      <command>   touch ~/one.txt </command>
+      <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
+      <command>   ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
+      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  UVM_VERBOSITY=UVM_NONE OVM_VERBOSITY=OVM_NONE COVER=true  BITS=(%BITS%)</command>
+      <command>   if ($status != 0) then </command>
+      <command>       exit(1)</command>
+      <command>   endif </command>
+      <command> else </command>
+      <command>  echo "Running the simulation for the second time,with full vis, DEBUG_MODE=(%DEBUGMODE:0%)"</command>
+      <command> touch ~/two.txt </command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
       <command>  ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
       <command>  ln -s   (%PATH_TO_COMPDIR%)/vsim.dbg</command>
       <command>  make batch_regression_dbg  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%) COVER=true  BITS=(%BITS%)</command>
       <command>   if ($status != 0) exit 1 </command>
+      <command> endif </command>
       <command> endif </command>
     </execScript>
   </runnable>
@@ -636,6 +649,16 @@
       <command> vcover report -html -nosource -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_coverage_report (%mymergefile%)</command>
     </execScript>
   </runnable>
+
+  <runnable name="regression_summary" type="task" base="testsetup">
+    <execScript>
+      <command> vrun -status -html -htmldir regression_run_report -vrmdata (%DATADIR%) -rmdb (%RMDBFILE%)</command>
+      <command> cp -rf regression_run_report  (%HTML_REPORTDIR%)</command>
+    </execScript>
+  </runnable>
+
+
+
     <xi:include href="mytcl.rmdb"/>
 
 

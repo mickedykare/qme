@@ -61,7 +61,8 @@ include ${QME_HOME}/templates/Makefile.relations
 compile:: clean copy_modelsimini ${COMPILE_UVM_TARGET} ${COMPILE_UVMC_TARGET} ${COMPILE_SC_TARGET} compile_rtl compile_tb liblist
 
 copy_modelsimini::
-	cp -f ${ORIGIN_MODELSIM_INI} .
+	@cp -f ${ORIGIN_MODELSIM_INI} .
+	@chmod u+w modelsim.ini
 ################################################################
 # Clean out sim dir
 ################################################################
@@ -109,6 +110,7 @@ compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 compile_rtl::precompile_rtl check_filelist_rtl compile_rtl_script postcompile_rtl
 
 compile_rtl_script::
+	@test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
 	@test -d ${QUESTACLIBS_DIR}||mkdir ${QUESTACLIBS_DIR}
 	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS} ${NOCOLOR}
 	mv  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/rtl_liborder.txt
@@ -117,6 +119,7 @@ compile_rtl_script::
 compile_rtl_fv::precompile_rtl check_filelist_rtl compile_rtl_fv_script postcompile_rtl
 
 compile_rtl_fv_script::
+	@test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
 	@test -d ${QUESTACLIBS_DIR}||mkdir ${QUESTACLIBS_DIR}
 	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS} \
 	${SKIP_SYNTHOFF_REGION} ${NOCOLOR}
@@ -276,6 +279,7 @@ gui_block_cmd::
 	${DEBUG} \
 	+UVM_TESTNAME=${TEST} \
 	${FSMDEBUG} \
+	${TITLE} \
 	+UVM_VERBOSITY=${UVM_VERBOSITY}
 
 #########################################################
@@ -311,6 +315,7 @@ gui_chip_cmd::
 	${DEBUG} \
 	+UVM_TESTNAME=${TEST} \
 	${FSMDEBUG} \
+	${TITLE} \
 	+UVM_VERBOSITY=${UVM_VERBOSITY}
 
 #########################################################

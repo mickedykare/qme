@@ -23,11 +23,21 @@ SEND_EMAIL=0
 XLSFILE=${QME_HOME}/examples/ra_example/docs/ra_example_regs.xls
 
 #Defined my own variable to decide if we should generate rtl or not
-GENERATE_REGISTERS=1
+GENERATE_REGISTERS=0
+VISUALIZER=1
+ifeq (${VISUALIZER},1)
 
+VOPTSWITCHES_BLOCK = +acc ${VLOG_TIMESCALE} +designfile
+VOPTSWITCHES_FAST_BLOCK = +acc ${VLOG_TIMESCALE} +designfile
+
+VISUALIZER_SIM_ARGS=-qwavedb=+signal+class+msgmode=both+displaymsgmode=both+uvm_schematic+transactions+dynamic+queue+assertion
+
+
+endif
+EXTRA_VSIM_ARGS=${VISUALIZER_SIM_ARGS} ${NO_ILLEGAL_NAME}
 
 # Extend these targets using ::
-precompile_rtl::convert2csv generate_hdl
+precompile_rtl::convert2csv ${GENERATE_HDL_TARGET}
 precompile_tb::convert2csv generate_rm
 
 # Convert xls to csv
@@ -55,5 +65,19 @@ generate_rm:
 
 
 
-my_test::
+my_gui::
 	make gui TEST=ra_example_smoke_test
+my_batch::
+	make batch TEST=ra_example_smoke_test
+
+
+
+
+NO_ILLEGAL_NAME=+uvm_set_action=*,ILLEGALNAME,UVM_WARNING,UVM_NO_ACTION +uvm_set_action=*,ILLEGALNAME,UVM_INFO,UVM_NO_ACTION
+VISUALIZER=1
+
+
+visualizer::
+	cd ${RUNDIR};${DISABLE_VERDI_PLI};visualizer +designfile +wavefile
+
+

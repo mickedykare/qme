@@ -1,4 +1,20 @@
 SEND_EMAIL=1
 EMAIL_RECIPIENT=Mikael_Andersson@mentor.com
 UVMC=1
-EXTRA_VSIM_ARGS=+PATTERNSET_FILENAME=${QME_PROJECT_HOME}/fpu/tb/golden/pattern_set_ultra_small.pat +PATTERNSET_MAXCOUNT=-1
+NO_ILLEGAL_NAME=+uvm_set_action=*,ILLEGALNAME,UVM_WARNING,UVM_NO_ACTION +uvm_set_action=*,ILLEGALNAME,UVM_INFO,UVM_NO_ACTION
+VISUALIZER=0
+
+ifeq (${VISUALIZER},1)
+
+VOPTSWITCHES_BLOCK = +acc ${VLOG_TIMESCALE} +designfile
+VOPTSWITCHES_FAST_BLOCK = +acc ${VLOG_TIMESCALE} +designfile
+
+VISUALIZER_SIM_ARGS=-qwavedb=+signal+class+msgmode=both+displaymsgmode=both+uvm_schematic+transactions+dynamic+queue+assertion
+endif
+
+EXTRA_VSIM_ARGS=+PATTERNSET_FILENAME=${QME_PROJECT_HOME}/fpu/tb/golden/pattern_set_ultra_small.pat +PATTERNSET_MAXCOUNT=-1   ${VISUALIZER_SIM_ARGS} ${NO_ILLEGAL_NAME}
+
+visualizer::
+	cd ${RUNDIR};${DISABLE_VERDI_PLI};visualizer +designfile +wavefile
+
+RERUN_FAILING_TESTS=1

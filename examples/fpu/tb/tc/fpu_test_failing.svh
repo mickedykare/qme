@@ -21,7 +21,8 @@ class fpu_test_failing extends fpu_test_base;
       repeat(no_of_cycles) begin
 	 #100ns;
       end
-      `uvm_error(get_type_name(),"Got my fake error");
+      if (no_of_cycles > 700)
+	`uvm_error(get_type_name(),"Got my fake error");
       phase.drop_objection(this,);
    endtask // run_phase
    

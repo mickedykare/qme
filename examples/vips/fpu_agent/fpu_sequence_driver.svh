@@ -1,19 +1,19 @@
 class fpu_sequence_driver extends uvm_driver #(fpu_item, fpu_item);
-`uvm_component_utils(fpu_sequence_driver)
+   `uvm_component_utils(fpu_sequence_driver)
 
-	uvm_analysis_port       #(fpu_item) analysis_port;
+     uvm_analysis_port       #(fpu_item) analysis_port;
 
-	virtual fpu_pin_if m_fpu_pins;
-	fpu_vif_object fpu_vif_cfg;
+   virtual fpu_pin_if m_fpu_pins;
+   fpu_vif_object fpu_vif_cfg;
 
 
-	function new(string name, uvm_component parent=null);
+   function new(string name, uvm_component parent=null);
       super.new(name, parent);
-	endfunction // new
+   endfunction // new
 
 
-	function void build_phase(uvm_phase phase);
-      int verbosity_level = UVM_HIGH;
+   function void build_phase(uvm_phase phase);
+      int  verbosity_level = UVM_HIGH;
       uvm_object tmp;
 
       super.build_phase(phase);
@@ -22,15 +22,15 @@ class fpu_sequence_driver extends uvm_driver #(fpu_item, fpu_item);
       
       void'(uvm_config_db#(virtual fpu_pin_if)::get(null,"uvm_test_top.*","fpu_vif_if1",m_fpu_pins));
 
-		void'(uvm_config_db#(int)::get(this,"","verbosity_level", verbosity_level));
+      void'(uvm_config_db#(int)::get(this,"","verbosity_level", verbosity_level));
       set_report_verbosity_level(verbosity_level);
-	endfunction // build
+   endfunction // build
 
 
-	task run_phase(uvm_phase phase);
+   task run_phase(uvm_phase phase);
       
-		//      fpu_request m_request; 
-		//      fpu_response m_response; 
+      //      fpu_request m_request; 
+      //      fpu_response m_response; 
       fpu_item m_request; 
       fpu_item m_response; 
       // let it run a clock cycle to initialize itself
@@ -42,20 +42,20 @@ class fpu_sequence_driver extends uvm_driver #(fpu_item, fpu_item);
 
          uvm_report_info("request", m_request.convert2string(), UVM_HIGH ,`__FILE__,`__LINE__);
          analysis_port.write(m_request);
-	 		issue_request(m_request);
-            
+	 issue_request(m_request);
+         
          wait(m_fpu_pins.ready == 1);
 
-	 		m_response = collect_response(m_request);
+	 m_response = collect_response(m_request);
          m_response.set_id_info(m_request);
          rsp_port.write(m_response);
 
-			// ? @(posedge m_fpu_pins.clk);
+	 // ? @(posedge m_fpu_pins.clk);
       end // forever begin
-	endtask // run
+   endtask // run
 
 
-	task issue_request(input fpu_item request);
+   task issue_request(input fpu_item request);
       repeat ($urandom_range(0,17)) @(posedge m_fpu_pins.clk); // random idle time
 
       m_fpu_pins.opa <= request.a.operand;
@@ -66,12 +66,12 @@ class fpu_sequence_driver extends uvm_driver #(fpu_item, fpu_item);
 
       @(posedge m_fpu_pins.clk) m_fpu_pins.start <= 1'b0;
       @(negedge m_fpu_pins.clk);
-		
-	endtask // issue_request
+      
+   endtask // issue_request
 
-  
-	function fpu_item collect_response(input fpu_item request);
-		//      fpu_response response;
+   
+   function fpu_item collect_response(input fpu_item request);
+      //      fpu_response response;
       fpu_item response;
       
       response = new();
@@ -80,7 +80,7 @@ class fpu_sequence_driver extends uvm_driver #(fpu_item, fpu_item);
       response.op = op_t'(m_fpu_pins.fpu_op);
       response.round = round_t'(m_fpu_pins.rmode);
       response.result.operand = m_fpu_pins.outp;
-    
+      
       // collect up status information
       response.status[STATUS_INEXACT] = m_fpu_pins.ine;
       response.status[STATUS_OVERFLOW] = m_fpu_pins.overflow;
@@ -90,9 +90,9 @@ class fpu_sequence_driver extends uvm_driver #(fpu_item, fpu_item);
       response.status[STATUS_ZERO] = m_fpu_pins.zero;
       response.status[STATUS_QNAN] = m_fpu_pins.qnan;
       response.status[STATUS_SNAN] = m_fpu_pins.snan;
-    
+      
       return response;
-	endfunction // collect_response
-  
+   endfunction // collect_response
+   
 endclass
 

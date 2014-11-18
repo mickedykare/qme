@@ -64,7 +64,9 @@ FORMAL_RESULTS=formal_output_results
 UCDB_STORAGE=ucdbfiles
 HTML_HOME=html_reports
 LIBLIST=libs.list
-PROJECT_NAME="SET PROJECT_NAME"
+VSIM_VERSION=`vsim -version | cut -d" " -f5`
+PROJECT_NAME=QME(${QME_VERSION}) 
+TITLE= -title "${PROJECT_NAME} TEST=${TEST} ${VSIM_VERSION} (${ARCH})"
 ORIGIN_MODELSIM_INI=${QUESTA_HOME}/modelsim.ini
 QUESTALIBS_DIR=questa_libs
 QUESTACLIBS_DIR=${QUESTALIBS_DIR}/c_libs
@@ -164,8 +166,8 @@ TIMESTAMP=$(shell date +%G_%m_%d_%H.%M.%S)
 REQUIRE_VPLAN=1
 SEND_EMAIL=1
 XML2UCDB_DATAFIELDS="Section,Title,Description,Link,Type,Weight,Goal"
-#NOREUSESEEDS=-noreuseseeds 
-NOREUSESEEDS=
+NOREUSESEEDS=-noreuseseeds 
+#NOREUSESEEDS=
 
 #LSF STANDARD SETTINGS
 LSFARGS="-q asic -I" 
@@ -177,10 +179,10 @@ SCRATCHDIR=regression_data
 ###################################################################
 # Default visibility settings
 ###################################################################
-VOPTSWITCHES_FAST_CHIP="+acc=rn ${VLOG_TIMESCALE}"
-VOPTSWITCHES_CHIP="+acc=npr ${VLOG_TIMESCALE}" 
-VOPTSWITCHES_BLOCK="+acc ${VLOG_TIMESCALE}"
-VOPTSWITCHES_FAST_BLOCK="+acc=rn +acc+mgc_* ${VLOG_TIMESCALE}"
+VOPTSWITCHES_FAST_CHIP=+acc=rn ${VLOG_TIMESCALE}
+VOPTSWITCHES_CHIP=+acc=npr ${VLOG_TIMESCALE}
+VOPTSWITCHES_BLOCK=+acc ${VLOG_TIMESCALE}
+VOPTSWITCHES_FAST_BLOCK=+acc=rn +acc+mgc_* ${VLOG_TIMESCALE}
 CODECOVERAGE=+cover=fbecst
 
 ###################################################################

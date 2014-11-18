@@ -17,7 +17,7 @@ class ra_example_smoke_test extends ra_example_base_test;
 	 test_sequence_t m_sequence = test_sequence_t::type_id::create("m_sequence");
 
 	 phase.raise_objection(this);
-	 m_sequence.count = 10;
+	 m_sequence.count = 10000;
 	 
 	 m_sequence.start(m_apb3_sequencer);
 	

@@ -211,3 +211,8 @@ VSIM_TOP_LEVELS=$(TB_LIB_NAME).$(TB_TOP_NAME)
 VOPT_TOP_LEVELS=$(TB_TOP_NAME) 
 endif
 
+
+# In order to prevent problems with automatic rerun...
+ifeq ($(RERUN_FAILING_TESTS),1) # UVMC=true
+NOREUSESEEDS=
+endif

@@ -139,11 +139,11 @@ class fpu_item2gp_adaptor extends uvm_component;
       m_req = fpu_item::type_id::create("m_req",this);
       #(delay.get_realtime(1ns,1e-9));
       delay.reset();
-      void'(this.begin_tr(m_req,"receive_tlm_items"));
+//      void'(this.begin_tr(m_req,"receive_tlm_items"));
       m_req.convert2fpu_item(gp);
       ap.write(m_req);
       #0;
-      this.end_tr(m_req);
+  //    this.end_tr(m_req);
    endtask
 
    function uvm_tlm_sync_e nb_transport_fw(uvm_tlm_gp gp,
