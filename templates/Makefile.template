@@ -494,6 +494,7 @@ create_project_file::
 	-GEMAIL_RECIPIENT=${EMAIL_RECIPIENT} \
 	-GRERUN_FAILING_TESTS=${RERUN_FAILING_TESTS} \
 	-GVERIFICATION_LEVEL=${VERIFICATION_LEVEL} \
+	-GSANITY=${SANITY} \
 	-vrmdata ${SCRATCHDIR}}" >> default.vrm.tmp 
 	@echo "VRMEND" >> default.vrm.tmp;
 	@mv default.vrm.tmp  default.vrm

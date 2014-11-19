@@ -155,6 +155,7 @@ COVERCHECK_WITNESS_WAVEFORM=-witness_waveforms
 # Regression default parameters
 ###################################################################
 # Supports SGE or LSF or LOCAL:
+SANITY=0
 GRID_ENGINE=LOCAL   
 GRID_QUEUE=define_queue_name   
 AUTOSTART=0

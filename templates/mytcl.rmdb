@@ -1,5 +1,6 @@
+<rmdb>
 <!-- **********************************************************************************
-# myctl.rmdb
+# mytcl.rmdb
 # Questa Makefile Environment
 #
 # Copyright 2014 Mentor Graphics Corporation
@@ -11,7 +12,7 @@
 # bugs, enhancment requests to: Mikael_Andersson@mentor.com
 # **********************************************************************************-->
 
-<rmdb>
+  <usertcl name="mytcl">
   <!-- ================================================ -->
   <!-- == Over-ride TCL built-in                     == -->
   <!-- == Advanced VRM capabilities                  == -->
@@ -24,8 +25,9 @@
   <!-- == procedures that they wish to call in       == -->
   <!-- == action scripts here also.                  == -->
   <!-- ================================================ -->
-  <usertcl name="mytcl">
-
+  <!-- An example of overriding the VRM procedure StopRunning 
+        In this case, VRM will stop if 1000 errors are generated 
+        during execution of a regression                   -->
   proc StopRunning {userdata} {
     upvar $userdata data
     set result [expr {$data(fail) == 1000}]
@@ -90,7 +92,7 @@
    }
 
    <!-- get_test_seeds: This tcl procedure will extract seeds for a given test/setup from the tc spec file -->
-   proc get_test_seeds {file_name setup test} {
+   proc get_test_seeds {file_name setup test sanity} {
       set tclist ""
       set tmp_file [open $file_name r]
       while {![eof $tmp_file]} {
@@ -134,7 +136,15 @@
          }
       }
       close $tmp_file
-      return $tclist
+       if {$sanity == 0} {
+	   return $tclist
+       } else {
+	   set tclist {}
+	   set seed 0
+	   set sanityname sanity
+	   lappend tclist [format "%s:%s:%s" $tc $seed $sanityname]
+	   return $tclist
+       }
    }
 
 
@@ -151,6 +161,22 @@
      close $tmp_file
      return ""
   }
+
+
+  proc get_extra_args_extended {file_name setup args} {
+     set tmp_file [open $file_name r]
+     while {![eof $tmp_file]} {
+        gets $tmp_file line
+        if {[regexp "^$setup:$args=(.+)$" $line all x_args]} {
+           close $tmp_file
+           return "$args=$x_args"
+        }
+     }
+     close $tmp_file
+     return ""
+  }
+
+
 
 
   <!-- get_extra_vlog_args: This tcl procedure looks for extra vlog arguments from the tc spec file -->
@@ -170,7 +196,7 @@
     set res [join $vlog_args_list " "]
     set l [string length $res]
     if { $l > 0} {
-      return "--questa_vlogopt=\'$res\'"
+      return "--questa_vlogopt \'$res\'"
     } else {
       return ""
     }
@@ -193,7 +219,7 @@
     set res [join $vcom_args_list " "]
     set l [string length $res]
     if { $l > 0} {
-      return "--questa_vcomopt=\'$res\'"
+      return "--questa_vcomopt \'$res\'"
     } else {
        return ""
     }
@@ -217,15 +243,329 @@
   }
 
 
+proc read_file { filename } {
+    set data &quot;&quot;
+    set fp [open $filename r]
+    set filedata [read $fp]
+    close $fp   
+    return \{[split $filedata "\n"]\}
+  }
+ 
+proc get_regression_status { filedata } {
+     set tmp &quot;&quot;
+     set x 4
+     set print 0
+                               foreach line [lindex $filedata 0] {
+                                  if {[ regexp &quot;Pass/fail status summary:&quot; $line all match]} {
+                                     set print 1
+                                  }
+                                  if {$print &amp;&amp; [ regexp &quot;&lt;/table&gt;&quot; $line all match]} {
+                                     incr x -1
+                                  }
+                                  if {$print &amp;&amp; $x&gt;0} {
+                                     lappend tmp $line
+                                  }
+                               }
+                               return $tmp
+  }
+ 
+  proc get_coverage_status { filedata } {
+     set print 0
+     set x &quot;&quot;
+                               foreach line [lindex $filedata 0] {
+                                  if {[ regexp &quot;Testplan Coverage Summary:&quot; $line all match]} {
+                                     regexp &quot;(&lt;/h3&gt;)(.*)&quot; $line all one two
+                                     set line $two
+                                     set print 1
+                                  }
+                                  if {$print &amp;&amp; [ regexp &quot;&lt;/table&gt;&quot; $line all match]} {
+                                     lappend x $line
+                                     set print 0
+                                  }
+                                  if {$print} {
+                                     lappend x $line
+                                  }
+                               }
+                               return $x
+  }
+   
+  proc get_start_end_date { filedata } {
+    set start 0
+                               foreach line [lindex $filedata 0] {
+                                  if {$start} {
+                                     set start 0
+                                     regexp &quot;\&quot;&gt;(.+?)&lt;&quot; $line all start_date
+                                     break;
+                                  }
+                                  if {[ regexp &quot;Regression started:&quot; $line all match]} {
+                                     set start 1
+                                  }
+                                }
+      return $start_date
+  }
+ 
+  
+   proc get_css { } {
+      set text &quot;&quot;
+      set css_header {
+         { &lt;head&gt;                    }
+                                                                                      { &lt;style type=&quot;text/css&quot;&gt; table, th, td { border-width:     1px; border-style:     solid; } th.odd { background-color: #80CCCC; }  th.even {                              background-color: #90CCCC; } }
+                                                                                       {   td.bgRed    { width: auto; border-width: 1px; border-style: solid; border-color: black; color: white; background-color: red;    font-weight: bold; text-align: center; }                  }
+                                                                                      {   td.bgYellow { width: auto; border-width: 1px; border-style: solid; border-color: black; color: black; background-color: yellow; font-weight: bold; text-align: center; }                  }
+                                                                                      {   td.bgGreen  { width: auto; border-width: 1px; border-style: solid; border-color: black; color: white; background-color: green;  font-weight: bold; text-align: center; }                   }
+                                                                                      { &lt;/style&gt;     }
+                                                                                      { &lt;/head&gt;}
+                                                         }
+                                                          foreach line $css_header  {
+                                                                                       append text &quot; &quot; $line
+                                                          }
+      return $text
+   }
+ 
+  proc cov_report { row_template coverage_report setup} {
+    set text &quot;&quot;
+    set cov_contents [read_file $coverage_report]
+    set cov_contents [get_coverage_status $cov_contents]
+    regsub -all {REPLACE_WITH_SETUP} $row_template $setup row_template
+     foreach line $row_template  {
+        if {[regexp &quot;REPLACE_WITH_COVERAGE_STATUS&quot; $line all match]} {
+              foreach line $cov_contents {
+                 append text &quot; &quot; $line
+              }
+        } else {
+          append text &quot; &quot; $line
+        }
+     }
+     return $text
+  }
+ 
+  
+proc generate_report { projectname cov_reports vrun_report testplan_exists} {
+  set text &quot;&quot;
+
+      set cov_template {
+                                                           { &lt;tr&gt;&lt;td&gt; &lt;b&gt;&lt;span class=&quot;strip&quot;&gt;}
+                                                           {REPLACE_WITH_SETUP}
+                                                           {&lt;/br&gt;&lt;/b&gt;&lt;/span&gt; &lt;/td&gt;}
+                                                           { &lt;td&gt; &lt;table cellpadding=&quot;1&quot; cellspacing=&quot;1&quot; style=&quot;border-style: none;&quot;&gt;  &lt;tbody&gt;  }
+                                                           { &lt;tr&gt; &lt;td&gt;}
+                                                           {REPLACE_WITH_COVERAGE_STATUS}
+                                                           {&lt;/td&gt; &lt;/tr&gt;  }
+                                                           { &lt;tr&gt; &lt;/tr&gt; &lt;/tbody&gt; &lt;/table&gt; &lt;/td&gt; &lt;/tr&gt;  &lt;/tr&gt;}
+                             }
+ 
+    set vrun_template {
+                                                           { &lt;td&gt; &lt;b&gt; &lt;/br&gt;&lt;/br&gt;}
+                                                           {Regression started:&lt;/br&gt;&lt;/b&gt;   &lt;span class=&quot;strip&quot;&gt;}
+                                                           {REPLACE_WITH_START_DATE}
+                                                           {&lt;/br&gt;&lt;/span&gt; }
+                                                           { &lt;b&gt;Regression finished:&lt;/br&gt;&lt;/b&gt;  &lt;span class=&quot;strip&quot;&gt;}
+                                                           {REPLACE_WITH_END_DATE}
+                                                           {&lt;br&gt;&lt;/span&gt; &lt;/td&gt;  }
+                                                           { &lt;td&gt; &lt;table cellpadding=&quot;1&quot; cellspacing=&quot;1&quot; style=&quot;border-style: none; &quot;&gt; &lt;tbody&gt;  }
+                                                           { &lt;tr&gt;}
+                                                           {REPLACE_WITH_REGRESSION_STATUS}
+                                                           {  &lt;/table&gt;&lt;/td&gt; &lt;/tr&gt;  }
+                                                           { &lt;tr&gt; &lt;/tr&gt; &lt;/tbody&gt; &lt;/table&gt; &lt;/td&gt;  }
+                             }
+                            
+    set vrun_template_header {
+                             { &lt;!doctype html&gt; &lt;html&gt;  &lt;body&gt; &lt;table border=&quot;1&quot; cellpadding=&quot;1&quot; cellspacing=&quot;1&quot;&gt;                       }
+                             { &lt;thead&gt; &lt;tr&gt;       &lt;th colspan=&quot;4&quot; scope=&quot;col&quot; style=&quot;border-style: solid;&quot;&gt; }
+                             { BLOCKNAME: REPLACE_WITH_BLOCKNAME &lt;/th&gt; &lt;/tr&gt; &lt;/thead&gt;                             &lt;tbody&gt;&lt;tr&gt; }
+                             {                           &lt;th align=&quot;center&quot; style=&quot;border-style: none;&quot;&gt;START/END DATE&lt;/th&gt; }
+                             {                           &lt;th align=&quot;center&quot; style=&quot;border-style: none;&quot;&gt;REGRESSION SUMMARY&lt;/th&gt;&lt;/tr&gt; }
+    }
+ 
+    set cov_template_header {
+                             { &lt;body&gt; &lt;table border=&quot;1&quot; cellpadding=&quot;1&quot; cellspacing=&quot;1&quot;&gt;}
+                             {                           &lt;thead&gt; &lt;tr&gt; &lt;th colspan=&quot;4&quot; scope=&quot;col&quot; style=&quot;border-style: none;&quot;&gt; }
+                             {  &lt;/th&gt; &lt;/tr&gt; &lt;/thead&gt;        &lt;tbody&gt;&lt;tr&gt; }
+                             {                           &lt;th align=&quot;center&quot; style=&quot;border-style: none;&quot;&gt;SETUP&lt;/th&gt; }
+                             {                           &lt;th align=&quot;center&quot; style=&quot;border-style: none;&quot;&gt;COVERAGE SUMMARY&lt;/th&gt;&lt;/tr&gt; }
+    }
+ 
+    set template_footer {          &lt;/tbody&gt; &lt;/table&gt; &lt;/body&gt; }
+    set row_separator { &lt;tr&gt; &lt;th align=&quot;center&quot; style=&quot;border-style: none;&quot; &gt; _ &lt;/th&gt; &lt;/tr&gt; }
+ 
+    ############# First the vrun report #####################
+    regsub -all {REPLACE_WITH_BLOCKNAME} $vrun_template_header $projectname vrun_template_header
+ 
+    foreach line $vrun_template_header  {
+       append text &quot; &quot; $line
+    }
+
+    set vrun_contents [read_file $vrun_report]
+    set start_date [get_start_end_date $vrun_contents]
+    set end_date [exec date]
+    set vrun_contents [get_regression_status $vrun_contents]
+    regsub -all {REPLACE_WITH_START_DATE} $vrun_template $start_date vrun_template
+    regsub -all {REPLACE_WITH_END_DATE} $vrun_template $end_date vrun_template
+ 
+    foreach line $vrun_template  {
+       if {[regexp &quot;REPLACE_WITH_REGRESSION_STATUS&quot; $line all match]} {
+          foreach line $vrun_contents {
+             append text &quot; &quot; $line
+          }
+       } else {
+          append text &quot; &quot; $line
+       }
+     }
+    append text &quot; &quot; $template_footer
+ 
+    ############# End of the vrun report #####################
+
+    ############# Coverage summary for each setup ##########
+    set reports [glob -nocomplain $cov_reports/*_coverage_report]
+    set nbr_iterations [llength $reports]
+
+
+
+  if {($testplan_exists != 0) &amp; ($nbr_iterations > 0)} {
+    foreach line $cov_template_header  {
+       append text &quot; &quot; $line
+    }
+   
+
+    for {set i 0} {$i &lt; $nbr_iterations} {incr i} {
+       set report [lindex $reports $i]
+       set t [file tail $report]
+       regexp &quot;(.*)_coverage_report&quot; $t all setup
+
+        append text &quot; &quot; [cov_report $cov_template $report/covsummary.html $projectname-$setup]
+       if {$i != $nbr_iterations-1} {append text &quot; &quot; $row_separator}
+    }
+    append text &quot; &quot; $template_footer
+      } 
+    
+  ############# END Coverage summary for each setup ##########
+    return $text
+} 
+
+
+
+#trinity
+###################################################################
+# This procedure gets information from the tc_spec file in the form:
+# (SETUP):(TEST)=(TESTOPTION)=(VALUE)
+###################################################################
+proc get_setup_test_testoption {file_name curr_setup test testoption} {
+   set tmp_file [open $file_name r]
+   while {![eof $tmp_file]} {
+      gets $tmp_file line
+      if {[regexp "^\s*$curr_setup\s*:\s*$test\s*=\s*$testoption\s*=(.+)$" $line all matches]} {
+         close $tmp_file
+         return $matches
+      }
+   }
+   close $tmp_file
+   return 0
+}
+
+
+proc get_exttools {file_name setup} {
+   set tclist &quot;&quot;
+   set tmp_file [open $file_name r]
+   while {![eof $tmp_file]} {
+      gets $tmp_file line
+      if {[regexp &quot;^\s*$setup:EXT_TOOL:(\\S+)&quot; $line all toolname ]} {
+                   lappend tclist $toolname
+      }
+   }
+        close $tmp_file
+        return [lsort -u $tclist]
+}
+
+proc get_exttools_tests {file_name setup tool} {
+   set tclist &quot;&quot;
+   set tmp_file [open $file_name r]
+   while {![eof $tmp_file]} {
+      gets $tmp_file line
+      if {[regexp &quot;^\s*$setup:EXT_TOOL:$tool\\s+(\\S+)&quot; $line all test]} {
+                   lappend tclist $test
+      }
+   }
+        close $tmp_file
+        return $tclist
+}
+
+
+proc get_exttools_test_cmd {file_name setup tool test} {
+   set tclist &quot;&quot;
+   set tmp_file [open $file_name r]
+   while {![eof $tmp_file]} {
+      gets $tmp_file line
+                echo "DBG--$line"
+      if {[regexp &quot;^\s*$setup:EXT_TOOL:$tool\\s+$test\\s+(.+)&quot; $line all cmd]} {
+                   echo {DBG:$cmd}
+                   lappend tclist $cmd
+      }
+   }
+        close $tmp_file
+        return $tclist
+}
 
 
 
 
+proc print_rerun_tests { setup tdbfilename } {
+    set text  &quot;&quot;
+    set failing_tests [triage query -statement &quot;SELECT Testname,Seed FROM %TESTS% &quot; -name $tdbfilename]
+    set compile_command  &quot;make compile SETUP=$setup&quot;;
+
+        foreach test $failing_tests  {
+	    # Clean out 
+	    set seed [lindex $test 1]
+	    set t [lindex $test 0]
+	    regsub -all &quot;${setup}_&quot; $t &quot;&quot; t
+	    set testname [lindex [split $t &quot;:&quot;] 0]
+	    set command &quot;make compile SETUP=$setup gui TEST=$testname SEED=$seed&lt;br&gt;&quot;
+	    append text $command 
+	}
+return $text
+
+}
+
+
+proc generate_rerun_info { timestamp location } {
+    set text &quot;To rerun any failing tests in GUI:&lt;br&gt;&quot;
+    set tdbfiles [glob -nocomplain $location/*.$timestamp.tdb]   
+
+    if {[llength $tdbfiles] &gt; 0 } {
+	foreach f [lsort $tdbfiles] {
+	    set n [lindex [split $f /] end]
+	    set setup [lindex [split $n .] 0]
+
+	    append text [print_rerun_tests $setup $f]
+	}
+
+    }
+return $text
+}
+
+
+
+proc generate_triage_cmd {timestamp location} {
+    set text &quot;&quot;
+    set tdbfiles [glob -nocomplain $location/*.$timestamp.tdb]   
+    if {[llength $tdbfiles] &gt; 0 } {
+      set text &quot;To start results analysis do:&lt;br&gt;&quot;
+     foreach f [lsort $tdbfiles] {
+	 set tr_command &quot;vsim -gui -do \&quot;triage view -name $f -question all\&quot;&lt;br&gt;&quot;
+
+	    append text $tr_command
+	}
+	
+
+    }
+	return $text
+}
 
 
 
 
   </usertcl>
+	    
 
 
 </rmdb>

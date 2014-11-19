@@ -58,6 +58,7 @@
       <parameter name="DUT_SETUPS" type = "tcl">[get_all_setups (%TCSPEC%)]</parameter>
       <parameter name="XML2UCDB_DATAFIELDS">-datafields "Section, Title, Description, Link, Type, Weight, Goal, Drop"</parameter>
       <parameter name="BITS">64</parameter>
+      <parameter name="SANITY">0</parameter>
     </parameters>
 
     <!-- NOTE! Not tested -->
@@ -71,7 +72,7 @@
       <command>qsub (%SGEARGS%) -N (%INSTANCE%) (%WRAPPER%)</command> 
     </method>
 
-    <method  name="compute_grid" if="{(%GRID%)} eq {LOCAL}">
+    <method  name="compute_grid" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LOCAL}">
     </method>   
 
   </runnable>
@@ -105,76 +106,76 @@
   <!-- ================================================ -->
   <!-- == Email report at the end   =================== -->
   <!-- ================================================ -->
-  <runnable name="send_email" type="task" if="(%SEND_EMAIL%) eq {1}">
+  <runnable name="send_email" type="task" base="testsetup" if="(%SEND_EMAIL%)">
     <!-- No need to run this on queu -->
     <method>
     </method>
     <parameters>
       <parameter name="EMAIL_SUBJECT">(%BLOCKNAME%) Regression Completed</parameter>
-      <parameter name="MESSAGE_FILE">(%TASKDIR%)/email_message.txt</parameter>
+      <parameter name="MESSAGE_FILE">(%TASKDIR%)/email_message.htm</parameter>
       <parameter name="ATTACHMENT_FILE">regression_report.txt</parameter>
-      <parameter name="EMAIL_RECIPIENT">`whoami`</parameter>
+      <parameter name="HTML" type="tcl">[generate_report (%BLOCKNAME%) (%HTML_REPORTDIR%) (%DATADIR%)/vrun_status_report/index.html (%REQUIRE_VPLAN%)]</parameter>
+      <parameter name="CSS" type="tcl">[get_css]</parameter>
+      <parameter name="REMOVE_TXT1">"Warning: Event stream not terminated in an 'end' event"</parameter>
+      <parameter name="REMOVE_TXT2">"regression may still be running or may have terminated abnormally"</parameter>
+      <parameter name="RERUN_TESTS" type="tcl">[generate_rerun_info (%TIMESTAMP%) (%DATADIR%)]</parameter>
+      <parameter name="TRIAGE_CMD" type="tcl">[generate_triage_cmd (%TIMESTAMP%) (%DATADIR%)]</parameter>
     </parameters>
-    <execScript launch="/bin/bash" mintimeout="300"> 
+
+    <execScript launch="/bin/bash" mintimeout="300">
+      <command>echo 'DEBUG:(%HTML%) '</command>
+      <command>echo "(%BLOCKNAME%)" </command>
+      <command>echo "DEBUG:(%HTML_REPORTDIR%) "</command>
+      <command>echo "DEBUG:(%DATADIR%) "</command>
+      <command>echo "DEBUG:generate_rerun_info  (%TIMESTAMP%) (%DATADIR%)"</command>
+      <command>echo "DEBUG:(%RERUN_TESTS%)"</command>
+
       <command>EMAILMESSAGE=&quot;(%MESSAGE_FILE%)&quot;</command>
       <!--HEADER -->
-      <command>echo &quot;To: (%EMAIL_RECIPIENT%)&quot; &gt; (%MESSAGE_FILE%)</command> 
-      <!--command>echo &quot;Cc: (%EMAIL_CCLIST%)&quot; &gt;&gt; (%MESSAGE_FILE%)</command--> 
-      <command>echo &quot;Subject: (%EMAIL_SUBJECT%)&quot; &gt;&gt; (%MESSAGE_FILE%)</command>; 
-
-      <command>echo &quot;MIME-Version: 1.0&quot; &gt;&gt; (%MESSAGE_FILE%)</command>;
-      <command>echo &quot;Content-Type: text/html; charset=&quot;us-ascii&quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>;
-      <command>echo &quot;Content-Disposition: inline&quot; &gt;&gt; (%MESSAGE_FILE%)</command>;
+      <command>echo 'To: (%EMAIL_RECIPIENT%)' &gt; (%MESSAGE_FILE%)</command>
+      <!--command>echo 'Cc: (%EMAIL_CCLIST%)' &gt;&gt; (%MESSAGE_FILE%)</command-->
+      <command>echo 'Subject: (%EMAIL_SUBJECT%)' &gt;&gt; (%MESSAGE_FILE%)</command>;
+ 
+      <command>echo 'MIME-Version: 1.0' &gt;&gt; (%MESSAGE_FILE%)</command>;
+      <command>echo 'Content-Type: text/html; charset='us-ascii'' &gt;&gt; (%MESSAGE_FILE%)</command>;
+      <command>echo 'Content-Disposition: inline' &gt;&gt; (%MESSAGE_FILE%)</command>;
       <!--BODY -->
-      <command>echo &quot;&lt;HTML&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>echo &quot;&lt;body&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>echo &quot;&lt;pre style="font: monospace"&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "&lt;HTML&gt;" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "(%CSS%)" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "&lt;body&gt;" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "&lt;pre style="font: monospace"&gt;" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo '(%HTML%)' &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "Regression on (%BLOCKNAME%) Done!" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "Time:      `date`" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "Machine Name :      `hostname`" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "&lt;H2&gt;DETAILED REGRESSION RESULTS&lt;/H2&gt;" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "&lt;b&gt;Regression run directory:&lt;/b&gt; (%SCRATCH%)\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "&lt;b&gt;Regression HTML reports:&lt;/b&gt; (%HTML_REPORTDIR%)\n\n" &gt;&gt; (%MESSAGE_FILE%)</command>
+ 
+      <command>printf "&lt;H2&gt;DETAILS ON ALL TASKS:&lt;/H2&gt;" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>vrun -status -filter status!=Empty -columns datetime/-30,runnable/-21,RMDB:CURRENT_SETUP/-20,RMDB:ITERATION/-40,seed/-20,status/-20,reason/-50 -nosummary -vrmdata (%DATADIR%)|grep -v "^\/\/"|grep -v (%REMOVE_TXT1%)|grep -v (%REMOVE_TXT2%) &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "&lt;H2&gt;Results analysis&lt;/H2&gt;" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "To do results analysis              \n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>printf "Copy command below                  \n" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command> echo '(%TRIAGE_CMD%)' &gt;&gt; (%MESSAGE_FILE%)</command>
 
-      <command>echo &quot;Regression on (%BLOCKNAME%) Done!&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>echo &quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>echo &quot;Time:      `date`&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>echo &quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>echo &quot;Machine Name :      `hostname`&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>echo &quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>echo &quot;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "## REGRESSION RESULTS                 ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "\nRegression run directory: (%SCRATCH%)\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "Regression HTML reports: (%HTML_REPORTDIR%)\n\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-
-      <command>printf "SUMMARY:\n\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>vrun -status -summary -vrmdata (%DATADIR%)|grep -v "^\/\/" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "DETAILS ON ALL TASKS:\n\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <!--command>vrun -status -filter status!=Empty -columns action,status,datetime -vrmdata (%DATADIR%) &gt;&gt; (%MESSAGE_FILE%)</command-->
-      <command>vrun -status -filter status!=Empty -columns datetime/-30,runnable/-21,RMDB:ACTUAL_SETUP/-20,RMDB:ITERATION/-40,seed/-20,status/-20,reason/-50 -nosummary -vrmdata (%DATADIR%)|grep -v "^\/\/" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "## To do results analysis (BETA):      ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "## cd (%DATADIR%)                      ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "## Copy command below                  ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>vrun -status -filter runnable=data_collection -columns RMDB:TRIAGECOMMAND -notruncate -nosummary  -vrmdata  (%DATADIR%)|grep -v "^\/\/" &gt;&gt; (%MESSAGE_FILE%)</command>
-
-      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "## To run failing tests interactive (BETA):  ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>printf "########################################\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-
-      <command>printf "NOTE NEEDS TO BE FIXED!!!!:  ##\n" &gt;&gt; (%MESSAGE_FILE%)</command>
-
-      <command>vrun -status -filter status!=Passed -filter status!=Empty -filter runnable=Simulate -columns RMDB:MAKEARGS/-100 -nosummary  -vrmdata  (%DATADIR%)|grep -v "^\/\/" &gt;&gt; (%MESSAGE_FILE%)</command>
-
-
-      <command>echo &quot;&lt;/pre&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>echo &quot;&lt;/body&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
-      <command>echo &quot;&lt;/HTML&gt;&quot; &gt;&gt; (%MESSAGE_FILE%)</command>
+       <command>printf "&lt;H2&gt;Make commands to run failing tests:&lt;/H2&gt;" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command> echo '(%RERUN_TESTS%)' &gt;&gt; (%MESSAGE_FILE%)</command>
+ 
+      <command>echo "&lt;/pre&gt;" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "&lt;/body&gt;" &gt;&gt; (%MESSAGE_FILE%)</command>
+      <command>echo "&lt;/HTML&gt;" &gt;&gt; (%MESSAGE_FILE%)</command>
+ 
 
       <command>/usr/lib/sendmail  (%EMAIL_RECIPIENT%) &lt; $EMAILMESSAGE</command>
+
       <command>echo "Regression complete and email report sent to (%EMAIL_RECIPIENT%)"</command>
     </execScript>
   </runnable>
-
 
   <!-- ================================================ -->
   <!-- == Handle each setup as it own  ================ -->
@@ -342,7 +343,7 @@
   <runnable name="all_sims" type="group" sequential="no" base="testsetup">
     <parameters>
       <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>      
-      <parameter name="TEST_SEEDS" type="tcl">[get_test_seeds (%TCSPEC%) (%ACTUAL_SETUP%) (%test.ITERATION%)]</parameter>
+      <parameter name="TEST_SEEDS" type="tcl">[get_test_seeds (%TCSPEC%) (%ACTUAL_SETUP%) (%test.ITERATION%) (%SANITY%)]</parameter>
       <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
     </parameters>
     <members>
@@ -446,14 +447,14 @@
   <!-- ================================================ -->
   <runnable name="coverage_trend_report_csv" type="task" base = "testsetup">
     <execScript launch="/bin/csh -f">
-      <command>vcover report -trend -csv (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb -file (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend_report.csv -bydu  </command>
+      <command>vcover report -trend -csv (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb -file (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend_report.csv -bydu  </command>
       <command> if ($status != 0) exit 1 </command>
     </execScript>
   </runnable>
 
   <runnable name="coverage_trend_report_html" type="task" base = "testsetup">
     <execScript launch="/bin/csh -f">
-      <command>vcover report -trend -html (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb -nodetails -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_trend_report  </command>
+      <command>vcover report -trend -html (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb -nodetails -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend_report  </command>
       <command> if ($status != 0) exit 1 </command>
     </execScript>
   </runnable>
@@ -478,10 +479,10 @@
       <command>   endif </command>
 
       <command> if ( (%REQUIRE_VPLAN%) != 0) then </command>
-      <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.ucdb</command>
+      <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.ucdb</command>
       <command> if ($status != 0) exit 1 </command>
       <command> else </command>
-      <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.noplan.ucdb</command>
+      <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.noplan.ucdb</command>
       <command> if ($status != 0) exit 1 </command>
       <command> endif </command>
 
@@ -545,7 +546,7 @@
     </members>
   </runnable>
 
-  <runnable name="convert_vplans_to_ucdb" type="group" sequential="yes" if="(%REQUIRE_VPLAN%) eq {1}">
+  <runnable name="convert_vplans_to_ucdb" type="group" sequential="no" if="(%REQUIRE_VPLAN%) eq {1}">
       <method>
       </method>
     <preScript launch="/bin/csh -f">
@@ -620,8 +621,10 @@
       <command>  echo "Using excel verification plan:$vplan_excel"</command> 
 
       <command>  if (-e $vplan_excel) then </command>
-      <command>    echo "Found $vplan_excel - starting soffice"</command> 
-      <command>    soffice --headless --convert-to xml:"MS Excel 2003 XML" $vplan_excel </command>
+      <command>    echo "Found $vplan_excel - starting to convert to xml"</command> 
+
+      <command>  excel2xml $vplan_excel </command>
+
       <command>    if ($status != 0) then </command>    
       <command>      echo " soffice conversion failed"</command>    
       <command>      exit 1          </command>    
@@ -649,9 +652,17 @@
   </runnable>
 
   <runnable name="regression_summary" type="task" base="testsetup">
-    <execScript>
-      <command> vrun -status -html -htmldir regression_run_report -vrmdata (%DATADIR%) -rmdb (%RMDBFILE%)</command>
-      <command> cp -rf regression_run_report  (%HTML_REPORTDIR%)</command>
+    <execScript launch="/bin/csh -f">
+      <command>test -e (%DATADIR%)/merged_ucdbfiles||ln -s (%MERGE_HOME%) (%DATADIR%)/merged_ucdbfiles </command>
+      <command>if ($status != 0) exit 1     </command>      
+      <command>test -e (%DATADIR%)/html_reports||ln -s (%HTML_REPORTDIR%) (%DATADIR%)/html_reports </command>
+      <command>if ($status != 0) exit 1     </command>      
+      <command>vrun -vrmdata (%DATADIR%) -status -full -html -htmldir (%DATADIR%)/vrun_status_report</command>
+      <command>if ($status != 0) exit 1     </command>      
+      <command>ln -s -f (%DATADIR%)/vrun_status_report (%HTML_REPORTDIR%)/vrun_status_report</command>
+      <command>if ($status != 0) exit 1     </command>      
+     <!--command> vrun -status  -full -html -htmldir regression_run_report -vrmdata (%DATADIR%) -rmdb (%RMDBFILE%)</command>
+    <command> cp -rf regression_run_report  (%HTML_REPORTDIR%)</command-->
     </execScript>
   </runnable>
 
