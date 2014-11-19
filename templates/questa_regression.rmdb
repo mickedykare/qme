@@ -410,7 +410,7 @@
       <command>echo "Running the simulation only once since we did not activate rerun failing tests"</command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
-      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  COVER=1  BITS=(%BITS%)</command>
+      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  COVER=1  BITS=(%BITS%) SETUP=(%ACTUAL_SETUP%)</command>
       <command>   if ($status != 0) then </command>
       <command>       exit(1)</command>
       <command>   endif </command>
@@ -421,7 +421,7 @@
       <command>   touch ~/one.txt </command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini</command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/questa_libs</command>
-      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  COVER=1  BITS=(%BITS%)</command>
+      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  COVER=1  BITS=(%BITS%) SETUP=(%ACTUAL_SETUP%)</command>
       <command>   if ($status != 0) then </command>
       <command>       exit(1)</command>
       <command>   endif </command>
