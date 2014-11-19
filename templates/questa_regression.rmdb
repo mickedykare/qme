@@ -56,7 +56,6 @@
       <parameter name="TIMESTAMP">0</parameter>
       <parameter name="EXCEL_VPLAN">""</parameter>
       <parameter name="DUT_SETUPS" type = "tcl">[get_all_setups (%TCSPEC%)]</parameter>
-      <parameter name="VERIFICATION_LEVEL">BLOCK</parameter>
       <parameter name="XML2UCDB_DATAFIELDS">-datafields "Section, Title, Description, Link, Type, Weight, Goal, Drop"</parameter>
       <parameter name="BITS">64</parameter>
     </parameters>
@@ -106,7 +105,7 @@
   <!-- ================================================ -->
   <!-- == Email report at the end   =================== -->
   <!-- ================================================ -->
-  <runnable name="send_email" type="task" if="(%SEND_EMAIL%)">
+  <runnable name="send_email" type="task" if="(%SEND_EMAIL%) eq {1}">
     <!-- No need to run this on queu -->
     <method>
     </method>
@@ -445,17 +444,16 @@
   <!-- == generates HTML reports + creates the       == -->
   <!-- == triage file                                == -->
   <!-- ================================================ -->
-  <runnable name="coverage_trend_report" type="task" base = "testsetup">
+  <runnable name="coverage_trend_report_csv" type="task" base = "testsetup">
     <execScript launch="/bin/csh -f">
-      <command> if ( (%REQUIRE_VPLAN%) != 0) then </command>
-      <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.ucdb        </command>
-      <command> else </command>
-      <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.noplan.ucdb      </command>
-      <command> endif </command>
-      <command> if ($status != 0) exit 1 </command>
       <command>vcover report -trend -csv (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb -file (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend_report.csv -bydu  </command>
       <command> if ($status != 0) exit 1 </command>
-      <command>vcover report -trend -html (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb -nodetails -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_trend_report  </command> -->
+    </execScript>
+  </runnable>
+
+  <runnable name="coverage_trend_report_html" type="task" base = "testsetup">
+    <execScript launch="/bin/csh -f">
+      <command>vcover report -trend -html (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb -nodetails -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_trend_report  </command>
       <command> if ($status != 0) exit 1 </command>
     </execScript>
   </runnable>
@@ -478,6 +476,19 @@
       <command>     vcover merge  (%VCOVER_OPTIONS%) -out (%mymergefile_noplan%) -inputs (%mergelist%) (%mergeoptions%)</command>
       <command>     if ($status != 0) exit 1     </command>      
       <command>   endif </command>
+
+      <command> if ( (%REQUIRE_VPLAN%) != 0) then </command>
+      <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.ucdb</command>
+      <command> if ($status != 0) exit 1 </command>
+      <command> else </command>
+      <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.noplan.ucdb</command>
+      <command> if ($status != 0) exit 1 </command>
+      <command> endif </command>
+
+
+
+
+
       <command>  else </command>
       <command>   echo "No (%mergelist%) was found. Could be because no simulation passed -no idea to do anything more..." </command>
       <command>  exit 1 </command>
@@ -512,7 +523,8 @@
     </parameters>
     <members>
       <member>coverage_html_report</member>
-      <member>coverage_trend_report</member>
+      <member>coverage_trend_report_csv</member>
+      <member>coverage_trend_report_html</member>
       <member>create_rankfile</member>
     </members>
   </runnable>
