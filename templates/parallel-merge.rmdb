@@ -1,0 +1,458 @@
+<?xml version="1.1" ?>
+<rmdb version="1.1" loadtcl="getucdbfiles" options="-nolocalrerun" xmlns:xi="http://www.w3.org/2003/XInclude">
+
+  <!-- This rmdb file holds a configuration to allow VRM to carry out a parallel merge of a list         -->
+  <!-- of UCDB files. The examples of its use can be found in the examples/vrm/parallel-merge directory. -->
+
+  <!-- This is the top level merge runnable that allows the main parameters to be set and the mode of -->
+  <!-- operation selected. -->
+  <runnable name="merge" type="group" sequential="yes">
+    <parameters>
+      <parameter name="MODE"
+                  ask="How do you want to run the parallel merges ?"
+               accept="oneof(rsh,lsf,sge,local)"
+                     >local</parameter>
+      <parameter name="GENFILELIST"
+                  ask="Would you like a filelist to be generated from the location to search for UCDB files ?"
+               accept="oneof(no,yes)"
+                     >yes</parameter>
+      <parameter name="FILELIST"
+                  ask="Enter the filename for the filelist ?"
+                     >filelist</parameter>
+      <parameter name="FILELISTLOCATION">(%VRUNDIR%)/(%FILELIST%)</parameter>
+      <parameter name="TESTSTATUS"
+                  ask="Which type of tests do you want to merge ?"
+               accept="oneof(all,passed,failed)"
+                     >all</parameter>
+      <parameter name="MERGEMODE"
+                  ask="Which type of merge do you want to do ?"
+               accept="oneof(-totals,-testassociated)"
+                     >-totals</parameter>
+      <parameter name="QUEUETIMEOUT"
+                  ask="Enter the maximum queue/start-up time for the time-out setting in seconds ?"
+                     >6000</parameter>
+      <parameter name="MERGETIMEOUT"
+                  ask="Enter the maximum merge time for the time-out setting in seconds ?"
+                     >6000</parameter>
+      <parameter name="COMMANDLINE">vrun merge -rmdb (%RMDBFILE%) -GMODE=(%MODE%) -GGENFILELIST=(%GENFILELIST%) -GFILELIST=(%FILELIST%) -GFILELISTLOCATION=(%FILELISTLOCATION%) -GTESTSTATUS=(%TESTSTATUS%)</parameter>
+    </parameters>
+    <members>
+      <member>filelist</member>
+      <member>optimize</member>
+      <member>mode</member>
+    </members>
+  </runnable>
+
+  <!-- This runnable runs if the user wants to generate a UCDB file list from a certain directory. -->
+  <!-- It allows the setting of the directory to be used to recursively searched and the search    -->
+  <!-- string. -->
+  <runnable name="filelist" type="group" if="[GenerateFileList {(%GENFILELIST%)}]">
+    <parameters>
+      <parameter name="UCDBDIR"
+                  ask="Enter directory to start ucdb recursive file search ?"
+                     >(%VRUNDIR%)/</parameter>
+      <parameter name="UCDBFILENAMES"
+                  ask="Enter search ucdb filename with wildcards ?"
+                     >*.ucdb</parameter>
+    </parameters>
+  </runnable>
+
+  <!-- This runnable runs if the user wants to optimize the list that is generated to be either only -->
+  <!-- all failures or all passes. -->
+  <runnable name="optimize" type="group" if="[OptimizeFilelist {(%TESTSTATUS%)}]">
+  </runnable>
+
+  <!-- This runnable checks the file list and displays the number of UCDBs that will be merged by the -->
+  <!-- process and then executes the correct method controlled by the MODE parameter. -->
+  <runnable name="mode" type="group" >
+    <preScript launch="vsim">
+       <command>if {![file exist {(%OPTFILELIST%)}]} {</command>
+       <command>  set message [format "# Supplied File '%s' doesn't exist. #" {(%OPTFILELIST%)}]</command>
+       <command>  runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>  runmgr::rm_message $message</command>
+       <command>  runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>  error $message</command>
+       <command>}</command>
+       <command>if {[file size {(%OPTFILELIST%)}] == 0} {</command>
+       <command>  set message [format "# Supplied File '%s' is empty. #" {(%OPTFILELIST%)}]</command>
+       <command>  runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>  runmgr::rm_message $message</command>
+       <command>  runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>  error $message</command>
+       <command>} else {</command>
+       <command>  package require fileutil</command>
+       <command>  set Tests [llength [::fileutil::cat (%OPTFILELIST%)]]</command>
+       <command>  set message [format "# Total Tests to merge from '%s' = %s #" (%OPTFILELIST%) $Tests]</command>
+       <command>  runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>  runmgr::rm_message $message</command>
+       <command>  runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>}</command>
+       <command>if {[string match [string range [vsimPlatform] 0 2] {win}] &amp;&amp; ![string match (%MODE%) {local}]} {</command>
+       <command>  set message [format "# VRM only supports local mode on the Windows Platform #"]</command>
+       <command>  runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>  runmgr::rm_message $message</command>
+       <command>  runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>  error $message</command>
+       <command>}</command>
+       <command></command>
+    </preScript>
+    <parameters>
+      <parameter name="OPTFILELIST" type="tcl">[switch -- (%TESTSTATUS%) { "all" {list (%FILELISTLOCATION%)} default {list (%FILELISTLOCATION%).optimized} }]</parameter>
+      <parameter name="mergefile">(%VRUNDIR%)/merge.ucdb</parameter>
+      <parameter name="mergeoptions">(%MERGEMODE%)</parameter>
+      <parameter name="DATABASES" type="tcl">[CountFiles (%OPTFILELIST%)]</parameter>
+      <parameter name="GROUPS" type="tcl">[CalculateGroups (%MODE%) (%RSHJOBS:1%) (%JOBS:1%) (%DATABASES%)]</parameter>
+      <parameter name="SWITCHES" type="tcl">[ProcessCommandLine {(%COMMANDLINE%)} (%RUNNABLE%)]</parameter>
+    </parameters>
+    <members>
+      <member>rsh</member>
+      <member>lsf</member>
+      <member>sge</member>
+      <member>local</member>
+    </members>
+<!--	 
+    <postScript launch="vsim">
+       <command>set Tests [llength [lindex [vcover testnames (%mergefile%) -tcl] end]]</command>
+       <command>set message [format "# Total Tests Merged = %s #" $Tests]</command>
+       <command>runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>runmgr::rm_message $message</command>
+       <command>runmgr::rm_message [string repeat "#" [string length $message]]</command>
+    </postScript>
+-->
+  </runnable>
+
+  <!-- This runnable runs if the selected mode is remote shell. -->
+  <runnable name="rsh" type="group" if="{(%MODE%)} eq {rsh}">
+    <parameters>
+      <parameter name="HOSTNAMES"
+                  ask="Which hosts do you want to run the process on ?"
+                     >host1 host2 host3</parameter>
+      <parameter name="HOST" type="tcl" >[GetNextHost {(%HOSTNAMES%)} {(%SCRIPT%)} {(%INSTANCE%)}]</parameter>
+      <parameter name="RSHJOBS" type="tcl">[llength {(%HOSTNAMES%)}]</parameter>
+    </parameters>
+    <preScript launch="vsim">
+       <command>if {[llength {(%HOSTNAMES%)}] == 0} {</command>
+       <command>  set message [format "# No Hosts defined in HOSTNAMES parameter. #" ]</command>
+       <command>  runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>  runmgr::rm_message $message</command>
+       <command>  runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>  error $message</command>
+       <command>}</command>
+       <command>foreach host {(%HOSTNAMES%)} {</command>
+       <command>  catch {exec rsh $host hostname} error</command>
+       <command>  if {![string match [lindex $error 0] $host]} {</command>
+       <command>    set message [format "# Can not RSH to host '%s'. #" $host]</command>
+       <command>    runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>    runmgr::rm_message $message</command>
+       <command>    runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>    error $message</command>
+       <command>  }</command>
+       <command>}</command>
+    </preScript>
+    <method name="homegrid-merge" queue="merge" action="mergeScript" mintimeout="(%QUEUETIMEOUT%)" maxrunning="(%GROUPS%)">
+       <command>rsh (%HOST%) (%WRAPPER%)</command>
+    </method>
+    <method name="homegrid" mintimeout="(%QUEUETIMEOUT%)" maxrunning="(%GROUPS%)">
+       <command>rsh (%HOST%) (%WRAPPER%)</command>
+    </method>
+    <members>
+      <member>levelOne</member>
+    </members>
+    <postScript launch="vsim">
+       <command>echo Process switches (%SWITCHES%)</command>
+    </postScript>
+  </runnable>
+
+  <!-- This runnable runs if the selected mode is LSF. -->
+  <runnable name="lsf" type="group" if="{(%MODE%)} eq {lsf}">
+    <parameters>
+      <parameter name="JOBS"
+                  ask="How many jobs do you want to split the merge into ?"
+                     >10</parameter>
+      <parameter name="GRIDSLOTS"
+                  ask="How many grid slots are going to be used ?"
+                     >10</parameter>
+      <parameter name="USERGRIDOPTS"
+                  ask="Are there any extra submission options i.e. queue names, resources etc, you need to add to the grid submission command ?"
+                     ></parameter>
+    </parameters>
+    <method name="grid-merge" gridtype="lsf" queue="merge" action="mergeScript" mintimeout="(%QUEUETIMEOUT%)" maxrunning="(%GRIDSLOTS%)" donedelay="50">
+       <command>bsub (%USERGRIDOPTS%) (%GRIDOPTS%) (%WRAPPER%)</command>
+    </method>
+    <method name="grid" gridtype="lsf" mintimeout="(%QUEUETIMEOUT%)" maxrunning="(%GRIDSLOTS%)" donedelay="50">
+       <command>bsub (%USERGRIDOPTS%) (%GRIDOPTS%) (%WRAPPER%)</command>
+    </method>
+    <members>
+      <member>levelOne</member>
+    </members>
+    <postScript launch="vsim">
+       <command>echo Process switches (%SWITCHES%)</command>
+    </postScript>
+  </runnable>
+
+  <!-- This runnable runs if the selected mode is SGE. -->
+  <runnable name="sge" type="group" if="{(%MODE%)} eq {sge}">
+    <parameters>
+      <parameter name="JOBS"
+                  ask="How many jobs do you want to split the merge into ?"
+                     >10</parameter>
+      <parameter name="GRIDSLOTS"
+                  ask="How many grid slots are going to be used ?"
+                     >10</parameter>
+      <parameter name="USERGRIDOPTS"
+                  ask="Are there any extra submission options i.e. queue names, resources etc, you need to add to the grid submission command ?"
+                     ></parameter>
+    </parameters>
+    <method name="grid-merge" gridtype="sge" queue="merge" action="mergeScript" mintimeout="(%QUEUETIMEOUT%)" maxrunning="(%GRIDSLOTS%)">
+       <command>qsub (%USERGRIDOPTS%) (%GRIDOPTS%) (%WRAPPER%)</command>
+    </method>
+    <method name="grid" gridtype="sge" mintimeout="(%QUEUETIMEOUT%)" maxrunning="(%GRIDSLOTS%)">
+       <command>qsub (%USERGRIDOPTS%) (%GRIDOPTS%) (%WRAPPER%)</command>
+    </method>
+    <members>
+      <member>levelOne</member>
+    </members>
+    <postScript launch="vsim">
+       <command>echo Process switches (%SWITCHES%)</command>
+    </postScript>
+  </runnable>
+
+  <!-- This runnable runs if the selected mode is local to make use of multi-core machines. -->
+  <runnable name="local" type="group" if="{(%MODE%)} eq {local}">
+    <parameters>
+      <parameter name="JOBS"
+                  ask="How many jobs would you like to split the merge into ?"
+                     >2</parameter>
+    </parameters>
+    <method name="local-merge" queue="merge" action="mergeScript" mintimeout="(%QUEUETIMEOUT%)" maxrunning="(%GROUPS%)" unless="[string match [string range [vsimPlatform] 0 2] {win}]">
+       <command>(%WRAPPER%)</command>
+    </method>
+    <method name="local" mintimeout="(%QUEUETIMEOUT%)" maxrunning="(%GROUPS%)" unless="[string match [string range [vsimPlatform] 0 2] {win}]">
+       <command>(%WRAPPER%)</command>
+    </method>
+    <members>
+      <member>levelOne</member>
+    </members>
+    <postScript launch="vsim">
+       <command>echo Process switches (%SWITCHES%)</command>
+    </postScript>
+  </runnable>
+
+  <!-- This runnable does the level one merges. -->
+  <runnable name="levelOne" type="task" repeat="(%GROUPS%)">
+    <parameters>
+      <parameter name="ucdbfile">(%INSTANCE%).ucdb</parameter>
+      <parameter name="ucdbfiles" type="tcl">[GetUcdbFiles (%OPTFILELIST%) (%DATABASES%) (%GROUPS%) (%INSTANCE%)]</parameter>
+    </parameters>
+    <execScript launch="vsim" mintimeout="(%MERGETIMEOUT%)">
+      <command>if {[llength {(%ucdbfiles%)}] != 0} {</command>
+      <command>  vcover merge (%mergeoptions%) -out (%ucdbfile%) (%ucdbfiles%)</command>
+      <command>}</command>
+    </execScript>
+    <mergeScript mintimeout="(%MERGETIMEOUT%)"/>
+  </runnable>
+
+  <!-- This runnable print the version of the parallel merge RMDB. -->
+  <runnable name="version" type="task">
+    <parameters>
+      <parameter name="VERISON">10.2 Date 9th January 2013</parameter>
+    </parameters>
+    <execScript launch="vsim">
+       <command>  set message [format "# Parallel Merge Version '%s'. #" {(%VERISON%)}]</command>
+       <command>  runmgr::rm_message [string repeat "#" [string length $message]]</command>
+       <command>  runmgr::rm_message $message</command>
+       <command>  runmgr::rm_message [string repeat "#" [string length $message]]</command>
+    </execScript>
+  </runnable>
+
+  <usertcl name="getucdbfiles">
+  set fp {}
+  set CommandLine ""
+  # Splits the filelist and returns the list of ucdb files for each group
+  proc GetUcdbFiles {path databases groups runnable} {
+    variable fp
+    global UcdbFiles Remainder
+    # If this is the first call, open the list of ucdb files...
+    if {[string equal $fp {}]} {
+      set fp [open $path]
+      set Remainder [expr $databases % $groups]
+    }
+
+    # ...then fetch "count" UCDB files or stop if EOF is reached
+    set retval [list]
+    if {![info exists UcdbFiles($runnable)]} {
+      if {$Remainder != 0} {
+        set count [expr ($databases / $groups) + 1 ]
+        incr Remainder -1
+      } else {
+        set count [expr ($databases / $groups) ]
+      }
+      while {($count > 0) &amp;&amp; ![eof $fp]} {
+        set file [gets $fp]
+        if {![string equal $file {}]} {lappend retval $file; incr count -1}
+      }
+      set UcdbFiles($runnable) [join $retval]
+      echo "$runnable Group [llength $UcdbFiles($runnable)] UCDB files"
+    }
+    return $UcdbFiles($runnable)
+  }
+
+  # Returns the total number of databases from the list
+  proc CountFiles {file} {
+    set count 0
+    if {![file exist $file]} {return 0}
+    set fp [open $file]
+    while {![eof $fp]} {
+       set file [gets $fp]
+       incr count
+    }
+    close $fp
+    return [expr $count - 1]
+  }
+
+  # Calculates the number of groups to be used. Reduces the group
+  # number if the number of databases divided by the group is less
+  # then 1
+  proc CalculateGroups {mode rshjobs gridjobs databases} {
+      if {$databases == 0} {return 0}
+      switch -- $mode { "rsh" {set groups $rshjobs} default {set groups $gridjobs} }
+      if {$groups == 0} {return $groups}
+      if { [expr $databases / $groups ] != 0 } {
+        return $groups
+      } else {
+        while {[expr $databases / $groups ] == 0 } {
+          incr groups -1
+        }
+        return $groups
+      }
+  }
+
+  # Used in RSH mode to return an unloaded host
+  proc GetNextHost {hosts script instance} {
+    global availableHosts NextHost
+    if {[string equal $script "preScript"]} {
+      return [exec hostname]
+    }
+    if {![info exists availableHosts]} {
+      set availableHosts $hosts
+    }
+    if {![info exists NextHost($instance)]} {
+      set currentHost [lindex $availableHosts 0]
+      lremove availableHosts 0
+      set NextHost($instance) $currentHost
+    }
+    return $NextHost($instance)
+  }
+
+  # Modified action complete routine to help manage the available
+  # hosts in RSH mode
+  proc ActionCompleted {userdata} {
+    upvar $userdata data
+    global availableHosts
+    if {[string equal $data(RUNNABLE) "levelOne"]} {
+      set action $data(ACTION)
+      set host [ExpandRmdbParameters $action "(%HOST:none%)"]
+      lappend availableHosts $host
+    }
+    if {[isChatty]} {
+      set msg [list "Action '$data(ACTION)' $data(passfail) at [RightNow] (default)"]
+      eval logDebug $msg
+    }
+   }
+
+  # Set-up the parameters for the merge process
+  proc GenerateFileList {genfilelist} {
+    global ucdbfilenames
+    if {[string equal $genfilelist "yes"]} {
+      set ucdbdir [ExpandRmdbParameters merge/filelist/execScript "(%UCDBDIR%)"]
+      set ucdbfilenames [ExpandRmdbParameters merge/filelist/execScript "(%UCDBFILENAMES%)"]
+      set filelistlocation [ExpandRmdbParameters merge/filelist/execScript "(%FILELISTLOCATION%)"]
+      package require fileutil
+      proc is_ucdb {name} {global ucdbfilenames; return [string match $ucdbfilenames $name]}
+      set files [::fileutil::find $ucdbdir is_ucdb]
+      set ofile [open $filelistlocation "w"]
+      foreach file $files {puts $ofile [file join [pwd] $file]}
+      close $ofile
+      return 1
+    } else {
+      return 0
+    }
+  }
+
+  proc ProcessCommandLine {commandline mode} {
+    set switches ""
+    set filelist [ExpandRmdbParameters merge/preScript "(%GENFILELIST%)"]
+    if {[string equal $filelist "yes"]} {
+      set dir [ExpandRmdbParameters merge/filelist/execScript "(%UCDBDIR%)"]
+      set names [ExpandRmdbParameters merge/filelist/execScript "(%UCDBFILENAMES%)"]
+      append switches [format "-GUCDBDIR=%s -GUCDBFILENAMES=\"%s\" " $dir $names]
+    }
+    if {[string equal $mode "lsf"] || [string equal $mode "sge"]} {
+      set gridjobs [ExpandRmdbParameters merge/mode/$mode/execScript "(%JOBS%)"]
+      set gridslots [ExpandRmdbParameters merge/mode/$mode/execScript "(%GRIDSLOTS:1%)"]
+      set usergridopts [ExpandRmdbParameters merge/mode/$mode/execScript "(%USERGRIDOPTS:%)"]
+      append switches [format "%s -GJOBS=%s -GGRIDSLOTS=%s" $switches $gridjobs $gridslots]
+      if {[string length $usergridopts]} {
+        append switches [format " -GUSERGRIDOPTS=\"%s\"" $usergridopts]
+      }
+    }
+    if {[string equal $mode "rsh"]} {
+      set hosts [ExpandRmdbParameters merge/mode/$mode/execScript "(%HOSTNAMES%)"]
+      append switches [format "%s -GHOSTNAMES=\"%s\"" $switches $hosts]
+    }
+    echo [format "Command line: %s %s" $commandline $switches]
+    return 0
+  }
+
+  # Opimize the filelist
+  proc OptimizeFilelist {optimize} {
+    if {![string equal $optimize "all"]} {
+      echo "#####################################"
+      echo "# Extract TESTSTATUS from each UCDB #"
+      echo "#####################################"
+      set filelistlocation [ExpandRmdbParameters merge/filelist/execScript "(%FILELISTLOCATION%)"]
+      set optimizeFile [format "%s.optimized" $filelistlocation]
+      set ffile [open $filelistlocation r]
+      set ofile [open $optimizeFile w]
+      set passed 0
+      set failed 0
+      while {![eof $ffile]} {
+        gets $ffile line
+        if {$line != "" } {
+          foreach attribute [vcover stats $line -tcl]  {
+            if {[string match [lindex $attribute 0] TESTSTATUS]} {
+              set result [lindex $attribute 1]
+            }
+          }
+          if {$result &lt; 2} {
+            if {[string match $optimize "passed"]} {
+              puts $ofile $line
+            }
+            echo [format "Passed:  %s" $line]
+            incr passed
+          } else {
+            if {[string match $optimize "failed"]} {
+              puts $ofile $line
+            }
+            incr failed
+            echo [format "Failed:  %s" $line]
+          }
+        }
+      }
+      close $ffile
+      close $ofile
+      echo "#####################################"
+      echo "#                                   #"
+      echo [format "# Tests Total   = %7s           #" [expr $passed + $failed]]
+      echo [format "# Tests Passed  = %7s           #" $passed]
+      echo [format "# Tests Failed  = %7s           #" $failed]
+      echo "#                                   #"
+      echo "#####################################"
+      return 1
+    } else {
+      return 0
+    }
+  }
+
+  </usertcl>
+</rmdb>
