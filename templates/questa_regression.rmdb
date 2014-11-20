@@ -59,6 +59,8 @@
       <parameter name="XML2UCDB_DATAFIELDS">-datafields "Section, Title, Description, Link, Type, Weight, Goal, Drop"</parameter>
       <parameter name="BITS">64</parameter>
       <parameter name="SANITY">0</parameter>
+      <parameter name="USER_REPORT_TARGET"></parameter>
+
     </parameters>
 
     <!-- NOTE! Not tested -->
@@ -99,6 +101,7 @@
       <member>all_setups</member>
       <member>finalize_ranking</member>
       <member>regression_summary</member>
+      <member>user_report</member>
       <member>send_email</member>
     </members>
   </runnable>
@@ -399,7 +402,6 @@
       <parameter name="ucdbfile">(%ACTUAL_SETUP%)_(%ITERATION%).ucdb</parameter>
       <parameter name="ucdbtestname">(%ACTUAL_SETUP%)_(%ITERATION%)</parameter>
       <parameter name="UCDBFILE" export="yes">(%ucdbfile%)</parameter>
-      <parameter name="MAKEARGS">"make compile gui TEST=(%TESTNAME%) SEED=(%seed%) SETUP=(%ACTUAL_SETUP%)"</parameter>
     </parameters>
     <execScript launch="/bin/csh -f">
       <command>echo mergelist=(%mergelist%) </command>
@@ -666,6 +668,15 @@
     </execScript>
   </runnable>
 
+  <!-- ============================================================================= -->
+  <!-- == user_report: Call a user provided makefile target if provided              == -->
+  <!-- ============================================================================= -->
+  <runnable name="user_report" type="task" base="testsetup" if="{(%USER_REPORT_TARGET%)} ne &quot;&quot;">
+    <execScript launch="/bin/csh -f">
+      <command> echo "Calling user provided target (%USER_REPORT_TARGET%)" </command>
+      <command> make -f (%MAKEFILE%) (%USER_REPORT_TARGET%) TIMESTAMP=(%TIMESTAMP%)        </command>
+    </execScript>
+  </runnable>
 
 
     <xi:include href="mytcl.rmdb"/>

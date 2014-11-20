@@ -45,6 +45,7 @@ COMPILE_SC_TARGET=no_comp_sc
 SC_MAKE_TARGET=comp_link
 SC_TOP_NAME=sc_main
 RERUN_FAILING_TESTS=0
+USER_REPORT_TARGET=
 ###################################################################
 # Tool pointers  
 #################################################################

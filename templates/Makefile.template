@@ -495,6 +495,7 @@ create_project_file::
 	-GRERUN_FAILING_TESTS=${RERUN_FAILING_TESTS} \
 	-GVERIFICATION_LEVEL=${VERIFICATION_LEVEL} \
 	-GSANITY=${SANITY} \
+	-GUSER_REPORT_TARGET=${USER_REPORT_TARGET} \
 	-vrmdata ${SCRATCHDIR}}" >> default.vrm.tmp 
 	@echo "VRMEND" >> default.vrm.tmp;
 	@mv default.vrm.tmp  default.vrm
