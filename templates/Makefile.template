@@ -249,6 +249,13 @@ clean_rundir:
 #########################################################
 # Start a block level simulation, using built in vopt
 #########################################################
+ifeq (${METHODOLOGY},OVM)
+UVM_ARGUMENTS=+OVM_TESTNAME=${TEST} +OVM_VERBOSITY=${OVM_VERBOSITY} ${NO_ILLEGAL_NAME_OVM} 
+else
+UVM_ARGUMENTS=+UVM_TESTNAME=${TEST} +UVM_VERBOSITY=${UVM_VERBOSITY} ${NO_ILLEGAL_NAME_UVM} ${UVMCONTROL} 
+endif
+
+
 
 gui_block:: create_recompile_in_background liblist clean_rundir presim_script gui_block_cmd postsim_script
 gui_block_cmd::
@@ -262,11 +269,10 @@ gui_block_cmd::
 	-printsimstats \
 	-sv_seed ${SEED} \
 	-msgmode both -onfinish stop  \
-	${UVM_SIM_ARGS} \
 	${VSIM_GCC_VERSION} \
 	${DPI_GCC_VERSION} \
 	${QUESTA_VIP_SIM_ARGS} \
-	${UVMCONTROL} \
+
 	${CLASSDEBUG} \
 	${VSIMARGS} \
 	${VSIMVOPTARGS} \
@@ -277,11 +283,9 @@ gui_block_cmd::
 	${SOLVEFAIL_ARGS}  \
 	${POSTSIMDEBUG} \
 	${DEBUG} \
-	+UVM_TESTNAME=${TEST} \
 	${FSMDEBUG} \
 	${TITLE} \
-	+UVM_VERBOSITY=${UVM_VERBOSITY}
-
+	${UVM_ARGUMENTS}
 #########################################################
 # Start a chip level simulation, using vopt separately
 #########################################################
@@ -299,11 +303,9 @@ gui_chip_cmd::
 	-printsimstats \
 	-sv_seed ${SEED} \
 	-msgmode both -onfinish stop  \
-	${UVM_SIM_ARGS} \
 	${VSIM_GCC_VERSION} \
 	${DPI_GCC_VERSION} \
 	${QUESTA_VIP_SIM_ARGS} \
-	${UVMCONTROL} \
 	${CLASSDEBUG} \
 	${VSIMARGS} \
 	${GUI_DO} \
@@ -313,11 +315,9 @@ gui_chip_cmd::
 	${SOLVEFAIL_ARGS}  \
 	${POSTSIMDEBUG} \
 	${DEBUG} \
-	+UVM_TESTNAME=${TEST} \
 	${FSMDEBUG} \
 	${TITLE} \
-	+UVM_VERBOSITY=${UVM_VERBOSITY}
-
+	${UVM_ARGUMENTS}
 #########################################################
 # Start a block level simulation, using built in vopt
 #########################################################
@@ -335,11 +335,10 @@ batch_block_cmd::
 	-printsimstats \
 	-sv_seed ${SEED} \
 	-msgmode both -onfinish stop  \
-	${UVM_SIM_ARGS} \
 	${VSIM_GCC_VERSION} \
 	${DPI_GCC_VERSION} \
 	${QUESTA_VIP_SIM_ARGS} \
-	${UVMCONTROL} \
+	${UVM_ARGUMENTS} \
 	${CLASSDEBUG} \
 	${VSIMARGS} \
 	${VSIMVOPTARGS} \
@@ -350,7 +349,6 @@ batch_block_cmd::
 	${SOLVEFAIL_ARGS}  \
 	${POSTSIMDEBUG} \
 	${DEBUG} \
-	+UVM_TESTNAME=${TEST} \
 	${FSMDEBUG} \
 	+UVM_VERBOSITY=${UVM_VERBOSITY}
 
@@ -371,11 +369,10 @@ batch_chip_cmd::
 	-printsimstats \
 	-sv_seed ${SEED} \
 	-msgmode both -onfinish stop  \
-	${UVM_SIM_ARGS} \
 	${VSIM_GCC_VERSION} \
 	${DPI_GCC_VERSION} \
 	${QUESTA_VIP_SIM_ARGS} \
-	${UVMCONTROL} \
+	${UVM_ARGUMENTS} \
 	${CLASSDEBUG} \
 	${VSIMARGS} \
 	${REGRESSION_DO} \
@@ -385,9 +382,7 @@ batch_chip_cmd::
 	${SOLVEFAIL_ARGS}  \
 	${POSTSIMDEBUG} \
 	${DEBUG} \
-	+UVM_TESTNAME=${TEST} \
-	${FSMDEBUG} \
-	+UVM_VERBOSITY=${UVM_VERBOSITY}
+	${FSMDEBUG} 
 
 
 ############# Regression Targets ########################
@@ -410,21 +405,19 @@ batch_regression_cmd::
 	-printsimstats \
 	-sv_seed ${SEED} \
 	-msgmode both -onfinish stop  \
-	${UVM_SIM_ARGS} \
 	${VSIM_GCC_VERSION} \
 	${DPI_GCC_VERSION} \
 	${QUESTA_VIP_SIM_ARGS} \
-	${UVMCONTROL_REGR} \
+	${UVM_ARGUMENTS} \
 	${VSIMARGS} \
 	${REGRESSION_DO} \
 	-c \
 	${EXTRA_VSIM_ARGS}  \
 	${CC_COLLECT} \
 	-assertdebug \
-	-wlf ${TEST}.wlf \
-	+UVM_TESTNAME=${TEST} \
-	+UVM_VERBOSITY=${UVM_VERBOSITY_REGR}
-#########################################################
+	-wlf ${TEST}.wlf 
+
+ #########################################################
 # When rerunning a simulation due to failure
 #########################################################
 # Start a simulation in regression with debug, vopt is done before
@@ -442,7 +435,6 @@ batch_regression_dbg_cmd::
 	-printsimstats \
 	-sv_seed ${SEED} \
 	-msgmode both -onfinish stop  \
-	${UVM_SIM_ARGS} \
 	${VSIM_GCC_VERSION} \
 	${DPI_GCC_VERSION} \
 	${QUESTA_VIP_SIM_ARGS} \
@@ -458,8 +450,7 @@ batch_regression_dbg_cmd::
 	${DEBUG} \
 	+UVM_TESTNAME=${TEST} \
 	${FSMDEBUG} \
-	-wlf ${TEST}.wlf \
-	+UVM_VERBOSITY=${UVM_VERBOSITY}
+	-wlf ${TEST}.wlf 
 
 #########################################################
 # Preparing a project file containing all the switches

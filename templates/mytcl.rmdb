@@ -562,6 +562,11 @@ proc generate_triage_cmd {timestamp location} {
 }
 
 
+  proc count_no_of_lines {filename} {
+  return [eval wc -l |cut -d " " -f1]
+
+}
+
 
 
   </usertcl>
