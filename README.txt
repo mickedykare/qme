@@ -18,7 +18,7 @@
 ##################################################################################
 #  
 ## What is QME and how is it supposed to be used?
-# QME is an integrated environment developed for effecient use of the Quest Verification
+# QME is an integrated environment developed for effecient use of the Questa Verification
 # Platform.
 # The basic use model is that you provide filelists in a very simple format,
 # create a simulation directory containing a Makefile by using a simple script.
