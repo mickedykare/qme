@@ -216,3 +216,30 @@ endif
 ifeq ($(RERUN_FAILING_TESTS),1) # UVMC=true
 NOREUSESEEDS=
 endif
+
+############ FORMAL STUFF ##################
+ifneq (${FORMAL_DIRECTIVES},)
+DO_FORMAL_DIRECTIVES=do ${FORMAL_DIRECTIVES}
+else
+DO_FORMAL_DIRECTIVES=
+endif
+
+ifneq (${FORMAL_INIT_FILE},)
+DO_FORMAL_INIT=-init ${FORMAL_INIT_FILE}
+else
+DO_FORMAL_INIT=
+endif
+
+ifneq (${FORMAL_GENERICS_FILE},)
+DO_FORMAL_GENERICS=-f ${FORMALGENERICS_FILE}
+else
+DO_FORMAL_GENERICS=
+endif
+
+
+
+#FORMAL_GENERICS= $(shell \
+#        if [ -e $(FORMAL_GENERICS_FILE) ]; then \
+#          cat ${FORMAL_GENERICS_FILE}; \
+#        fi; \
+#)

@@ -74,7 +74,6 @@ RTLDIR=rtl
 WORKLIB=work
 LIBRARY_HOME=questa_libs
 CDC_RESULTS=cdc_output_results
-FORMAL_RESULTS=formal_output_results
 UCDB_STORAGE=ucdbfiles
 HTML_HOME=html_reports
 LIBLIST=libs.list
@@ -111,7 +110,6 @@ COVER=0
 ARCH=32
 RANKING=0
 VLOG_TIMESCALE=-timescale 1ns/1ps
-FORMAL=0
 
 CDC_STATIC=0
 SETUP=____DEFAULT_SETUP
@@ -136,13 +134,15 @@ SKIP_SYNTHOFF_REGION=-vlogargs=-skipsynthoffregion -vcomargs=-skipsynthoffregion
 # Autocheck defaults
 ###################################################################
 AUTOCHECK=0
-AUTOCHECK_DO_COMMANDS=
+AUTOCHECK_DO_COMMANDS=autocheck enable;autocheck disable -type ARITH*
 AUTOCHECK_DUT=${BLOCKNAME}
 AUTOCHECK_DESIGN_LIB=${DESIGN_LIB}
-AUTOCHECK_EFFORT=medium
+AUTOCHECK_EFFORT=unlimited
+AUTOCHECK_TIMEOUT=5m
 AUTOCHECK_GENERICS=
 AUTOCHECK_RESULTS=autocheck_output_results
-AUTOCHECK_EXTRA_ARGS=
+AUTOCHECK_EXTRA_COMP_ARGS=
+AUTOCHECK_EXTRA_VERIFY_ARGS=
 ###################################################################
 # Covercheck defaults
 # Can be used in regression or interactivly 
@@ -161,8 +161,24 @@ COVERCHECK_EXTRA_VERIFY_ARGS=
 COVERCHECK_EFFORT=medium
 COVERCHECK_WITNESS_WAVEFORM=-witness_waveforms
 
-
-
+###################################################################
+# Covercheck defaults
+# Can be used in regression or interactivly 
+# Set FORMAL=1 to run in regression
+###################################################################
+FORMAL=0
+FORMAL_RESULTS=formal_output_results
+FORMAL_UCDB=formal_verify.ucdb
+FORMAL_GENERICS= -f generics.txt
+FORMAL_DUT=${BLOCKNAME}
+FORMAL_DESIGN_LIB=${DESIGN_LIB}
+FORMAL_EXTRA_COMPILE_ARGS=
+FORMAL_EXTRA_VERIFY_ARGS=
+FORMAL_EFFORT=medium
+FORMAL_DIRECTIVES=
+FORMAL_INIT_FILE=
+FORMAL_GENERICS_FILE=
+FORMAL_BIND_MODULE=
 
 
 ###################################################################

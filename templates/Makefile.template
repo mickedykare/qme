@@ -219,6 +219,24 @@ recompile::
 	@${DISABLE_VERDI_PLI};make all -f  ${QUESTALIBS_DIR}/makefile.remake
 
 
+load_dut_cmd:: 
+	${DISABLE_VERDI_PLI}; \
+	${VSIM} -$(ARCH) \
+	${VSIM_TIMERES} \
+	-f ${LIBLIST} \
+	-lib $(DESIGN_LIB) \
+	${TIMINGCHECKS} \
+	-printsimstats \
+	${BLOCKNAME} -voptargs=+acc
+
+
+
+load_dut::compile_rtl liblist load_dut_cmd
+
+
+
+
+
 ############  Simulation targets ########################
 # Flow is different for chip level or block level
 #########################################################
@@ -246,6 +264,7 @@ clean_rundir:
 	@if test -e ${QUESTALIBS_DIR} ;then cd ${RUNDIR};ln -s ../${QUESTALIBS_DIR};fi
 	@if test -e ${MODELSIM_INI} ;then cd ${RUNDIR};ln -s ../modelsim.ini;fi
 	@if test -e ${LIBLIST} ;then cd ${RUNDIR};ln -s ../${LIBLIST};fi
+	@cd ${RUNDIR};ln -sf ../Makefile
 #########################################################
 # Start a block level simulation, using built in vopt
 #########################################################
@@ -272,7 +291,6 @@ gui_block_cmd::
 	${VSIM_GCC_VERSION} \
 	${DPI_GCC_VERSION} \
 	${QUESTA_VIP_SIM_ARGS} \
-
 	${CLASSDEBUG} \
 	${VSIMARGS} \
 	${VSIMVOPTARGS} \
@@ -554,13 +572,16 @@ get_generics_only:
 #########################################################
 
 autocheck::clean compile_rtl_fv liblist autocheck_only
+
 autocheck_only::
 	${DISABLE_VERDI_PLI}; \
-	qautocheck -c -licq -od ${AUTOCHECK_RESULTS} -do "configure license queue on; \
+	qverify -c -licq -od ${AUTOCHECK_RESULTS} -do "configure license queue on; \
 	${AUTOCHECK_DO_COMMAND}; \
-	autocheck run -d ${AUTOCHECK_DUT} \
+	autocheck compile -d ${AUTOCHECK_DUT}  \
 	-work ${AUTOCHECK_DESIGN_LIB} \
-	-effort ${AUTOCHECK_EFFORT} -f ${LIBLIST}  ${AUTOCHECK_GENERICS} ${AUTOCHECK_EXTRA_ARGS}; exit"
+	-f ${LIBLIST} ${AUTOCHECK_GENERICS} ${AUTOCHECK_EXTRA_COMP_ARGS}; \
+	autocheck verify -effort ${AUTOCHECK_EFFORT} -timeout ${AUTOCHECK_TIMEOUT} ${AUTOCHECK_EXTRA_VERIFY_ARGS};\
+	exit"
 
 #########################################################
 # Run Questa Covercheck
@@ -578,6 +599,27 @@ covercheck_only:
 	covercheck verify -effort ${COVERCHECK_EFFORT}  ${COVERCHECK_WITNESS_WAVEFORM} ${COVERCHECK_EXTRA_VERIFY_ARGS} -byinstance; \
 	covercheck generate exclude ${COVERCHECK_RESULTS}/covercheck_verify.db \
 	covercheck_exclude.do ; \
+	exit"
+
+
+#########################################################
+# Run Questa Formal
+# Can be run as part of regression or interactively
+#
+#########################################################
+
+formal::clean compile_rtl_fv liblist formal_only
+
+
+
+
+formal_only::
+	@echo "Starting to execute target $@";
+	${DISABLE_VERDI_PLI};qformal -c -licq -od ${FORMAL_RESULTS} -do "configure license queue on;\
+	${DO_FORMAL_DIRECTIVES}; \
+	formal compile -d ${FORMAL_DUT} -f ${LIBLIST} ${DO_FORMAL_GENERICS} -work ${FORMAL_DESIGN_LIB} ${FORMAL_BIND_MODULE}; \
+	formal verify ${DO_FORMAL_INIT} -effort ${FORMAL_EFFORT}; \
+	formal generate ucdb ${FORMAL_UCDB}; \
 	exit"
 
 
