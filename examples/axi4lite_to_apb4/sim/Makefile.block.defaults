@@ -1,0 +1,23 @@
+ifeq (${VHDL},1)
+DUT_FILELIST = ${SRCHOME}/${BLOCKNAME}/${RTLDIR}/rtl.vhd.files
+else
+DUT_FILELIST = ${SRCHOME}/${BLOCKNAME}/${RTLDIR}/rtl.vl.files
+endif
+
+QVIP_TARGETS=axi4 apb3
+
+SEND_EMAIL=0
+XLSFILE=${QME_HOME}/examples/${BLOCKNAME}/docs/axi4lite_to_apb4_registers.xls
+
+# Convert xls to csv
+convert2csv:
+	ruvm_xls2csv.pl ${XLSFILE}
+
+# This is using Questa Register Assistant
+generate_rm:
+	${QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin regs.csv blocks.csv maps.csv -block ${BLOCKNAME}_registers -uvmout ${QME_PROJECT_HOME}/${BLOCKNAME}/tb/registers/${BLOCKNAME}_regs_pkg.sv 
+
+precompile_tb::convert2csv generate_rm
+
+
+

@@ -573,15 +573,25 @@ get_generics_only:
 
 autocheck::clean compile_rtl_fv liblist autocheck_only
 
+#autocheck_only::
+#	${DISABLE_VERDI_PLI}; \
+#	qverify -c -licq -od ${AUTOCHECK_RESULTS} -do "configure license queue on; \
+#	${AUTOCHECK_DO_COMMAND}; \
+#	autocheck compile -d ${AUTOCHECK_DUT}  \
+#	-work ${AUTOCHECK_DESIGN_LIB} \
+#	-f ${LIBLIST} ${AUTOCHECK_GENERICS} ${AUTOCHECK_EXTRA_COMP_ARGS}; \
+#	autocheck verify -effort ${AUTOCHECK_EFFORT} -timeout ${AUTOCHECK_TIMEOUT} ${AUTOCHECK_EXTRA_VERIFY_ARGS};\
+#	exit"
+#
+
 autocheck_only::
 	${DISABLE_VERDI_PLI}; \
-	qverify -c -licq -od ${AUTOCHECK_RESULTS} -do "configure license queue on; \
+	qautocheck -c -licq -od ${AUTOCHECK_RESULTS} -do "configure license queue on; \
 	${AUTOCHECK_DO_COMMAND}; \
-	autocheck compile -d ${AUTOCHECK_DUT}  \
+	autocheck run -d ${AUTOCHECK_DUT} \
 	-work ${AUTOCHECK_DESIGN_LIB} \
-	-f ${LIBLIST} ${AUTOCHECK_GENERICS} ${AUTOCHECK_EXTRA_COMP_ARGS}; \
-	autocheck verify -effort ${AUTOCHECK_EFFORT} -timeout ${AUTOCHECK_TIMEOUT} ${AUTOCHECK_EXTRA_VERIFY_ARGS};\
-	exit"
+	-effort ${AUTOCHECK_EFFORT} -f ${LIBLIST}  ${AUTOCHECK_GENERICS} ${AUTOCHECK_EXTRA_ARGS}; exit"
+
 
 #########################################################
 # Run Questa Covercheck

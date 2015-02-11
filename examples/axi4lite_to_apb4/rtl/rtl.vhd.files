@@ -1,0 +1,18 @@
+
+@library axi4lite_to_apb4_lib
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/components.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/qft_lib.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/pinmux.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/apb_master_sc.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/apb_access_arb.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/apb_master_mc.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/master_interface.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/axi4lite_slave.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/dp_sram.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/dp_fifo.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/fifos.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/apb_slave_int.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/config_status_reg.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/csr_interface_apb.vhd:-2008
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vhdl/axi4lite_to_apb4.vhd:-2008
+

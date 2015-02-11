@@ -1,0 +1,23 @@
+@library std_cells_lib
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/qft_lib.v
+@library axi4lite_to_apb4_lib
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/axi4lite_to_apb4.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/master_interface.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/pinmux.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/apb_master_sc.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/apb_master_mc.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/apb_access_arb.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/apb_slave_int.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/axi4lite_slave.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/dp_sram.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/dp_fifo.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/fifos.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/apb_stat_reg.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/axi_stat_reg.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/master_config_reg.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/sample_config_reg.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/slave_config_reg.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/sample_reg.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/config_status_reg.v:-sv
+$QME_PROJECT_HOME/axi4lite_to_apb4/rtl/vlog/csr_interface_apb.v:-sv
+
