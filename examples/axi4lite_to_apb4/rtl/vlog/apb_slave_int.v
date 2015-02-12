@@ -16,7 +16,7 @@
 // 
 // ************************************************************************
 
-module apb_slave_int (
+module apb_slave_int #(parameter BLOCK_START_ADDRESS=32'h0000_0000) (
 // APB Interface Signals
 input             PSELx,
 input             PCLK,
@@ -29,10 +29,10 @@ output     [31:0] PRDATA,
 
 //internal Signals
 output        wen,
-output [31:0] waddr,
+output [11:0] waddr,
 output [31:0] wdata,
 output        ren,
-output [31:0] raddr,
+output [11:0] raddr,
 input  [31:0] rdata
 );
 
@@ -41,6 +41,13 @@ reg pselx_d;
 reg penable_d;
 reg pwrite_d;
 
+   wire [31:0] masked_address;
+   
+   assign masked_address = (PADDR & 32'hFFFFF000);
+   assign address_ok = (masked_address ==  BLOCK_START_ADDRESS);
+   
+
+   
 // Convert APB signals to config/status bus 
 always @(posedge PCLK or negedge PRESETn)
 if (!PRESETn) begin
@@ -54,11 +61,17 @@ end else begin
 
 end
 
-assign wen    = (pselx_d && PSELx && !penable_d && PENABLE &&  pwrite_d &&  PWRITE);
-assign waddr  = PADDR;
+   assign wen = PSELx && PENABLE && PWRITE && address_ok;
+   assign ren = PSELx && PENABLE && ~PWRITE && address_ok;   
+
+   
+
+//assign wen    = (pselx_d && PSELx && !penable_d && PENABLE &&  pwrite_d &&  PWRITE) & address_ok;
+//assign ren    = (pselx_d && PSELx && !penable_d && PENABLE && !pwrite_d && !PWRITE) & address_ok;
+assign waddr  = PADDR[11:0];
 assign wdata  = PWDATA;
-assign ren    = (pselx_d && PSELx && !penable_d && PENABLE && !pwrite_d && !PWRITE);
-assign raddr  = PADDR;
+
+assign raddr  = PADDR[11:0];
 assign PRDATA = rdata;
 
 endmodule

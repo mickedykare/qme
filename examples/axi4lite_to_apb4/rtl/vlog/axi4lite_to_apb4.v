@@ -18,9 +18,8 @@
 module axi4lite_to_apb4 #(
 			  parameter AW  = 32,
 			  parameter DW  = 32, 
-			  parameter USE_1CLK=1'b0
-
-
+			  parameter USE_1CLK=1'b0,
+			  parameter BLOCK_START_ADDRESS=32'h0000_0000
 )
 (
 // APB4 Master Interface Signals
@@ -177,7 +176,7 @@ master_interface #(.AW(AW), .DW(DW)) u_master_interface (
 );
 
 
-csr_interface_apb #(.AW(AW), .DW(DW)) u_csr_interface_apb (
+csr_interface_apb #(.AW(AW), .DW(DW),.BLOCK_START_ADDRESS(BLOCK_START_ADDRESS)) u_csr_interface_apb (
 // APB2 Interface Signals
 .PSELx(PSELx_i_csr),
 .PCLK(PCLK_i_csr),

@@ -8,7 +8,7 @@
 // File            : axi4lite_to_apb4_regs_pkg.sv
 //----------------------------------------------------------------------
 // Created by      : mikaela
-// Creation Date   : 2/11/15 8:20 PM
+// Creation Date   : 2/12/15 1:00 AM
 //----------------------------------------------------------------------
 // Title           : registers
 //
@@ -30,20 +30,20 @@ package axi4lite_to_apb4_regs_pkg;
 
 
    //--------------------------------------------------------------------
-   // Class: AXI4LITE_TO_APB4_SAMPLE_REG
+   // Class: axi4lite_to_apb4_sample_reg
    // 
    // Register of samples transactions
    //--------------------------------------------------------------------
 
-   class AXI4LITE_TO_APB4_SAMPLE_REG extends uvm_reg;
-      `uvm_object_utils(AXI4LITE_TO_APB4_SAMPLE_REG)
+   class axi4lite_to_apb4_sample_reg extends uvm_reg;
+      `uvm_object_utils(axi4lite_to_apb4_sample_reg)
 
-      uvm_reg_field REG; // Sample data
+      uvm_reg_field data; // Sample data
 
 
       // Function: new
       // 
-      function new(string name = "AXI4LITE_TO_APB4_SAMPLE_REG");
+      function new(string name = "axi4lite_to_apb4_sample_reg");
          super.new(name, 32, UVM_NO_COVERAGE);
       endfunction
 
@@ -51,29 +51,29 @@ package axi4lite_to_apb4_regs_pkg;
       // Function: build
       // 
       virtual function void build();
-         REG = uvm_reg_field::type_id::create("REG");
+         data = uvm_reg_field::type_id::create("data");
 
-         REG.configure(this, 32, 0, "RO", 0, 32'h00000000, 1, 0, 1);
+         data.configure(this, 32, 0, "RO", 0, 32'h00000000, 1, 0, 1);
       endfunction
    endclass
 
 
 
    //--------------------------------------------------------------------
-   // Class: AXI4LITE_TO_APB4_MST_CONFIG_REG
+   // Class: axi4lite_to_apb4_mst_config_reg
    // 
    // Master config register
    //--------------------------------------------------------------------
 
-   class AXI4LITE_TO_APB4_MST_CONFIG_REG extends uvm_reg;
-      `uvm_object_utils(AXI4LITE_TO_APB4_MST_CONFIG_REG)
+   class axi4lite_to_apb4_mst_config_reg extends uvm_reg;
+      `uvm_object_utils(axi4lite_to_apb4_mst_config_reg)
 
-      rand uvm_reg_field WR_RD_RATIO; 
+      rand uvm_reg_field wr_rd_ratio; 
 
 
       // Function: new
       // 
-      function new(string name = "AXI4LITE_TO_APB4_MST_CONFIG_REG");
+      function new(string name = "axi4lite_to_apb4_mst_config_reg");
          super.new(name, 32, UVM_NO_COVERAGE);
       endfunction
 
@@ -81,44 +81,44 @@ package axi4lite_to_apb4_regs_pkg;
       // Function: build
       // 
       virtual function void build();
-         WR_RD_RATIO = uvm_reg_field::type_id::create("WR_RD_RATIO");
+         wr_rd_ratio = uvm_reg_field::type_id::create("wr_rd_ratio");
 
-         WR_RD_RATIO.configure(this, 3, 0, "RW", 0, 3'b000, 1, 1, 0);
+         wr_rd_ratio.configure(this, 3, 0, "RW", 0, 3'b000, 1, 1, 0);
       endfunction
    endclass
 
 
 
    //--------------------------------------------------------------------
-   // Class: AXI4LITE_TO_APB4_SAMPLE_CONFIG_REG
+   // Class: axi4lite_to_apb4_sample_config_reg
    // 
    // Sample config register
    //--------------------------------------------------------------------
 
-   class AXI4LITE_TO_APB4_SAMPLE_CONFIG_REG extends uvm_reg;
-      `uvm_object_utils(AXI4LITE_TO_APB4_SAMPLE_CONFIG_REG)
+   class axi4lite_to_apb4_sample_config_reg extends uvm_reg;
+      `uvm_object_utils(axi4lite_to_apb4_sample_config_reg)
 
-      rand uvm_reg_field WADDR_ND; // sample waddr normal data
-      rand uvm_reg_field WADDR_NI; // sample waddr normal instr
-      rand uvm_reg_field WADDR_PD; // sample waddr privileged data
-      rand uvm_reg_field WADDR_PI; // sample waddr privileged instr
-      rand uvm_reg_field WDATA_ND; // sample wdata normal data
-      rand uvm_reg_field WDATA_NI; // sample wdata normal instr
-      rand uvm_reg_field WDATA_PD; // sample wdata privileged data
-      rand uvm_reg_field WDATA_PI; // sample wdata privileged instr
-      rand uvm_reg_field RADDR_ND; // sample raddr normal data
-      rand uvm_reg_field RADDR_NI; // sample raddr normal instr
-      rand uvm_reg_field RADDR_PD; // sample raddr privileged data
-      rand uvm_reg_field RADDR_PI; // sample raddr privileged instr
-      rand uvm_reg_field RDATA_ND; // sample rdata normal data
-      rand uvm_reg_field RDATA_NI; // sample rdata normal instr
-      rand uvm_reg_field RDATA_PD; // sample rdata privileged data
-      rand uvm_reg_field RDATA_PI; // sample rdata privileged instr
+      rand uvm_reg_field waddr_nd; // sample waddr normal data
+      rand uvm_reg_field waddr_ni; // sample waddr normal instr
+      rand uvm_reg_field waddr_pd; // sample waddr privileged data
+      rand uvm_reg_field waddr_pi; // sample waddr privileged instr
+      rand uvm_reg_field wdata_nd; // sample wdata normal data
+      rand uvm_reg_field wdata_ni; // sample wdata normal instr
+      rand uvm_reg_field wdata_pd; // sample wdata privileged data
+      rand uvm_reg_field wdata_pi; // sample wdata privileged instr
+      rand uvm_reg_field raddr_nd; // sample raddr normal data
+      rand uvm_reg_field raddr_ni; // sample raddr normal instr
+      rand uvm_reg_field raddr_pd; // sample raddr privileged data
+      rand uvm_reg_field raddr_pi; // sample raddr privileged instr
+      rand uvm_reg_field rdata_nd; // sample rdata normal data
+      rand uvm_reg_field rdata_ni; // sample rdata normal instr
+      rand uvm_reg_field rdata_pd; // sample rdata privileged data
+      rand uvm_reg_field rdata_pi; // sample rdata privileged instr
 
 
       // Function: new
       // 
-      function new(string name = "AXI4LITE_TO_APB4_SAMPLE_CONFIG_REG");
+      function new(string name = "axi4lite_to_apb4_sample_config_reg");
          super.new(name, 32, UVM_NO_COVERAGE);
       endfunction
 
@@ -126,60 +126,60 @@ package axi4lite_to_apb4_regs_pkg;
       // Function: build
       // 
       virtual function void build();
-         WADDR_ND = uvm_reg_field::type_id::create("WADDR_ND");
-         WADDR_NI = uvm_reg_field::type_id::create("WADDR_NI");
-         WADDR_PD = uvm_reg_field::type_id::create("WADDR_PD");
-         WADDR_PI = uvm_reg_field::type_id::create("WADDR_PI");
-         WDATA_ND = uvm_reg_field::type_id::create("WDATA_ND");
-         WDATA_NI = uvm_reg_field::type_id::create("WDATA_NI");
-         WDATA_PD = uvm_reg_field::type_id::create("WDATA_PD");
-         WDATA_PI = uvm_reg_field::type_id::create("WDATA_PI");
-         RADDR_ND = uvm_reg_field::type_id::create("RADDR_ND");
-         RADDR_NI = uvm_reg_field::type_id::create("RADDR_NI");
-         RADDR_PD = uvm_reg_field::type_id::create("RADDR_PD");
-         RADDR_PI = uvm_reg_field::type_id::create("RADDR_PI");
-         RDATA_ND = uvm_reg_field::type_id::create("RDATA_ND");
-         RDATA_NI = uvm_reg_field::type_id::create("RDATA_NI");
-         RDATA_PD = uvm_reg_field::type_id::create("RDATA_PD");
-         RDATA_PI = uvm_reg_field::type_id::create("RDATA_PI");
+         waddr_nd = uvm_reg_field::type_id::create("waddr_nd");
+         waddr_ni = uvm_reg_field::type_id::create("waddr_ni");
+         waddr_pd = uvm_reg_field::type_id::create("waddr_pd");
+         waddr_pi = uvm_reg_field::type_id::create("waddr_pi");
+         wdata_nd = uvm_reg_field::type_id::create("wdata_nd");
+         wdata_ni = uvm_reg_field::type_id::create("wdata_ni");
+         wdata_pd = uvm_reg_field::type_id::create("wdata_pd");
+         wdata_pi = uvm_reg_field::type_id::create("wdata_pi");
+         raddr_nd = uvm_reg_field::type_id::create("raddr_nd");
+         raddr_ni = uvm_reg_field::type_id::create("raddr_ni");
+         raddr_pd = uvm_reg_field::type_id::create("raddr_pd");
+         raddr_pi = uvm_reg_field::type_id::create("raddr_pi");
+         rdata_nd = uvm_reg_field::type_id::create("rdata_nd");
+         rdata_ni = uvm_reg_field::type_id::create("rdata_ni");
+         rdata_pd = uvm_reg_field::type_id::create("rdata_pd");
+         rdata_pi = uvm_reg_field::type_id::create("rdata_pi");
 
-         WADDR_ND.configure(this, 1, 31, "RW", 0, 1'b0, 1, 1, 0);
-         WADDR_NI.configure(this, 1, 30, "RW", 0, 1'b0, 1, 1, 0);
-         WADDR_PD.configure(this, 1, 29, "RW", 0, 1'b0, 1, 1, 0);
-         WADDR_PI.configure(this, 1, 28, "RW", 0, 1'b0, 1, 1, 0);
-         WDATA_ND.configure(this, 1, 27, "RW", 0, 1'b0, 1, 1, 0);
-         WDATA_NI.configure(this, 1, 26, "RW", 0, 1'b0, 1, 1, 0);
-         WDATA_PD.configure(this, 1, 25, "RW", 0, 1'b0, 1, 1, 0);
-         WDATA_PI.configure(this, 1, 24, "RW", 0, 1'b0, 1, 1, 0);
-         RADDR_ND.configure(this, 1, 23, "RW", 0, 1'b0, 1, 1, 0);
-         RADDR_NI.configure(this, 1, 22, "RW", 0, 1'b0, 1, 1, 0);
-         RADDR_PD.configure(this, 1, 21, "RW", 0, 1'b0, 1, 1, 0);
-         RADDR_PI.configure(this, 1, 20, "RW", 0, 1'b0, 1, 1, 0);
-         RDATA_ND.configure(this, 1, 19, "RW", 0, 1'b0, 1, 1, 0);
-         RDATA_NI.configure(this, 1, 18, "RW", 0, 1'b0, 1, 1, 0);
-         RDATA_PD.configure(this, 1, 17, "RW", 0, 1'b0, 1, 1, 0);
-         RDATA_PI.configure(this, 1, 16, "RW", 0, 1'b0, 1, 1, 0);
+         waddr_nd.configure(this, 1, 31, "RW", 0, 1'b0, 1, 1, 0);
+         waddr_ni.configure(this, 1, 30, "RW", 0, 1'b0, 1, 1, 0);
+         waddr_pd.configure(this, 1, 29, "RW", 0, 1'b0, 1, 1, 0);
+         waddr_pi.configure(this, 1, 28, "RW", 0, 1'b0, 1, 1, 0);
+         wdata_nd.configure(this, 1, 27, "RW", 0, 1'b0, 1, 1, 0);
+         wdata_ni.configure(this, 1, 26, "RW", 0, 1'b0, 1, 1, 0);
+         wdata_pd.configure(this, 1, 25, "RW", 0, 1'b0, 1, 1, 0);
+         wdata_pi.configure(this, 1, 24, "RW", 0, 1'b0, 1, 1, 0);
+         raddr_nd.configure(this, 1, 23, "RW", 0, 1'b0, 1, 1, 0);
+         raddr_ni.configure(this, 1, 22, "RW", 0, 1'b0, 1, 1, 0);
+         raddr_pd.configure(this, 1, 21, "RW", 0, 1'b0, 1, 1, 0);
+         raddr_pi.configure(this, 1, 20, "RW", 0, 1'b0, 1, 1, 0);
+         rdata_nd.configure(this, 1, 19, "RW", 0, 1'b0, 1, 1, 0);
+         rdata_ni.configure(this, 1, 18, "RW", 0, 1'b0, 1, 1, 0);
+         rdata_pd.configure(this, 1, 17, "RW", 0, 1'b0, 1, 1, 0);
+         rdata_pi.configure(this, 1, 16, "RW", 0, 1'b0, 1, 1, 0);
       endfunction
    endclass
 
 
 
    //--------------------------------------------------------------------
-   // Class: AXI4LITE_TO_APB4_AXI_STAT_REG
+   // Class: axi4lite_to_apb4_axi_stat_reg
    // 
    // AXI Status register
    //--------------------------------------------------------------------
 
-   class AXI4LITE_TO_APB4_AXI_STAT_REG extends uvm_reg;
-      `uvm_object_utils(AXI4LITE_TO_APB4_AXI_STAT_REG)
+   class axi4lite_to_apb4_axi_stat_reg extends uvm_reg;
+      `uvm_object_utils(axi4lite_to_apb4_axi_stat_reg)
 
-      uvm_reg_field RD_CNT; 
-      uvm_reg_field WR_CNT; 
+      uvm_reg_field rd_cnt; 
+      uvm_reg_field wr_cnt; 
 
 
       // Function: new
       // 
-      function new(string name = "AXI4LITE_TO_APB4_AXI_STAT_REG");
+      function new(string name = "axi4lite_to_apb4_axi_stat_reg");
          super.new(name, 32, UVM_NO_COVERAGE);
       endfunction
 
@@ -187,62 +187,32 @@ package axi4lite_to_apb4_regs_pkg;
       // Function: build
       // 
       virtual function void build();
-         RD_CNT = uvm_reg_field::type_id::create("RD_CNT");
-         WR_CNT = uvm_reg_field::type_id::create("WR_CNT");
+         rd_cnt = uvm_reg_field::type_id::create("rd_cnt");
+         wr_cnt = uvm_reg_field::type_id::create("wr_cnt");
 
-         RD_CNT.configure(this, 10, 10, "RC", 0, 10'b0000000000, 1, 0, 0);
-         WR_CNT.configure(this, 10, 0, "RC", 0, 10'b0000000000, 1, 0, 0);
+         rd_cnt.configure(this, 10, 10, "RC", 0, 10'b0000000000, 1, 0, 0);
+         wr_cnt.configure(this, 10, 0, "RC", 0, 10'b0000000000, 1, 0, 0);
       endfunction
    endclass
 
 
 
    //--------------------------------------------------------------------
-   // Class: AXI4LITE_TO_APB4_SLV_CONFIG_REG
-   // 
-   // Slave config register
-   //--------------------------------------------------------------------
-
-   class AXI4LITE_TO_APB4_SLV_CONFIG_REG extends uvm_reg;
-      `uvm_object_utils(AXI4LITE_TO_APB4_SLV_CONFIG_REG)
-
-      rand uvm_reg_field USE_MERR_RESP; 
-
-
-      // Function: new
-      // 
-      function new(string name = "AXI4LITE_TO_APB4_SLV_CONFIG_REG");
-         super.new(name, 32, UVM_NO_COVERAGE);
-      endfunction
-
-
-      // Function: build
-      // 
-      virtual function void build();
-         USE_MERR_RESP = uvm_reg_field::type_id::create("USE_MERR_RESP");
-
-         USE_MERR_RESP.configure(this, 3, 0, "RW", 0, 3'b000, 1, 1, 0);
-      endfunction
-   endclass
-
-
-
-   //--------------------------------------------------------------------
-   // Class: AXI4LITE_TO_APB4_APB_STAT_REG
+   // Class: axi4lite_to_apb4_apb_stat_reg
    // 
    // APB Status register
    //--------------------------------------------------------------------
 
-   class AXI4LITE_TO_APB4_APB_STAT_REG extends uvm_reg;
-      `uvm_object_utils(AXI4LITE_TO_APB4_APB_STAT_REG)
+   class axi4lite_to_apb4_apb_stat_reg extends uvm_reg;
+      `uvm_object_utils(axi4lite_to_apb4_apb_stat_reg)
 
-      uvm_reg_field RD_CNT; 
-      uvm_reg_field WR_CNT; 
+      uvm_reg_field rd_cnt; 
+      uvm_reg_field wr_cnt; 
 
 
       // Function: new
       // 
-      function new(string name = "AXI4LITE_TO_APB4_APB_STAT_REG");
+      function new(string name = "axi4lite_to_apb4_apb_stat_reg");
          super.new(name, 32, UVM_NO_COVERAGE);
       endfunction
 
@@ -250,11 +220,41 @@ package axi4lite_to_apb4_regs_pkg;
       // Function: build
       // 
       virtual function void build();
-         RD_CNT = uvm_reg_field::type_id::create("RD_CNT");
-         WR_CNT = uvm_reg_field::type_id::create("WR_CNT");
+         rd_cnt = uvm_reg_field::type_id::create("rd_cnt");
+         wr_cnt = uvm_reg_field::type_id::create("wr_cnt");
 
-         RD_CNT.configure(this, 10, 10, "RC", 0, 10'b0000000000, 1, 0, 0);
-         WR_CNT.configure(this, 10, 0, "RC", 0, 10'b0000000000, 1, 0, 0);
+         rd_cnt.configure(this, 10, 10, "RC", 0, 10'b0000000000, 1, 0, 0);
+         wr_cnt.configure(this, 10, 0, "RC", 0, 10'b0000000000, 1, 0, 0);
+      endfunction
+   endclass
+
+
+
+   //--------------------------------------------------------------------
+   // Class: axi4lite_to_apb4_slv_config_reg
+   // 
+   // Slave config register
+   //--------------------------------------------------------------------
+
+   class axi4lite_to_apb4_slv_config_reg extends uvm_reg;
+      `uvm_object_utils(axi4lite_to_apb4_slv_config_reg)
+
+      rand uvm_reg_field use_merr_resp; 
+
+
+      // Function: new
+      // 
+      function new(string name = "axi4lite_to_apb4_slv_config_reg");
+         super.new(name, 32, UVM_NO_COVERAGE);
+      endfunction
+
+
+      // Function: build
+      // 
+      virtual function void build();
+         use_merr_resp = uvm_reg_field::type_id::create("use_merr_resp");
+
+         use_merr_resp.configure(this, 1, 0, "RW", 0, 1'b0, 1, 1, 0);
       endfunction
    endclass
 
@@ -280,12 +280,12 @@ package axi4lite_to_apb4_regs_pkg;
          option.name = name; 
 
          ADDR: coverpoint addr {
-            bins AXI4LITE_TO_APB4_AXI_STAT = {'h0};
-            bins AXI4LITE_TO_APB4_APB_STAT = {'h4};
-            bins AXI4LITE_TO_APB4_SLV_CONFIG = {'h10};
-            bins AXI4LITE_TO_APB4_MST_CONFIG = {'h20};
-            bins AXI4LITE_TO_APB4_SAMPLE_CONFIG = {'hb60};
-            bins AXI4LITE_TO_APB4_SAMPLE = {'hbac};
+            bins axi4lite_to_apb4_axi_stat = {'h0};
+            bins axi4lite_to_apb4_apb_stat = {'h4};
+            bins axi4lite_to_apb4_slv_config = {'h10};
+            bins axi4lite_to_apb4_mst_config = {'h20};
+            bins axi4lite_to_apb4_sample_config = {'hb60};
+            bins axi4lite_to_apb4_sample = {'hbac};
          }
 
          RW: coverpoint is_read {
@@ -318,12 +318,12 @@ package axi4lite_to_apb4_regs_pkg;
    class axi4lite_to_apb4_registers extends uvm_reg_block;
       `uvm_object_utils(axi4lite_to_apb4_registers)
 
-      rand AXI4LITE_TO_APB4_AXI_STAT_REG AXI4LITE_TO_APB4_AXI_STAT; // AXI Status register
-      rand AXI4LITE_TO_APB4_APB_STAT_REG AXI4LITE_TO_APB4_APB_STAT; // APB Status register
-      rand AXI4LITE_TO_APB4_SLV_CONFIG_REG AXI4LITE_TO_APB4_SLV_CONFIG; // Slave config register
-      rand AXI4LITE_TO_APB4_MST_CONFIG_REG AXI4LITE_TO_APB4_MST_CONFIG; // Master config register
-      rand AXI4LITE_TO_APB4_SAMPLE_CONFIG_REG AXI4LITE_TO_APB4_SAMPLE_CONFIG; // Sample config register
-      rand AXI4LITE_TO_APB4_SAMPLE_REG AXI4LITE_TO_APB4_SAMPLE; // Register of samples transactions
+      rand axi4lite_to_apb4_axi_stat_reg axi4lite_to_apb4_axi_stat; // AXI Status register
+      rand axi4lite_to_apb4_apb_stat_reg axi4lite_to_apb4_apb_stat; // APB Status register
+      rand axi4lite_to_apb4_slv_config_reg axi4lite_to_apb4_slv_config; // Slave config register
+      rand axi4lite_to_apb4_mst_config_reg axi4lite_to_apb4_mst_config; // Master config register
+      rand axi4lite_to_apb4_sample_config_reg axi4lite_to_apb4_sample_config; // Sample config register
+      rand axi4lite_to_apb4_sample_reg axi4lite_to_apb4_sample; // Register of samples transactions
 
       uvm_reg_map axi4lite_to_apb4_register_map; 
       axi4lite_to_apb4_registers_axi4lite_to_apb4_register_map_coverage axi4lite_to_apb4_register_map_cg;
@@ -347,39 +347,39 @@ package axi4lite_to_apb4_regs_pkg;
             axi4lite_to_apb4_register_map_cg.ra_cov.set_inst_name(this.get_full_name());
             void'(set_coverage(UVM_CVR_ADDR_MAP));
          end
-         AXI4LITE_TO_APB4_AXI_STAT = AXI4LITE_TO_APB4_AXI_STAT_REG::type_id::create("AXI4LITE_TO_APB4_AXI_STAT");
-         AXI4LITE_TO_APB4_AXI_STAT.configure(this);
-         AXI4LITE_TO_APB4_AXI_STAT.build();
+         axi4lite_to_apb4_axi_stat = axi4lite_to_apb4_axi_stat_reg::type_id::create("axi4lite_to_apb4_axi_stat");
+         axi4lite_to_apb4_axi_stat.configure(this);
+         axi4lite_to_apb4_axi_stat.build();
 
-         AXI4LITE_TO_APB4_APB_STAT = AXI4LITE_TO_APB4_APB_STAT_REG::type_id::create("AXI4LITE_TO_APB4_APB_STAT");
-         AXI4LITE_TO_APB4_APB_STAT.configure(this);
-         AXI4LITE_TO_APB4_APB_STAT.build();
+         axi4lite_to_apb4_apb_stat = axi4lite_to_apb4_apb_stat_reg::type_id::create("axi4lite_to_apb4_apb_stat");
+         axi4lite_to_apb4_apb_stat.configure(this);
+         axi4lite_to_apb4_apb_stat.build();
 
-         AXI4LITE_TO_APB4_SLV_CONFIG = AXI4LITE_TO_APB4_SLV_CONFIG_REG::type_id::create("AXI4LITE_TO_APB4_SLV_CONFIG");
-         AXI4LITE_TO_APB4_SLV_CONFIG.configure(this);
-         AXI4LITE_TO_APB4_SLV_CONFIG.build();
+         axi4lite_to_apb4_slv_config = axi4lite_to_apb4_slv_config_reg::type_id::create("axi4lite_to_apb4_slv_config");
+         axi4lite_to_apb4_slv_config.configure(this);
+         axi4lite_to_apb4_slv_config.build();
 
-         AXI4LITE_TO_APB4_MST_CONFIG = AXI4LITE_TO_APB4_MST_CONFIG_REG::type_id::create("AXI4LITE_TO_APB4_MST_CONFIG");
-         AXI4LITE_TO_APB4_MST_CONFIG.configure(this);
-         AXI4LITE_TO_APB4_MST_CONFIG.build();
+         axi4lite_to_apb4_mst_config = axi4lite_to_apb4_mst_config_reg::type_id::create("axi4lite_to_apb4_mst_config");
+         axi4lite_to_apb4_mst_config.configure(this);
+         axi4lite_to_apb4_mst_config.build();
 
-         AXI4LITE_TO_APB4_SAMPLE_CONFIG = AXI4LITE_TO_APB4_SAMPLE_CONFIG_REG::type_id::create("AXI4LITE_TO_APB4_SAMPLE_CONFIG");
-         AXI4LITE_TO_APB4_SAMPLE_CONFIG.configure(this);
-         AXI4LITE_TO_APB4_SAMPLE_CONFIG.build();
+         axi4lite_to_apb4_sample_config = axi4lite_to_apb4_sample_config_reg::type_id::create("axi4lite_to_apb4_sample_config");
+         axi4lite_to_apb4_sample_config.configure(this);
+         axi4lite_to_apb4_sample_config.build();
 
-         AXI4LITE_TO_APB4_SAMPLE = AXI4LITE_TO_APB4_SAMPLE_REG::type_id::create("AXI4LITE_TO_APB4_SAMPLE");
-         AXI4LITE_TO_APB4_SAMPLE.configure(this);
-         AXI4LITE_TO_APB4_SAMPLE.build();
+         axi4lite_to_apb4_sample = axi4lite_to_apb4_sample_reg::type_id::create("axi4lite_to_apb4_sample");
+         axi4lite_to_apb4_sample.configure(this);
+         axi4lite_to_apb4_sample.build();
 
          axi4lite_to_apb4_register_map = create_map("axi4lite_to_apb4_register_map", 'h0, 4, UVM_LITTLE_ENDIAN);
          default_map = axi4lite_to_apb4_register_map;
 
-         axi4lite_to_apb4_register_map.add_reg(AXI4LITE_TO_APB4_AXI_STAT, 'h0, "RW");
-         axi4lite_to_apb4_register_map.add_reg(AXI4LITE_TO_APB4_APB_STAT, 'h4, "RW");
-         axi4lite_to_apb4_register_map.add_reg(AXI4LITE_TO_APB4_SLV_CONFIG, 'h10, "RW");
-         axi4lite_to_apb4_register_map.add_reg(AXI4LITE_TO_APB4_MST_CONFIG, 'h20, "RW");
-         axi4lite_to_apb4_register_map.add_reg(AXI4LITE_TO_APB4_SAMPLE_CONFIG, 'hb60, "RW");
-         axi4lite_to_apb4_register_map.add_reg(AXI4LITE_TO_APB4_SAMPLE, 'hbac, "RW");
+         axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_axi_stat, 'h0, "RW");
+         axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_apb_stat, 'h4, "RW");
+         axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_slv_config, 'h10, "RW");
+         axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_mst_config, 'h20, "RW");
+         axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_sample_config, 'hb60, "RW");
+         axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_sample, 'hbac, "RW");
 
          lock_model();
       endfunction

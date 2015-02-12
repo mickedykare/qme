@@ -17,227 +17,322 @@
 
 module csr_interface_apb #(
 parameter AW  = 32,
-parameter DW  = 32 
-)
-(
-// APB Interface Signals
-  input           PSELx,
-  input           PCLK,
-  input           PRESETn,
-  input           PENABLE,
-  input  [31:0]   PADDR,
-  input           PWRITE,
-  input  [31:0]   PWDATA,
-  output [31:0]   PRDATA,
+parameter DW  = 32,
+parameter BLOCK_START_ADDRESS=32'h0000_0000			   
+  )
+   (
+    // APB Interface Signals
+    input           PSELx,
+    input           PCLK,
+    input           PRESETn,
+    input           PENABLE,
+    input  [31:0]   PADDR,
+    input           PWRITE,
+    input  [31:0]   PWDATA,
+    output [31:0]   PRDATA,
 
-// internal signals
-  input           axi_rd,
-  input           axi_wr,
-  input           mstr_rd,
-  input           mstr_wr,
-  output [2:0]    wr_rd_ratio,
-  output          use_merr_resp,
-  input  [AW+2:0] wa,
-  input           wa_vld,
-  input  [DW-1:0] wd,
-  input           wd_vld,
-  input  [AW+2:0] ra,
-  input           ra_vld,
-  input  [DW-1:0] rd,
-  input           rd_vld,
-  input           mclk,
-  input           mrstn
-);
+    // internal signals
+    input           axi_rd,
+    input           axi_wr,
+    input           mstr_rd,
+    input           mstr_wr,
+    output [2:0]    wr_rd_ratio,
+    output          use_merr_resp,
+    input  [AW+2:0] wa,
+    input           wa_vld,
+    input  [DW-1:0] wd,
+    input           wd_vld,
+    input  [AW+2:0] ra,
+    input           ra_vld,
+    input  [DW-1:0] rd,
+    input           rd_vld,
+    input           mclk,
+    input           mrstn
+    );
 
 
-// signal definitions
+   // signal definitions
 `include "defines.h"
-samp_st        cstate, nstate;
-wire           w_en;
-wire           r_en;
-wire [31:0]    w_addr; 
-wire [31:0]    w_data; 
-wire [31:0]    r_addr; 
-wire [31:0]    r_data;
-wire [31:0]    sample_dat;
-wire           sample_reg_ld;
-wire           sample_reg_rd;
-wire [15:0]    sample_cmd;
-wire           sf_fe, sf_ff;
-wire           sf_push, sf_pop;
-reg  [31:0]    sf_wdata; 
-wire           push_wa_n_d;
-wire           push_wa_n_i;
-wire           push_wa_p_d;
-wire           push_wa_p_i;
-wire           push_wa;
-wire           push_wd_n_d;
-wire           push_wd_n_i;
-wire           push_wd_p_d;
-wire           push_wd_p_i;
-wire           push_wd;
-wire           push_ra_n_d;
-wire           push_ra_n_i;
-wire           push_ra_p_d;
-wire           push_ra_p_i;
-wire           push_ra;
-wire           push_rd_n_d;
-wire           push_rd_n_i;
-wire           push_rd_p_d;
-wire           push_rd_p_i;
-wire           push_rd;
-reg [2:0]      ra_d;
+   samp_st        cstate, nstate;
+   wire 	    w_en;
+   wire 	    r_en;
+   wire [11:0] 	    w_addr; 
+   wire [31:0] 	    w_data; 
+   wire [11:0] 	    r_addr; 
+   wire [31:0] 	    r_data;
+   wire [31:0] 	    sample_dat;
+   wire 	    sample_reg_ld;
+   wire 	    sample_reg_rd;
+   wire [15:0] 	    sample_cmd;
+   wire 	    sf_fe, sf_ff;
+   wire 	    sf_push, sf_pop;
+   reg [31:0] 	    sf_wdata; 
+   wire 	    push_wa_n_d;
+   wire 	    push_wa_n_i;
+   wire 	    push_wa_p_d;
+   wire 	    push_wa_p_i;
+   wire 	    push_wa;
+   wire 	    push_wd_n_d;
+   wire 	    push_wd_n_i;
+   wire 	    push_wd_p_d;
+   wire 	    push_wd_p_i;
+   wire 	    push_wd;
+   wire 	    push_ra_n_d;
+   wire 	    push_ra_n_i;
+   wire 	    push_ra_p_d;
+   wire 	    push_ra_p_i;
+   wire 	    push_ra;
+   wire 	    push_rd_n_d;
+   wire 	    push_rd_n_i;
+   wire 	    push_rd_p_d;
+   wire 	    push_rd_p_i;
+   wire 	    push_rd;
+   reg [2:0] 	    ra_d;
+   localparam AXI4LITE_TO_APB4_AXI_STAT_ADDR = 12'h000;
+   localparam AXI4LITE_TO_APB4_APB_STAT_ADDR = 12'h004;
+   localparam AXI4LITE_TO_APB4_SAMPLE_ADDR = 12'hBAC;
 
 
-// instantiations
-//
-apb_slave_int u_apb_slave_int (
-// APB2 Interface Signals
-.PSELx(PSELx),
-.PCLK(PCLK),
-.PRESETn(PRESETn),
-.PENABLE(PENABLE),
-.PADDR(PADDR),
-.PWRITE(PWRITE),
-.PWDATA(PWDATA),
-.PRDATA(PRDATA),
-.wen(w_en),
-.waddr(w_addr),
-.wdata(w_data),
-.ren(r_en),
-.raddr(r_addr),
-.rdata(r_data)
-);
+   wire  	    use_merr_resp_axi4lite_to_apb4_slv_config;
+   
+
+   wire [9:0] 	    rd_cnt_axi4lite_to_apb4_axi_stat_ip,
+		    wr_cnt_axi4lite_to_apb4_axi_stat_ip,
+		    rd_cnt_axi4lite_to_apb4_apb_stat_ip,
+		    wr_cnt_axi4lite_to_apb4_apb_stat_ip;
+   
+   wire [2:0] 	    wr_rd_ratio_axi4lite_to_apb4_mst_config;
+
+   wire 	    use_merr_resp_axi4lite_to_apb4_slv_config_ip;
+   
+   assign wr_rd_ratio=wr_rd_ratio_axi4lite_to_apb4_mst_config;
+   assign use_merr_resp=use_merr_resp_axi4lite_to_apb4_slv_config_ip;
+   
+
+   
+   // instantiations
+   //
+   apb_slave_int#(BLOCK_START_ADDRESS) u_apb_slave_int  (// APB2 Interface Signals
+							 .PSELx(PSELx),
+							 .PCLK(PCLK),
+							 .PRESETn(PRESETn),
+							 .PENABLE(PENABLE),
+							 .PADDR(PADDR),
+							 .PWRITE(PWRITE),
+							 .PWDATA(PWDATA),
+							 .PRDATA(PRDATA),
+							 .wen(w_en),
+							 .waddr(w_addr),
+							 .wdata(w_data),
+							 .ren(r_en),
+							 .raddr(r_addr),
+							 .rdata(r_data)
+							 );
+
+   
+   // This module is autogenerated by HDL Designer from the excel spreedsheet
+   axi4lite_to_apb4_registers #(12,32) i_registers(
+						   // FIELD OUTPUT PORTS
+						   .rd_cnt_axi4lite_to_apb4_axi_stat         (),// unused
+						   .wr_cnt_axi4lite_to_apb4_axi_stat         (),// unused
+						   .rd_cnt_axi4lite_to_apb4_apb_stat         (),// unused
+						   .wr_cnt_axi4lite_to_apb4_apb_stat         (),// unused
+						   .use_merr_resp_axi4lite_to_apb4_slv_config(use_merr_resp_axi4lite_to_apb4_slv_config_ip),
+						   .wr_rd_ratio_axi4lite_to_apb4_mst_config  (wr_rd_ratio_axi4lite_to_apb4_mst_config),
+						   .waddr_nd_axi4lite_to_apb4_sample_config  (sample_cmd[15]),
+						   .waddr_ni_axi4lite_to_apb4_sample_config  (sample_cmd[14]),
+						   .waddr_pd_axi4lite_to_apb4_sample_config  (sample_cmd[13]),
+						   .waddr_pi_axi4lite_to_apb4_sample_config  (sample_cmd[12]),
+						   .wdata_nd_axi4lite_to_apb4_sample_config  (sample_cmd[11]),
+						   .wdata_ni_axi4lite_to_apb4_sample_config  (sample_cmd[10]),
+						   .wdata_pd_axi4lite_to_apb4_sample_config  (sample_cmd[9] ),
+						   .wdata_pi_axi4lite_to_apb4_sample_config  (sample_cmd[8] ),
+						   .raddr_nd_axi4lite_to_apb4_sample_config  (sample_cmd[7] ),
+						   .raddr_ni_axi4lite_to_apb4_sample_config  (sample_cmd[6] ),
+						   .raddr_pd_axi4lite_to_apb4_sample_config  (sample_cmd[5] ),
+						   .raddr_pi_axi4lite_to_apb4_sample_config  (sample_cmd[4] ),
+						   .rdata_nd_axi4lite_to_apb4_sample_config  (sample_cmd[3] ),
+						   .rdata_ni_axi4lite_to_apb4_sample_config  (sample_cmd[2] ),
+						   .rdata_pd_axi4lite_to_apb4_sample_config  (sample_cmd[1] ),
+						   .rdata_pi_axi4lite_to_apb4_sample_config  (sample_cmd[0] ),
+						   .data_axi4lite_to_apb4_sample              (), // Unused
+
+						   // INPUT PORTS
+						   .rd_cnt_axi4lite_to_apb4_axi_stat_ip         (rd_cnt_axi4lite_to_apb4_axi_stat_ip),
+						   .wr_cnt_axi4lite_to_apb4_axi_stat_ip         (wr_cnt_axi4lite_to_apb4_axi_stat_ip),
+						   .rd_cnt_axi4lite_to_apb4_apb_stat_ip         (rd_cnt_axi4lite_to_apb4_apb_stat_ip),
+						   .wr_cnt_axi4lite_to_apb4_apb_stat_ip         (wr_cnt_axi4lite_to_apb4_apb_stat_ip),
+						   .use_merr_resp_axi4lite_to_apb4_slv_config_ip(use_merr_resp_axi4lite_to_apb4_slv_config_ip),
+						   .wr_rd_ratio_axi4lite_to_apb4_mst_config_ip  (wr_rd_ratio_axi4lite_to_apb4_mst_config),
+						   .waddr_nd_axi4lite_to_apb4_sample_config_ip  (sample_cmd[15]),
+						   .waddr_ni_axi4lite_to_apb4_sample_config_ip  (sample_cmd[14]),
+						   .waddr_pd_axi4lite_to_apb4_sample_config_ip  (sample_cmd[13]),
+						   .waddr_pi_axi4lite_to_apb4_sample_config_ip  (sample_cmd[12]),
+						   .wdata_nd_axi4lite_to_apb4_sample_config_ip  (sample_cmd[11]),
+						   .wdata_ni_axi4lite_to_apb4_sample_config_ip  (sample_cmd[10]),
+						   .wdata_pd_axi4lite_to_apb4_sample_config_ip  (sample_cmd[9] ),
+						   .wdata_pi_axi4lite_to_apb4_sample_config_ip  (sample_cmd[8] ),
+						   .raddr_nd_axi4lite_to_apb4_sample_config_ip  (sample_cmd[7] ),
+						   .raddr_ni_axi4lite_to_apb4_sample_config_ip  (sample_cmd[6] ),
+						   .raddr_pd_axi4lite_to_apb4_sample_config_ip  (sample_cmd[5] ),
+						   .raddr_pi_axi4lite_to_apb4_sample_config_ip  (sample_cmd[4] ),
+						   .rdata_nd_axi4lite_to_apb4_sample_config_ip  (sample_cmd[3] ),
+						   .rdata_ni_axi4lite_to_apb4_sample_config_ip  (sample_cmd[2] ),
+						   .rdata_pd_axi4lite_to_apb4_sample_config_ip  (sample_cmd[1] ),
+						   .rdata_pi_axi4lite_to_apb4_sample_config_ip  (sample_cmd[0] ),
+						   .data_axi4lite_to_apb4_sample_ip              (sample_dat),
+
+						   // GENERIC BUS PORTS
+						   .clock   (PCLK), // Register Bus Clock
+						   .reset   (PRESETn), // Register Bus Reset
+						   .waddr   (w_addr), // Write Address-Bus
+						   .raddr   (r_addr), // Read Address-Bus
+						   .wdata   (w_data), // Write Data-Bus
+						   .rdata   (r_data), // Read Data-Bus
+						   .rstrobe (r_en), // Read-Strobe
+						   .wstrobe (w_en), // Write-Strobe
+						   .raddrerr(), // Read-Address-Error
+						   .waddrerr(), // Write-Address-Error
+						   .wack    (), // Write Acknowledge
+						   .rack    ()  // Read Acknowledge
+						    );
+
+   // Add some counters used by control registers
+access_counter #(10) i_rd_cnt_axi4lite_to_apb4_axi_stat_ip(.clk(PCLK),
+							  .nrst(PRESETn),
+							  .clear((r_addr==AXI4LITE_TO_APB4_AXI_STAT_ADDR) & r_en) ,
+							  .count_ena(axi_rd),
+							  .count(rd_cnt_axi4lite_to_apb4_axi_stat_ip));
+
+access_counter #(10) i_wr_cnt_axi4lite_to_apb4_axi_stat_ip(.clk(PCLK),
+							  .nrst(PRESETn),
+							  .clear((r_addr==AXI4LITE_TO_APB4_AXI_STAT_ADDR) & r_en) ,
+							  .count_ena(axi_wr),
+							  .count(wr_cnt_axi4lite_to_apb4_axi_stat_ip));
+
+access_counter#(10) i_rd_cnt_axi4lite_to_apb4_apb_stat_ip(.clk(PCLK),
+							  .nrst(PRESETn),
+							  .clear((r_addr==AXI4LITE_TO_APB4_APB_STAT_ADDR) & r_en) ,
+							  .count_ena(mstr_rd),
+							  .count(rd_cnt_axi4lite_to_apb4_apb_stat_ip));
+
+access_counter#(10) i_wr_cnt_axi4lite_to_apb4_apb_stat_ip(.clk(PCLK),
+							  .nrst(PRESETn),
+							  .clear((r_addr==AXI4LITE_TO_APB4_APB_STAT_ADDR) & r_en) ,
+							  .count_ena(mstr_wr),
+							  .count(wr_cnt_axi4lite_to_apb4_apb_stat_ip));
+   
 
 
-config_status_reg u_config_status_reg (
-// Interface Signals
-.rstn(PRESETn),
-.clk(PCLK),
-.wen(w_en),
-.waddr(w_addr),
-.wdata(w_data),
-.ren(r_en),
-.raddr(r_addr),
-.rdata(r_data),
 
-// Internal Signals
-.axi_rd(axi_rd),
-.axi_wr(axi_wr),
-.mstr_rd(mstr_rd),
-.mstr_wr(mstr_wr),
-.mst_config_wr_rd_ratio(wr_rd_ratio),
-.slv_config_use_merr_resp(use_merr_resp),
-.sample_data(sample_dat),
-.sample_reg_wr(sample_reg_ld),
-.sample_reg_rd(sample_reg_rd),
-.sample_conf_ctrl(sample_cmd)
-);
+   
+   
 
-// sample cmd
-// 15  sample waddr normal data
-// 14  sample waddr normal instr
-// 13  sample waddr privileged data
-// 12  sample waddr privileged instr
-// 11  sample wdata normal data
-// 10  sample wdata normal instr
-// 09  sample wdata privileged data
-// 08  sample wdata privileged instr
-// 07  sample raddr normal data
-// 06  sample raddr normal instr
-// 05  sample raddr privileged data
-// 04  sample raddr privileged instr
-// 03  sample rdata normal data
-// 02  sample rdata normal instr
-// 01  sample rdata privileged data
-// 00  sample rdata privileged instr
-assign push_wa_n_d = sample_cmd[15] & wa_vld & (wa[34:32] == 3'b010);
-assign push_wa_n_i = sample_cmd[14] & wa_vld & (wa[34:32] == 3'b011);
-assign push_wa_p_d = sample_cmd[13] & wa_vld & (wa[34:32] == 3'b110);
-assign push_wa_p_i = sample_cmd[12] & wa_vld & (wa[34:32] == 3'b111);
-assign push_wa     = push_wa_n_d | push_wa_n_i | push_wa_p_d | push_wa_p_i;
+   // sample cmd
+   // 15  sample waddr normal data
+   // 14  sample waddr normal instr
+   // 13  sample waddr privileged data
+   // 12  sample waddr privileged instr
+   // 11  sample wdata normal data
+   // 10  sample wdata normal instr
+   // 09  sample wdata privileged data
+   // 08  sample wdata privileged instr
+   // 07  sample raddr normal data
+   // 06  sample raddr normal instr
+   // 05  sample raddr privileged data
+   // 04  sample raddr privileged instr
+   // 03  sample rdata normal data
+   // 02  sample rdata normal instr
+   // 01  sample rdata privileged data
+   // 00  sample rdata privileged instr
+   assign push_wa_n_d = sample_cmd[15] & wa_vld & (wa[34:32] == 3'b010);
+   assign push_wa_n_i = sample_cmd[14] & wa_vld & (wa[34:32] == 3'b011);
+   assign push_wa_p_d = sample_cmd[13] & wa_vld & (wa[34:32] == 3'b110);
+   assign push_wa_p_i = sample_cmd[12] & wa_vld & (wa[34:32] == 3'b111);
+   assign push_wa     = push_wa_n_d | push_wa_n_i | push_wa_p_d | push_wa_p_i;
 
-assign push_wd_n_d = sample_cmd[11] & wd_vld & (wa[34:32] == 3'b010);
-assign push_wd_n_i = sample_cmd[10] & wd_vld & (wa[34:32] == 3'b011);
-assign push_wd_p_d = sample_cmd[9]  & wd_vld & (wa[34:32] == 3'b110);
-assign push_wd_p_i = sample_cmd[8]  & wd_vld & (wa[34:32] == 3'b111);
-assign push_wd     = push_wd_n_d | push_wd_n_i | push_wd_p_d | push_wd_p_i;
+   assign push_wd_n_d = sample_cmd[11] & wd_vld & (wa[34:32] == 3'b010);
+   assign push_wd_n_i = sample_cmd[10] & wd_vld & (wa[34:32] == 3'b011);
+   assign push_wd_p_d = sample_cmd[9]  & wd_vld & (wa[34:32] == 3'b110);
+   assign push_wd_p_i = sample_cmd[8]  & wd_vld & (wa[34:32] == 3'b111);
+   assign push_wd     = push_wd_n_d | push_wd_n_i | push_wd_p_d | push_wd_p_i;
 
-assign push_ra_n_d = sample_cmd[7]  & ra_vld & (ra[34:32] == 3'b010);
-assign push_ra_n_i = sample_cmd[6]  & ra_vld & (ra[34:32] == 3'b011);
-assign push_ra_p_d = sample_cmd[5]  & ra_vld & (ra[34:32] == 3'b110);
-assign push_ra_p_i = sample_cmd[4]  & ra_vld & (ra[34:32] == 3'b111);
-assign push_ra     = push_ra_n_d | push_ra_n_i | push_ra_p_d | push_ra_p_i;
+   assign push_ra_n_d = sample_cmd[7]  & ra_vld & (ra[34:32] == 3'b010);
+   assign push_ra_n_i = sample_cmd[6]  & ra_vld & (ra[34:32] == 3'b011);
+   assign push_ra_p_d = sample_cmd[5]  & ra_vld & (ra[34:32] == 3'b110);
+   assign push_ra_p_i = sample_cmd[4]  & ra_vld & (ra[34:32] == 3'b111);
+   assign push_ra     = push_ra_n_d | push_ra_n_i | push_ra_p_d | push_ra_p_i;
 
-always @(posedge mclk or negedge mrstn)
-if (!mrstn)
-	ra_d <= 3'b0;
-else
-	if (ra_vld)
-		ra_d <= ra[34:32];
-	else
-		ra_d <= ra_d;
+   always @(posedge mclk or negedge mrstn)
+     if (!mrstn)
+       ra_d <= 3'b0;
+     else
+       if (ra_vld)
+	 ra_d <= ra[34:32];
+       else
+	 ra_d <= ra_d;
 
-assign push_rd_n_d = sample_cmd[3]  & rd_vld & (ra_d == 3'b010);
-assign push_rd_n_i = sample_cmd[2]  & rd_vld & (ra_d == 3'b011);
-assign push_rd_p_d = sample_cmd[1]  & rd_vld & (ra_d == 3'b110);
-assign push_rd_p_i = sample_cmd[0]  & rd_vld & (ra_d == 3'b111);
-assign push_rd     = push_rd_n_d | push_rd_n_i | push_rd_p_d | push_rd_p_i;
+   assign push_rd_n_d = sample_cmd[3]  & rd_vld & (ra_d == 3'b010);
+   assign push_rd_n_i = sample_cmd[2]  & rd_vld & (ra_d == 3'b011);
+   assign push_rd_p_d = sample_cmd[1]  & rd_vld & (ra_d == 3'b110);
+   assign push_rd_p_i = sample_cmd[0]  & rd_vld & (ra_d == 3'b111);
+   assign push_rd     = push_rd_n_d | push_rd_n_i | push_rd_p_d | push_rd_p_i;
 
-assign sf_push     = !sf_ff & (push_wa | push_wd | push_ra | push_rd);
+   assign sf_push     = !sf_ff & (push_wa | push_wd | push_ra | push_rd);
 
-always @* 
-case ({push_wa,push_wd,push_ra,push_rd})
-4'b0000: sf_wdata <= 32'b00000000;
-4'b0001: sf_wdata <= rd;
-4'b0010: sf_wdata <= ra[31:0];
-4'b0100: sf_wdata <= wd;
-4'b1000: sf_wdata <= wa[31:0];
-4'b1100: sf_wdata <= wd;           // data takes precedence over addr 
-default: sf_wdata <= 32'b00000000;
-endcase
+   always @* 
+     case ({push_wa,push_wd,push_ra,push_rd})
+       4'b0000: sf_wdata <= 32'b00000000;
+       4'b0001: sf_wdata <= rd;
+       4'b0010: sf_wdata <= ra[31:0];
+       4'b0100: sf_wdata <= wd;
+       4'b1000: sf_wdata <= wa[31:0];
+       4'b1100: sf_wdata <= wd;           // data takes precedence over addr 
+       default: sf_wdata <= 32'b00000000;
+     endcase
 
-// once fifo is full won't be written to. pull data when available or read
-dp_fifo #(.AW(2), .DW(DW)) u_samplefifo (
-.wrstn(mrstn),
-.wclk(mclk),
-.rrstn(PRESETn),
-.rclk(PCLK),
-.push(sf_push),
-.pop(sf_pop),
-.wdata(sf_wdata),
-.rdata(sample_dat),
-.empty(sf_fe),
-.full(sf_ff)
-);
+   // once fifo is full won't be written to. pull data when available or read
+   dp_fifo #(.AW(2), .DW(DW)) u_samplefifo (
+					    .wrstn(mrstn),
+					    .wclk(mclk),
+					    .rrstn(PRESETn),
+					    .rclk(PCLK),
+					    .push(sf_push),
+					    .pop(sf_pop),
+					    .wdata(sf_wdata),
+					    .rdata(sample_dat),
+					    .empty(sf_fe),
+					    .full(sf_ff)
+					    );
 
 
 
-always @(posedge PCLK or negedge PRESETn)
-if (!PRESETn)
-	cstate <= INIT;
-else
-	cstate <= nstate;
+   always @(posedge PCLK or negedge PRESETn)
+     if (!PRESETn)
+       cstate <= INIT;
+     else
+       cstate <= nstate;
 
+   assign sample_reg_rd = (r_en && (r_addr == AXI4LITE_TO_APB4_SAMPLE_ADDR));
 
-always @*
-case (cstate)
-INIT: if (!sf_fe)
-		nstate <= POP;
-	else
-		nstate <= INIT;
-POP: nstate <= LOAD;
-LOAD: nstate <= HOLD;
-HOLD: if (sf_fe)
-		nstate <= INIT;
-	else if (sample_reg_rd)
-		nstate <= POP;
-	else
-		nstate <= HOLD;
-default: nstate <= INIT;
-endcase
+   always @*
+     case (cstate)
+       INIT: if (!sf_fe)
+	 nstate <= POP;
+       else
+	 nstate <= INIT;
+       POP: nstate <= LOAD;
+       LOAD: nstate <= HOLD;
+       HOLD: if (sf_fe)
+	 nstate <= INIT;
+       else if (sample_reg_rd)
+	 nstate <= POP;
+       else
+	 nstate <= HOLD;
+       default: nstate <= INIT;
+     endcase
 
-assign sf_pop        = (cstate == POP);
-assign sample_reg_ld = (cstate == LOAD);
+   assign sf_pop        = (cstate == POP);
+   assign sample_reg_ld = (cstate == LOAD);
 
 endmodule
