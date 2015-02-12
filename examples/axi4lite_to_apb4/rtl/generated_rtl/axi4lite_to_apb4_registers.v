@@ -6,15 +6,26 @@
 // File            : /home/mikaela/questa_makefile_environment/examples/axi4lite_to_apb4/rtl/generated_rtl//axi4lite_to_apb4_registers.v
 //----------------------------------------------------------------------
 // Created by      : mikaela
-// Creation Date   : 12 02 2015 01:00::08
+// Creation Date   : 12 02 2015 17:37::45
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
 // Block           : axi4lite_to_apb4_registers
 // Address Range   : 0xBB0
 //----------------------------------------------------------------------
-// Description: 
-//    Register block
+// Block Settings:
+//    rtl.BUS_TYPE                 : NONE
+//    rtl.CLOCK                    : clk
+//    rtl.CLOCK_EDGE               : POSITIVE
+//    rtl.DECLARE_INFERRED_SIGNALS : TRUE
+//    rtl.DEFAULT_RDATA_NAME       : DEFAULT_RDATA
+//    rtl.DEFAULT_RDATA_VALUE      : 0
+//    rtl.DEFAULT_SCALAR_INPUT_TYPE: wire
+//    rtl.DEFAULT_VECTOR_INPUT_TYPE: wire
+//    rtl.LANGUAGE                 : VLOG_2005
+//    rtl.RESET                    : nreset
+//    rtl.RESET_LEVEL              : LOW
+//    rtl.RESET_STYLE              : ASYNC
 //----------------------------------------------------------------------
 
 module axi4lite_to_apb4_registers
@@ -74,8 +85,8 @@ module axi4lite_to_apb4_registers
   input wire   [31:0] data_axi4lite_to_apb4_sample_ip             ,
 
   // GENERIC BUS PORTS
-  input  wire                  clock   , // Register Bus Clock
-  input  wire                  reset   , // Register Bus Reset
+  input  wire                  clk     , // Register Bus Clock
+  input  wire                  nreset  , // Register Bus Reset
   input  wire [ADDR_WIDTH-1:0] waddr   , // Write Address-Bus
   input  wire [ADDR_WIDTH-1:0] raddr   , // Read Address-Bus
   input  wire [DATA_WIDTH-1:0] wdata   , // Write Data-Bus
@@ -104,7 +115,7 @@ module axi4lite_to_apb4_registers
   wire [DATA_WIDTH-1:0] rmux_axi4lite_to_apb4_sample       ;
 
   // DEFAULT VALUE FOR READ DATA BUS
-  localparam DEF_RDATA_VAL = 32'h00000000;
+  localparam DEFAULT_RDATA = 32'h00000000;
 
   // ADDRESS PARAMETERS
   localparam AXI4LITE_TO_APB4_AXI_STAT_ADDR = 12'h000;
@@ -172,10 +183,10 @@ module axi4lite_to_apb4_registers
   //   Width: 10                   , Offset: 10             
   //   SW Access: RO-Clear-On-Read , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_axi_stat_reg_rd_cnt_axi4lite_to_apb4_axi_stat
     // Reset
-    if ( !reset )
+    if ( !nreset )
       rd_cnt_axi4lite_to_apb4_axi_stat <= 10'h000;
     // SW:RO-Clear-On-Read
     else if (ren_axi4lite_to_apb4_axi_stat)
@@ -190,10 +201,10 @@ module axi4lite_to_apb4_registers
   //   Width: 10                   , Offset: 0              
   //   SW Access: RO-Clear-On-Read , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_axi_stat_reg_wr_cnt_axi4lite_to_apb4_axi_stat
     // Reset
-    if ( !reset )
+    if ( !nreset )
       wr_cnt_axi4lite_to_apb4_axi_stat <= 10'h000;
     // SW:RO-Clear-On-Read
     else if (ren_axi4lite_to_apb4_axi_stat)
@@ -225,10 +236,10 @@ module axi4lite_to_apb4_registers
   //   Width: 10                   , Offset: 10             
   //   SW Access: RO-Clear-On-Read , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_apb_stat_reg_rd_cnt_axi4lite_to_apb4_apb_stat
     // Reset
-    if ( !reset )
+    if ( !nreset )
       rd_cnt_axi4lite_to_apb4_apb_stat <= 10'h000;
     // SW:RO-Clear-On-Read
     else if (ren_axi4lite_to_apb4_apb_stat)
@@ -243,10 +254,10 @@ module axi4lite_to_apb4_registers
   //   Width: 10                   , Offset: 0              
   //   SW Access: RO-Clear-On-Read , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_apb_stat_reg_wr_cnt_axi4lite_to_apb4_apb_stat
     // Reset
-    if ( !reset )
+    if ( !nreset )
       wr_cnt_axi4lite_to_apb4_apb_stat <= 10'h000;
     // SW:RO-Clear-On-Read
     else if (ren_axi4lite_to_apb4_apb_stat)
@@ -277,10 +288,10 @@ module axi4lite_to_apb4_registers
   //   Width: 1              , Offset: 0              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_slv_config_reg_use_merr_resp_axi4lite_to_apb4_slv_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       use_merr_resp_axi4lite_to_apb4_slv_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_slv_config)
@@ -311,10 +322,10 @@ module axi4lite_to_apb4_registers
   //   Width: 3              , Offset: 0              
   //   SW Access: read-write , HW Access: read-write  
   //------------------------------------------------------------
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_mst_config_reg_wr_rd_ratio_axi4lite_to_apb4_mst_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       wr_rd_ratio_axi4lite_to_apb4_mst_config <= 3'b000;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_mst_config)
@@ -362,10 +373,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample waddr normal data
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_waddr_nd_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       waddr_nd_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -382,10 +393,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample waddr normal instr
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_waddr_ni_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       waddr_ni_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -402,10 +413,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample waddr privileged data
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_waddr_pd_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       waddr_pd_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -422,10 +433,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample waddr privileged instr
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_waddr_pi_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       waddr_pi_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -442,10 +453,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample wdata normal data
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_wdata_nd_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       wdata_nd_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -462,10 +473,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample wdata normal instr
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_wdata_ni_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       wdata_ni_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -482,10 +493,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample wdata privileged data
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_wdata_pd_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       wdata_pd_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -502,10 +513,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample wdata privileged instr
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_wdata_pi_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       wdata_pi_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -522,10 +533,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample raddr normal data
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_raddr_nd_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       raddr_nd_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -542,10 +553,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample raddr normal instr
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_raddr_ni_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       raddr_ni_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -562,10 +573,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample raddr privileged data
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_raddr_pd_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       raddr_pd_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -582,10 +593,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample raddr privileged instr
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_raddr_pi_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       raddr_pi_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -602,10 +613,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample rdata normal data
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_rdata_nd_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       rdata_nd_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -622,10 +633,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample rdata normal instr
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_rdata_ni_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       rdata_ni_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -642,10 +653,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample rdata privileged data
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_rdata_pd_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       rdata_pd_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -662,10 +673,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   sample rdata privileged instr
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_config_reg_rdata_pi_axi4lite_to_apb4_sample_config
     // Reset
-    if ( !reset )
+    if ( !nreset )
       rdata_pi_axi4lite_to_apb4_sample_config <= 1'b0;
     // SW:read-write
     else if (wen_axi4lite_to_apb4_sample_config)
@@ -698,10 +709,10 @@ module axi4lite_to_apb4_registers
   //------------------------------------------------------------
   //   Sample data
   //
-  always @ (posedge clock or negedge reset)
+  always @ (posedge clk or negedge nreset)
   begin : reg_axi4lite_to_apb4_sample_reg_data_axi4lite_to_apb4_sample
     // Reset
-    if ( !reset )
+    if ( !nreset )
       data_axi4lite_to_apb4_sample <= 32'h00000000;
     // HW:read-write
     else
@@ -712,21 +723,21 @@ module axi4lite_to_apb4_registers
   //----------------------------------------------------------------------
   //                    READ BUS MULTIPLEXER
   //----------------------------------------------------------------------
-  assign rmux_axi4lite_to_apb4_axi_stat[31:20] = DEF_RDATA_VAL[31:20]; // Default read value for un-assigned portion
+  assign rmux_axi4lite_to_apb4_axi_stat[31:20] = DEFAULT_RDATA[31:20]; // Default read value for un-assigned portion
   assign rmux_axi4lite_to_apb4_axi_stat[19:10] = rd_cnt_axi4lite_to_apb4_axi_stat;
   assign rmux_axi4lite_to_apb4_axi_stat[9:0] = wr_cnt_axi4lite_to_apb4_axi_stat;
 
-  assign rmux_axi4lite_to_apb4_apb_stat[31:20] = DEF_RDATA_VAL[31:20]; // Default read value for un-assigned portion
+  assign rmux_axi4lite_to_apb4_apb_stat[31:20] = DEFAULT_RDATA[31:20]; // Default read value for un-assigned portion
   assign rmux_axi4lite_to_apb4_apb_stat[19:10] = rd_cnt_axi4lite_to_apb4_apb_stat;
   assign rmux_axi4lite_to_apb4_apb_stat[9:0] = wr_cnt_axi4lite_to_apb4_apb_stat;
 
-  assign rmux_axi4lite_to_apb4_slv_config[31:1] = DEF_RDATA_VAL[31:1]; // Default read value for un-assigned portion
+  assign rmux_axi4lite_to_apb4_slv_config[31:1] = DEFAULT_RDATA[31:1]; // Default read value for un-assigned portion
   assign rmux_axi4lite_to_apb4_slv_config[0] = use_merr_resp_axi4lite_to_apb4_slv_config;
 
-  assign rmux_axi4lite_to_apb4_mst_config[31:3] = DEF_RDATA_VAL[31:3]; // Default read value for un-assigned portion
+  assign rmux_axi4lite_to_apb4_mst_config[31:3] = DEFAULT_RDATA[31:3]; // Default read value for un-assigned portion
   assign rmux_axi4lite_to_apb4_mst_config[2:0] = wr_rd_ratio_axi4lite_to_apb4_mst_config;
 
-  assign rmux_axi4lite_to_apb4_sample_config[15:0] = DEF_RDATA_VAL[15:0]; // Default read value for un-assigned portion
+  assign rmux_axi4lite_to_apb4_sample_config[15:0] = DEFAULT_RDATA[15:0]; // Default read value for un-assigned portion
   assign rmux_axi4lite_to_apb4_sample_config[31] = waddr_nd_axi4lite_to_apb4_sample_config;
   assign rmux_axi4lite_to_apb4_sample_config[30] = waddr_ni_axi4lite_to_apb4_sample_config;
   assign rmux_axi4lite_to_apb4_sample_config[29] = waddr_pd_axi4lite_to_apb4_sample_config;
@@ -784,7 +795,7 @@ module axi4lite_to_apb4_registers
         end
         default:
         begin
-          rdata =  DEF_RDATA_VAL;
+          rdata =  DEFAULT_RDATA;
           raddrerr =  1'b1;
         end
       endcase
@@ -792,7 +803,7 @@ module axi4lite_to_apb4_registers
     end
     else
       begin
-        rdata =  DEF_RDATA_VAL;
+        rdata =  DEFAULT_RDATA;
       end
   end
 endmodule

@@ -20,6 +20,9 @@ generate_rm:
 precompile_tb::convert2csv generate_rm
 
 #precompile_rtl::convert2csv generate_hdl
-generate_hdl:
+generate_vlog:
 	${HDS_HOME}/registerassistant/regassist -f ${QME_PROJECT_HOME}/${BLOCKNAME}/sim/ctrl.rcf -project ${BLOCKNAME}_proj
+
+generate_vhdl:
+	${HDS_HOME}/registerassistant/regassist -f ${QME_PROJECT_HOME}/${BLOCKNAME}/sim/ctrl.vhdl.rcf -project ${BLOCKNAME}_proj
 
