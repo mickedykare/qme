@@ -79,6 +79,7 @@ clean::
 	@rm -rf ra_work
 	@rm -rf html
 	@rm -f modelsim.ini
+	@rm -rf ${CDC_RESULTS} ${AUTOCHECK_RESULTS} ${FORMAL_RESULTS} ${COVERCHECK_RESULTS}
 
 
 
@@ -107,7 +108,7 @@ compile_qvips::${QVIP_COMMON} ${QVIP_TARGETS}
 # Compile RTL code
 ################################################################
 
-compile_rtl::precompile_rtl check_filelist_rtl compile_rtl_script postcompile_rtl
+compile_rtl::remove_remake precompile_rtl check_filelist_rtl compile_rtl_script postcompile_rtl
 
 compile_rtl_script::
 	@test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
@@ -129,7 +130,7 @@ compile_rtl_fv_script::
 # Compile TB code
 ################################################################
 
-compile_tb::remove_opts precompile_tb compile_qvips check_filelist_tb compile_tb_script postcompile_tb
+compile_tb::remove_opts remove_remake precompile_tb compile_qvips check_filelist_tb compile_tb_script postcompile_tb
 
 compile_tb_script::
 	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS} ${X_VLOG_ARGS} ${X_VCOM_ARGS} ${NOCOLOR}
@@ -206,6 +207,9 @@ remove_opts:
 create_recompile_in_background::
 	@test -e ${QUESTALIBS_DIR}/makefile.remake||echo "Running generation of remake file in background"
 	@test -e ${QUESTALIBS_DIR}/makefile.remake||create_questa_remake.pl ${QUESTALIBS_DIR}  ${QUESTALIBS_DIR}/liborder.txt  ${QUESTALIBS_DIR}/makefile.remake&
+
+remove_remake::
+	@rm -f ${QUESTALIBS_DIR}/makefile.remake
 
 create_recompile::${QUESTALIBS_DIR}/makefile.remake
 

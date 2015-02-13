@@ -6,8 +6,6 @@ class axi4lite_to_apb4_basetest extends uvm_test;
    mvc_sequencer m_apb4_slave_sequencer;
    mvc_sequencer m_axi4_master_sequencer;
 
-   
-   
    //env 
    axi4lite_to_apb4_env m_env;
 
@@ -22,6 +20,13 @@ class axi4lite_to_apb4_basetest extends uvm_test;
    // register model
    axi4lite_to_apb4_registers m_registermodel;
    
+   // Adding a reporter for UVM reporting (for QVIP)
+   
+   qvip_err_assertion_reporter m_qvip_reporter;
+   
+
+
+
    // Components used by the register model
    // adapter for register bus
    reg2apb_adapter_t m_reg2apb;           
@@ -43,7 +48,8 @@ class axi4lite_to_apb4_basetest extends uvm_test;
       m_axi4_clk_config=sli_clk_reset_config::type_id::create("m_axi4_clk_config");
       m_apb4_master_clk_config=sli_clk_reset_config::type_id::create("m_apb4_master_clk_config");
       m_apb4_slave_clk_config=sli_clk_reset_config::type_id::create("m_apb4_slave_clk_config");
-      
+      m_qvip_reporter=new("m_qvip_reporter");
+ 
       // Get the pin interfaces
       if(!uvm_config_db #( axi4_if_t)::get( this , "", "AXI4_M_IF" ,m_axi4lite_cfg.m_bfm ))
 	`uvm_error("Config Error" , "uvm_config_db #( axi_if_t )::get can not find resource AXI4_M_IF" );
@@ -70,11 +76,13 @@ class axi4lite_to_apb4_basetest extends uvm_test;
 
       
       // Configure AXI4
+      m_axi4lite_cfg.m_bfm.register_interface_reporter(m_qvip_reporter);
+      
       m_axi4lite_cfg.m_bfm.set_config_axi4lite_interface(1);
       m_axi4lite_cfg.m_bfm.axi4_set_master_abstraction_level(1,0);
 
      // Configure APB4 master
-
+      m_apb4_master_cfg.m_bfm.register_interface_reporter(m_qvip_reporter);
       m_apb4_master_cfg.m_bfm.apb3_set_host_abstraction_level(0, 1);//Master TLM
 
       m_apb4_master_cfg.m_bfm.apb3_set_slave_abstraction_level(1, 0);// Slave is rtl
@@ -86,6 +94,7 @@ class axi4lite_to_apb4_basetest extends uvm_test;
       m_apb4_master_cfg.delete_analysis_component("trans_ap","checker");
 
      // Configure APB4 slave
+      m_apb4_slave_cfg.m_bfm.register_interface_reporter(m_qvip_reporter);
       m_apb4_slave_cfg.m_bfm.apb3_set_host_abstraction_level(1, 0); // master is rtl
       m_apb4_slave_cfg.m_bfm.apb3_set_slave_abstraction_level(0, 1); // slave is tlm
       m_apb4_slave_cfg.m_bfm.apb3_set_clk_contr_abstraction_level(1, 0);
