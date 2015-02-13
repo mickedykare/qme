@@ -32,5 +32,6 @@ java, check
 # ----- Generators
 #java, rtl, /home/mikaela/HDS/axi4lite_to_apb/axi4lite_to_apb_lib/hdl/_Registers/Generated_Files
 java, rtl, $(QME_PROJECT_HOME)/axi4lite_to_apb4/rtl/generated_rtl/
+java, uvm, axi4lite_to_apb4_regs_pkg.sv, 1.1, false, $(QME_PROJECT_HOME)/axi4lite_to_apb4/tb/registers/
 
 #js, $(RA_EXAMPLES)/html.js, /home/mikaela/HDS/axi4lite_to_apb/axi4lite_to_apb_lib/hdl/_Registers/Generated_Files

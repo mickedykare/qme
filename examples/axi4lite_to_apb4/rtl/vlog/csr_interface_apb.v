@@ -183,8 +183,8 @@ parameter BLOCK_START_ADDRESS=32'h0000_0000
 						   .data_axi4lite_to_apb4_sample_ip              (sample_dat),
 
 						   // GENERIC BUS PORTS
-						   .clock   (PCLK), // Register Bus Clock
-						   .reset   (PRESETn), // Register Bus Reset
+						   .clk   (PCLK), // Register Bus Clock
+						   .nreset   (PRESETn), // Register Bus Reset
 						   .waddr   (w_addr), // Write Address-Bus
 						   .raddr   (r_addr), // Read Address-Bus
 						   .wdata   (w_data), // Write Data-Bus

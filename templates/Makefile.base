@@ -34,6 +34,7 @@ UVM_SIM_ARGS=+UVM_NO_RELNOTES
 UVMCONTROL_REGR=-uvmcontrol=all
 UVM_VERBOSITY=UVM_MEDIUM
 UVM_VERBOSITY_REGR=UVM_NONE
+
 NO_ILLEGAL_NAME_UVM=+uvm_set_action=*,ILLEGALNAME,UVM_WARNING,UVM_NO_ACTION +uvm_set_action=*,ILLEGALNAME,UVM_INFO,UVM_NO_ACTION
 # OVM
 OVM_SIM_ARGS=+OVM_NO_RELNOTES
@@ -73,7 +74,6 @@ EMAIL_RECIPIENT=`whoami`
 RTLDIR=rtl
 WORKLIB=work
 LIBRARY_HOME=questa_libs
-CDC_RESULTS=cdc_output_results
 UCDB_STORAGE=ucdbfiles
 HTML_HOME=html_reports
 LIBLIST=libs.list
@@ -160,7 +160,20 @@ COVERCHECK_EXTRA_COMPILE_ARGS=
 COVERCHECK_EXTRA_VERIFY_ARGS=
 COVERCHECK_EFFORT=medium
 COVERCHECK_WITNESS_WAVEFORM=-witness_waveforms
-
+###################################################################
+# CDC defaults
+###################################################################
+CDC_DUT=${BLOCKNAME}
+CDC_RESULTS=cdc_output_results
+CDC_DESIGN_LIB=${DESIGN_LIB}
+CDC_DIRECTIVES=${SRCHOME}/${BLOCKNAME}/sim/cdc_directives.tcl
+CDC_GENERICS= -f generics.txt
+CDC_FORMAL=-formal
+CDC_VLOG_ARGS=${CDC_RESULTS}/cdc_sim.arg
+CDC_VCOM_ARGS=${CDC_RESULTS}/cdc_sim_vhdl.arg
+CDC_PLI_ARGS=-pli $(HOME_0IN)/lib/lib0InLoadMTIPLI.so
+CDC_VSIM_ARGS=-f ../${CDC_RESULTS}/cdc_sim.arg.vsim ${CDC_PLI_ARGS}
+CDC_PROTOCOL=0
 ###################################################################
 # Covercheck defaults
 # Can be used in regression or interactivly 

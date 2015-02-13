@@ -274,7 +274,9 @@ else
 UVM_ARGUMENTS=+UVM_TESTNAME=${TEST} +UVM_VERBOSITY=${UVM_VERBOSITY} ${NO_ILLEGAL_NAME_UVM} ${UVMCONTROL} 
 endif
 
-
+ifeq (${CDC_PROTOCOL},1)
+CDC_PROTOCOL_VSIM_ARGS=${CDC_VSIM_ARGS}
+endif
 
 gui_block:: create_recompile_in_background liblist clean_rundir presim_script gui_block_cmd postsim_script
 gui_block_cmd::
@@ -303,7 +305,9 @@ gui_block_cmd::
 	${DEBUG} \
 	${FSMDEBUG} \
 	${TITLE} \
-	${UVM_ARGUMENTS}
+	${UVM_ARGUMENTS} \
+	${UVM_SIM_ARGS} \
+	${CDC_PROTOCOL_VSIM_ARGS}
 #########################################################
 # Start a chip level simulation, using vopt separately
 #########################################################
@@ -335,7 +339,8 @@ gui_chip_cmd::
 	${DEBUG} \
 	${FSMDEBUG} \
 	${TITLE} \
-	${UVM_ARGUMENTS}
+	${UVM_ARGUMENTS} \
+	${UVM_SIM_ARGS} 
 #########################################################
 # Start a block level simulation, using built in vopt
 #########################################################
@@ -368,7 +373,8 @@ batch_block_cmd::
 	${POSTSIMDEBUG} \
 	${DEBUG} \
 	${FSMDEBUG} \
-	+UVM_VERBOSITY=${UVM_VERBOSITY}
+	+UVM_VERBOSITY=${UVM_VERBOSITY} \
+	${UVM_SIM_ARGS} 
 
 #########################################################
 # Start a chip level simulation, using vopt separately
@@ -400,8 +406,8 @@ batch_chip_cmd::
 	${SOLVEFAIL_ARGS}  \
 	${POSTSIMDEBUG} \
 	${DEBUG} \
-	${FSMDEBUG} 
-
+	${FSMDEBUG} \
+	${UVM_SIM_ARGS} 
 
 ############# Regression Targets ########################
 # Used as first target when running regression
@@ -433,8 +439,8 @@ batch_regression_cmd::
 	${EXTRA_VSIM_ARGS}  \
 	${CC_COLLECT} \
 	-assertdebug \
-	-wlf ${TEST}.wlf 
-
+	-wlf ${TEST}.wlf \
+	${UVM_SIM_ARGS} 
  #########################################################
 # When rerunning a simulation due to failure
 #########################################################
@@ -633,7 +639,35 @@ formal_only::
 	exit"
 
 
+#########################################################
+# Run Questa Formal
+# Can be run as part of regression or interactively
+#
+#########################################################
 
+cdc_static::clean compile_rtl_fv liblist cdc_static_only
+
+cdc_static_only::
+	@test -e ${CDC_DIRECTIVES}|| echo "ERROR: You need to provide ${CDC_DIRECTIVES}"
+	@test -e ${CDC_DIRECTIVES}|| exit 1
+	qverify -od ${CDC_RESULTS} -c -do " \
+	do ${CDC_DIRECTIVES}; \
+	cdc run -d $(CDC_DUT) -work ${CDC_DESIGN_LIB} -f ${LIBLIST} -compile_assertions  ${CDC_FORMAL}; \
+	cdc generate report cdc_detail.rpt; \
+	exit"
+
+cdc_generate_testplan::
+	qverify -od ${CDC_RESULTS} -c -do " \
+	cdc load db ${CDC_RESULTS}/cdc.db;\
+	cdc generate testplan cdc_testplan.xml -ucdb cdc.ucdb;\
+	exit"
+
+
+cdc_compile_assertions:
+	@if test -e  ${CDC_VLOG_ARGS}; \
+	then  vlog -work  ${TB_LIB_NAME} -f ${CDC_VLOG_ARGS} -cuname CDCSVABIND +define+ZI_CW_SVA+ZI_CW_SVCG -sv ; fi
+	@if test -e  ${CDC_VCOM_ARGS}; \
+	then vcom -work  ${TB_LIB_NAME} -f ${CDC_VCOM_ARGS} ; fi
 
 
 
