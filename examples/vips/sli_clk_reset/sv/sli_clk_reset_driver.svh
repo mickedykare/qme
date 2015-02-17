@@ -50,9 +50,14 @@ class sli_clk_reset_driver extends uvm_driver #(sli_clk_rst_item, sli_clk_rst_it
   //--------------------------------------------------------------------  
   
   virtual task drive_clk;
+     time halfperiod;
+     
      vif.clk = m_cfg.m_clk_initial_value;
      forever begin
-        #(m_cfg.m_clk_period/2);
+	halfperiod=m_cfg.m_clk_period/2.0;
+	#(halfperiod);
+	vif.period=m_cfg.m_clk_period;
+	
        if (m_cfg.m_clk_enable) vif.clk = ~vif.clk;
      end
   endtask

@@ -6,7 +6,7 @@
 // File            : /home/mikaela/questa_makefile_environment/examples/axi4lite_to_apb4/rtl/generated_rtl//axi4lite_to_apb4_registers.v
 //----------------------------------------------------------------------
 // Created by      : mikaela
-// Creation Date   : 13 02 2015 20:03::22
+// Creation Date   : 17 02 2015 23:47::54
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------

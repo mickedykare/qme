@@ -17,7 +17,7 @@ convert2csv:
 generate_rm:
 	${QUESTASIM_HOME}/RUVM_4.4/vreguvm -csvin regs.csv blocks.csv maps.csv -block ${BLOCKNAME}_registers -uvmout ${QME_PROJECT_HOME}/${BLOCKNAME}/tb/registers/${BLOCKNAME}_regs_pkg.sv 
 
-precompile_tb::convert2csv generate_vlog
+precompile_rtl::convert2csv generate_vlog
 
 #precompile_rtl::convert2csv generate_hdl
 generate_vlog:

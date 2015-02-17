@@ -90,9 +90,11 @@ package axi4lite_to_apb4_tb_pkg;
 
 `include "uvm_macros.svh"
 `include "qvip_err_assertion_report.svh";
+`include "axi4lite_to_apb4_seq_lib.svh";
 `include "axi4lite_to_apb4_env.svh";
 `include "axi4lite_to_apb4_basetest.svh";
 `include "axi4lite_apb4_reg_test.svh";
+`include "axi4lite_apb4_wr_rd_test.svh";
    
 
 

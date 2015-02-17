@@ -35,10 +35,30 @@ my $library_home="questa_libs";
 my $arch="32";
 my $gcc_version="4.3.3";
 my $nocolor=0;
+my $prev_lib="";
+my $prev_args="__NOARGS__";
+my $prev_type="unknown";
+
 # Let's find out the path to vmap
 # Since we can use any variable for questa we do the following
 
 my $model_tech_path=$ENV{"QUESTA_HOME"};
+my $db;
+my $file;
+my $type;
+my $args="";
+my $id;
+
+
+#@library x_lib
+#file1.v
+#file2.v
+#
+#
+#
+#
+
+
 
 
 sub infomsg{
@@ -56,96 +76,50 @@ sub infomsg{
 
 
 
-sub compile_file{
-    my $lib=pop;
-    my $file = pop;
-    my $args="";
-    my @f;
+
+
+sub compile{
+    my $ml=pop;
+    my $l=pop;
+    my $t=pop;
+    my $args=pop;
+    my $files = pop;
+
     my $cmd;
-    my $type="";
-    my $tmp;
-
-    my @vmap=`vmap|grep "maps to"|grep -v $model_tech_path|cut -d" " -f1|sed s/\\"/-L\\ /|sed s/\\"//g`;
-    chomp @vmap;
-    my $mapped_libs=join " ",@vmap;
-
-    if ($file =~ /:/) {
-	my @line=split ":",$file;
-	@f = split",",$line[0];
-	$args = $line[1];
-    } else {
-	push @f ,$file;    
-    }
-
-    # $f might contain many files:
-    my @flist=split " ",$f[0];
-    
-
-    # ###############################################################
-    # This is only valid if we have a library:
-    # Check if this is a VHDL file
-    # First of all. We will use the first file to decide file type
-    # Then we will check if we have conflicting types
-    # ###############################################################
-    if (($flist[0] =~ /\.vhd$/)|($flist[0] =~ /\.vhdl$/)) {
-	    $type="vhdl";
-    } elsif (($flist[0] =~ /\.sv$/)|($flist[0] =~ /\.v$/)|($flist[0] =~ /\.svh$/)) {
-	$type="verilog";
-
-    } elsif (($flist[0] =~ /\.c$/)|($flist[0] =~ /\.cpp$/)) {
-	$type="c"; 
-    } else {
-	&infomsg("Unknown filetype:$flist[0]",$nocolor);
-	exit(1);
-    }
-
-    # Next step is to compile the code
-    $tmp = join " ",@f;
-#    print "DEBUG:$args\n";
-    if ($type eq "vhdl") {
-	$cmd = "vcom -$arch -work $lib $tmp $args $vcomargs";
+    if ($t eq "verilog") {	
+	$cmd="vlog -work $l $files $args $ml";
 	&infomsg("Launching: $cmd",$nocolor);
 	&system_cmd_hl($cmd);
 
-    } elsif ($type eq "verilog") {
-	$cmd = "vlog -$arch -work $lib $tmp $args $vlogargs $mapped_libs";
-
+    } elsif ($t eq "vhdl") {
+	$cmd="vcom -work $l $files $args";
 	&infomsg("Launching: $cmd",$nocolor);
 	&system_cmd_hl($cmd);
-    } elsif ($type eq "c") {
+	
+    } elsif ($t eq "c") {
 	if ($usegcc) {
-	    my @x=split "/",$tmp;
+	    my @x=split "/",$files; # Only expect one file for C code in this case
 	    my $basename = pop @x;
 	    &infomsg("####################################################################################################",$nocolor);
 	    &infomsg("Using old way of compililing and linking c-code. Please refer to DPI Use Flow in Questa Users manual",$nocolor);
 	    &infomsg("####################################################################################################",$nocolor);
-
-	    &system_cmd("test -e c_libs/$lib||mkdir -p c_libs/$lib");
-	    $cmd="gcc -m$arch $args $cflags $tmp -o ./c_libs/$lib/$basename".".o";
+	    &system_cmd("test -e c_libs/$l||mkdir -p c_libs/$l");
+	    $cmd="gcc -m$arch $args $cflags $files -o ./c_libs/$l/$basename".".o";
 	    &infomsg("Launching: $cmd",$nocolor);
 	    &system_cmd($cmd);
-	    $cmd="g++ -m$arch $ldflags `find ./c_libs/$lib/ -name *.o -print` -o ./c_libs/$lib".".so";
+	    $cmd="g++ -m$arch $ldflags `find ./c_libs/$l/ -name *.o -print` -o ./c_libs/$l".".so";
 	    &infomsg("Launching: $cmd",$nocolor);
 	    &system_cmd($cmd);
-	    
-
 	} else {
-	$cmd = "vlog -$arch -work $lib $tmp -ccflags \"$args $cflags\" -dpicppinstall $gcc_version -";
-	&infomsg("Launching: $cmd",$nocolor);
-	&system_cmd_hl($cmd);
+	    $cmd = "vlog -$arch -work $l $files -ccflags \"$args $cflags\" -dpicppinstall $gcc_version";
+	    &infomsg("Launching: $cmd",$nocolor);
+	    &system_cmd_hl($cmd);
 	}
 
 
-    } else {
-	&infomsg("Unknown filetype:$type",$nocolor);
-	exit(1);
-
     }
+}
 
-
-
-} 
- 
 
 GetOptions ("cflags=s" => \$cflags,    # numeric
 	    "file=s"   => \$fltfile,      # string
@@ -163,6 +137,9 @@ GetOptions ("cflags=s" => \$cflags,    # numeric
 
 
 
+
+
+
 &infomsg("Parsing $fltfile",$nocolor);
 open(FHIN, "<", $fltfile) 
     or die "cannot open $fltfile\n";
@@ -172,50 +149,164 @@ my @indata=<FHIN>;
 chomp @indata;
 my @tmp;
 foreach my $l (@indata) {
-    if (($l =~/^\#/)|($l =~ /^$/)) {
-#	print "DBG:skipping $l\n";
+    if (($l =~/^\#/)|($l =~ /^ *$/)) {
+#	print "DBG:skipping line:$l\n";
     } else {
+	$l =~ s/\s+$//;
 	push @tmp,$l;
+
     }
 }
 
 @indata=@tmp;
 my $lib=$default_lib;
+my @liborder;
+my @fileorder;
+my @argorder;
+my @typeorder;
 
 my $cmd="rm -f $library_home/liborder.txt";
 &system_cmd($cmd);
 
-
+# Build a hash
+# db->{'lib'}->{type}->{<file>}->{arguments}
+my $i=1;
+$cmd="test -e $library_home||mkdir -p $library_home"; 
+&system_cmd_hl($cmd);
+&infomsg("Analyzing contents of FLT file and creating libraries",$nocolor);
 foreach my $f (@indata) {
+ #   &infomsg("LINE: $f",$nocolor);
     if ($f =~ /^\@library/ ) {
 	my @line=split " ",$f;
 	$lib=pop @line;
-	&infomsg("Creating library $lib if does not exists",$nocolor);
-	my $cmd="test -e $library_home||mkdir $library_home";
-	&system_cmd($cmd);
-
-	&infomsg("Creating library $lib/touchfiles if does not exists",$nocolor);
-	$cmd="test -e $library_home/touchfiles||mkdir $library_home/touchfiles";
-	&system_cmd($cmd);
-	&infomsg("Creating $lib",$nocolor);
-	$cmd="vlib $library_home/$lib";
+	push @liborder,$lib;
+	$file="";
+	$args="";
+	$i = 1;
+	$cmd="test -e $library_home/$lib||vlib $library_home/$lib"; 
 	&system_cmd_hl($cmd);
-	&infomsg("Mapping $lib",$nocolor);
-	$cmd="vmap $lib $ENV{'PWD'}/$library_home/$lib";
+	$cmd="vmap $lib $ENV{PWD}/$library_home/$lib"; 
 	&system_cmd_hl($cmd);
-	$cmd="echo $lib >> $library_home/liborder.txt";
-	&system_cmd($cmd);
-
+	$cmd = "echo $lib >> $library_home/liborder.txt";
+	&system_cmd_hl($cmd);
     } else {
-	 
+	if ($f =~ /:/) {
+	    my @line=split ":",$f;
+	    $file = $line[0];
+	    $args = $line[1];
+	} else {
+	    $file = $f;
+	    $args="";
+	}
 
+	################################################################
 
-	&compile_file($f,$lib);
-	my $cmd="touch $library_home/touchfiles/$lib";
-	&system_cmd_hl($cmd);
+	if (($file =~ /\.vhd$/)|($file =~ /\.vhdl$/)) {
+	    $type="vhdl";
+	} elsif (($file =~ /\.sv$/)|($file =~ /\.v$/)|($file =~ /\.svh$/)) {
+	    $type="verilog";
+	} elsif (($file =~ /\.c$/)|($file =~ /\.cpp$/)) {
+	    $type="c"; 
+	} else {
+	    &infomsg("Unknown filetype:$file",$nocolor);
+	    exit(1);
+	}
+#	print "DBG:$lib $i $file\n";
+	$db->{$lib}->{"$i"}->{'filename'}=$file;
+	$db->{$lib}->{"$i"}->{'type'}=$type;
+	$db->{$lib}->{"$i"}->{'args'}=$args;
+	$db->{$lib}->{'no_of_files'}=$i;
+    $i++;
 
     }
+
+ #   print "DBG: Next line:$i\n";
+
 }
+
+# At this point we should have a hash that contains all files that should be compiled.
+# 1. We are going to, for each library, compile all verilog files with the same arguments, where number is adjacent
+# I.e compile order MUST be respected
+
+#&infomsg("#################################",$nocolor);
+my @vmap=`vmap|grep "maps to"|grep -v $model_tech_path|cut -d" " -f1|sed s/\\"/-L\\ /|sed s/\\"//g`;
+chomp @vmap;
+my $mapped_libs=join " ",@vmap;
+my $command_files="";
+my $command_args="";
+
+
+&infomsg("Optimizing compile commands to save time where possible",$nocolor);
+for my $library (@liborder) {
+    my $no_of_files=$db->{$library}->{'no_of_files'};
+#    &infomsg("Analyzing $no_of_files files in $library",$nocolor);
+    for (my $n=1; $n<=$no_of_files;$n++){
+#	print "DBG:$library $n \n";
+	$file= $db->{$library}->{"$n"}->{'filename'};
+	$args= $db->{$library}->{"$n"}->{'args'};
+	$type= $db->{$library}->{"$n"}->{'type'};
+	$i++;
+#	print "-------------------------\n";
+#	&infomsg("n = $n,LIB=$library,PREV_LIB=$prev_lib",$nocolor);
+#	&infomsg("FILE=$file",$nocolor);
+#	&infomsg("ARGS=$args, PREV_ARGS=$prev_args",$nocolor);
+#	&infomsg("TYPE=$type,PREV_TYPE=$prev_type",$nocolor);
+
+	if ($library eq $prev_lib) {
+#	    print "DBG:Same library as previous file ($library,$type,$prev_type)\n";
+	    if (($type eq $prev_type)& ($type ne "c")) {
+#		print "DBG:Same type as previous file and not c code($type)\n";
+		if ($args eq $prev_args) {
+#		    print "DBG:Same arguments as previous file MERGE POSSIBLE\n";
+		    $command_files = join " ", $command_files,$file;
+#		    print "DBG:files = $command_files\n";
+		} else {
+#		    print "DBG:Different arguments (prev=$prev_args,args=$args) compared to previous file. NO MERGE\n";
+		    if ($command_files ne "") {
+#			print "DBG:Compile previous files: $prev_lib $command_files $prev_args\n";		    
+			&compile($command_files,$prev_args,$prev_type,$prev_lib,$mapped_libs);
+		    }
+		    $prev_args=$args;
+		    $prev_type=$type;
+		    $command_files=$file;
+		    $command_args=$args;
+		}
+	    } else {
+#		print "DBG:Different type compared to previous file ($prev_type). NO MERGE\n";
+		if ($command_files ne "") {
+#		    print "DBG:Compile previous files:$prev_lib $command_files $args\n";
+		    &compile($command_files,$prev_args,$prev_type,$prev_lib,$mapped_libs);
+		}
+		$prev_args=$args;
+		$prev_type=$type;
+		$command_files=$file;
+		$command_args=$args;
+	
+	    }
+	} else {
+#	    print "DBG:Different library compared to previous file. NO MERGE\n";
+	    if ($command_files ne "") {
+#		print "DBG:Compile previous files: $prev_lib $command_files $prev_args\n";		    
+		    &compile($command_files,$prev_args,$prev_type,$prev_lib,$mapped_libs);
+
+	    }
+	    $prev_args=$args;
+	    $prev_type=$type;
+	    $command_files=$file;
+	    $command_args = $args;
+	    # compile
+	    $prev_lib = $library;
+	}
+    }
+}
+
+
+if ($command_files ne "") {
+    print "DBG:Compile outstanding files: $prev_lib $command_files $prev_args\n";		    
+    &compile($command_files,$prev_args,$prev_type,$prev_lib,$mapped_libs);
+
+}
+
 
 
 

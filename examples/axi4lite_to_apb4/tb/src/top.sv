@@ -1,3 +1,5 @@
+timeunit 100ps;
+timeprecision 10fs;
 // ************************************************************************
 //               Copyright 2006-2015 Mentor Graphics Corporation
 //                            All Rights Reserved.
@@ -111,10 +113,10 @@ module top;
 //   assign apb4_master_if.PREADY = dut.u_csr_interface_apb.i_registers.rack;
    
    assign apb4_master_if.PSLVERR = 1'b0;
-   assign axi4_if.BREADY='1;
-   assign axi4_if.ARVALID='0;
-   assign axi4_if.AWVALID='0;
-   assign axi4_if.WVALID='0;
+//   assign axi4_if.BREADY='1;
+//   assign axi4_if.ARVALID='0;
+//   assign axi4_if.AWVALID='0;
+//   assign axi4_if.WVALID='0;
    
    
  initial 

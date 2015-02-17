@@ -79,7 +79,8 @@ class axi4lite_to_apb4_basetest extends uvm_test;
       m_axi4lite_cfg.m_bfm.register_interface_reporter(m_qvip_reporter);
       
       m_axi4lite_cfg.m_bfm.set_config_axi4lite_interface(1);
-      m_axi4lite_cfg.m_bfm.axi4_set_master_abstraction_level(1,0);
+      m_axi4lite_cfg.m_bfm.axi4_set_master_abstraction_level(0,1);
+      m_axi4lite_cfg.m_bfm.axi4_set_slave_abstraction_level(1,0);
 
      // Configure APB4 master
       m_apb4_master_cfg.m_bfm.register_interface_reporter(m_qvip_reporter);
@@ -106,7 +107,7 @@ class axi4lite_to_apb4_basetest extends uvm_test;
       m_apb4_master_clk_config.m_clk_period=5ns;
       m_apb4_slave_clk_config.m_clk_period=5ns;
 
-      m_axi4_clk_config.m_reset_delay=3;
+      m_axi4_clk_config.m_reset_delay=10;
       m_apb4_master_clk_config.m_reset_delay=3;
       m_apb4_slave_clk_config.m_reset_delay=3;
       
@@ -134,7 +135,7 @@ class axi4lite_to_apb4_basetest extends uvm_test;
       m_reg2apb = reg2apb_adapter_t::type_id::create("m_reg2apb");
       m_reg_predictor = apb3_reg_predictor_t::type_id::create("m_reg_predictor",this);
 //      uvm_reg::include_coverage(UVM_CVR_ALL);       
-      uvm_reg::include_coverage("*", UVM_CVR_ALL);
+      uvm_reg::include_coverage("*", UVM_CVR_ADDR_MAP);
 
    endfunction // build_phase
    
