@@ -29,9 +29,9 @@ my $scratchdir=$ENV{'QME_SCRATCH_HOME'};
 my $simsettingsdir=$ENV{'QME_SIM_SETTINGS_DIR'};
 my $makefile = $ENV{'QME_HOME'}."/"."templates/Makefile.template";
 my $block_overrides;
-
+my $simdir_fp;
 my $srchome=$ENV{'QME_PROJECT_HOME'}."/";
-my $qme_version=`cd $ENV{'QME_HOME'};git describe`;
+my $qme_version=`cd $ENV{'QME_HOME'};git describe --tags`;
 chomp $qme_version;
 # Functions
 sub print_note{
@@ -230,8 +230,16 @@ if (-e $block_defaults) {
     &system_cmd("touch $block_defaults");
 }
 
+if (-e $scratchdir) {
+    &print_note("Checking that $scratchdir exists (OK)");
+} else {
+    die("Error: $scratchdir do not exist");
+}
 
-my $simdir_fp=$ENV{'QME_SCRATCH_HOME'}."/".$simdir;
+
+    $simdir_fp=$scratchdir."/".$simdir;
+
+
 
 if (-e $simdir_fp) {
     if ($force == 0) {
