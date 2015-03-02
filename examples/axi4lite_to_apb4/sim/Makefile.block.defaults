@@ -8,6 +8,7 @@ QVIP_TARGETS=axi4 apb3
 
 SEND_EMAIL=0
 XLSFILE=${QME_HOME}/examples/${BLOCKNAME}/docs/axi4lite_to_apb4_registers.xls
+VLOG_TIMESCALE=-timescale 1ps/1ps
 
 # Convert xls to csv
 convert2csv:

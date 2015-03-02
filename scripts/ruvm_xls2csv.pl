@@ -15,6 +15,8 @@
 BEGIN {push @INC,$ENV{'QME_HOME'}."/perlmodules/lib/perl5/"}
 use strict;
 use Spreadsheet::ParseExcel;
+binmode STDOUT, ":encoding(UTF-8)";
+
 my $excel_file=pop;
 my $parser   = Spreadsheet::ParseExcel->new();
 my $workbook = $parser->parse($excel_file);
@@ -150,7 +152,7 @@ sub print_row {
 
 foreach my $s ($workbook->worksheets) {
     my $sheetname=$s->get_name;
-    print "Processing sheet $sheetname\n";
+    print "INFO:Processing sheet $sheetname\n";
     my $csvfile=$sheetname.".csv";
     open FILEP,">",$csvfile;
 #    &print_note("Checking sheet $s");
@@ -170,7 +172,7 @@ foreach my $s ($workbook->worksheets) {
 	    push @cols,$value;
 	}
     }    
-    $col--;
+    print "INFO:Found $col columns in $sheetname\n";
     for (my $i=0;$i<$col-1;$i++) {
 	my $tmp=shift @cols;
 	print FILEP "$tmp,";

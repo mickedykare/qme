@@ -8,7 +8,7 @@
 // File            : axi4lite_to_apb4_regs_pkg.sv
 //----------------------------------------------------------------------
 // Created by      : mikaela
-// Creation Date   : 2/17/15 11:47 PM
+// Creation Date   : 2/18/15 9:28 PM
 //----------------------------------------------------------------------
 // Title           : axi4lite_to_apb4_proj
 //
@@ -293,7 +293,9 @@ package axi4lite_to_apb4_regs_pkg;
             bins WR = {0};
          }
 
-         ACCESS: cross ADDR, RW;
+         ACCESS: cross ADDR, RW {
+            ignore_bins read_only  = binsof(ADDR) intersect {'h0, 'h4, 'hbac} && binsof(RW) intersect {0};
+         }
 
       endgroup: ra_cov
 
@@ -345,38 +347,61 @@ package axi4lite_to_apb4_regs_pkg;
             void'(set_coverage(UVM_CVR_ADDR_MAP));
          end
          axi4lite_to_apb4_axi_stat = axi4lite_to_apb4_axi_stat_reg::type_id::create("axi4lite_to_apb4_axi_stat");
-         axi4lite_to_apb4_axi_stat.configure(this);
+         axi4lite_to_apb4_axi_stat.configure(this, null, "");
+         axi4lite_to_apb4_axi_stat.add_hdl_path_slice("wr_cnt_axi4lite_to_apb4_axi_stat", 10, 10);
+         axi4lite_to_apb4_axi_stat.add_hdl_path_slice("rd_cnt_axi4lite_to_apb4_axi_stat", 0, 10);
          axi4lite_to_apb4_axi_stat.build();
 
          axi4lite_to_apb4_apb_stat = axi4lite_to_apb4_apb_stat_reg::type_id::create("axi4lite_to_apb4_apb_stat");
-         axi4lite_to_apb4_apb_stat.configure(this);
+         axi4lite_to_apb4_apb_stat.configure(this, null, "");
+         axi4lite_to_apb4_apb_stat.add_hdl_path_slice("rd_cnt_axi4lite_to_apb4_apb_stat", 10, 10);
+         axi4lite_to_apb4_apb_stat.add_hdl_path_slice("wr_cnt_axi4lite_to_apb4_apb_stat", 0, 10);
          axi4lite_to_apb4_apb_stat.build();
 
          axi4lite_to_apb4_slv_config = axi4lite_to_apb4_slv_config_reg::type_id::create("axi4lite_to_apb4_slv_config");
-         axi4lite_to_apb4_slv_config.configure(this);
+         axi4lite_to_apb4_slv_config.configure(this, null, "");
+         axi4lite_to_apb4_slv_config.add_hdl_path_slice("use_merr_resp_axi4lite_to_apb4_slv_config,", 0, 1);
          axi4lite_to_apb4_slv_config.build();
 
          axi4lite_to_apb4_mst_config = axi4lite_to_apb4_mst_config_reg::type_id::create("axi4lite_to_apb4_mst_config");
-         axi4lite_to_apb4_mst_config.configure(this);
+         axi4lite_to_apb4_mst_config.configure(this, null, "");
+         axi4lite_to_apb4_mst_config.add_hdl_path_slice("wr_rd_ratio_axi4lite_to_apb4_mst_config", 0, 3);
          axi4lite_to_apb4_mst_config.build();
 
          axi4lite_to_apb4_sample_config = axi4lite_to_apb4_sample_config_reg::type_id::create("axi4lite_to_apb4_sample_config");
-         axi4lite_to_apb4_sample_config.configure(this);
+         axi4lite_to_apb4_sample_config.configure(this, null, "");
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("waddr_nd_axi4lite_to_apb4_sample_config", 31, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("waddr_ni_axi4lite_to_apb4_sample_config", 30, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("waddr_pd_axi4lite_to_apb4_sample_config", 29, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("waddr_pi_axi4lite_to_apb4_sample_config", 28, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("wdata_nd_axi4lite_to_apb4_sample_config", 27, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("wdata_ni_axi4lite_to_apb4_sample_config", 26, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("wdata_pd_axi4lite_to_apb4_sample_config", 25, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("wdata_pi_axi4lite_to_apb4_sample_config", 24, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("raddr_nd_axi4lite_to_apb4_sample_config", 23, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("raddr_ni_axi4lite_to_apb4_sample_config", 22, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("raddr_pd_axi4lite_to_apb4_sample_config", 21, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("raddr_pi_axi4lite_to_apb4_sample_config", 20, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("rdata_nd_axi4lite_to_apb4_sample_config", 19, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("rdata_ni_axi4lite_to_apb4_sample_config", 18, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("rdata_pd_axi4lite_to_apb4_sample_config", 17, 1);
+         axi4lite_to_apb4_sample_config.add_hdl_path_slice("rdata_pi_axi4lite_to_apb4_sample_config", 16, 1);
          axi4lite_to_apb4_sample_config.build();
 
          axi4lite_to_apb4_sample = axi4lite_to_apb4_sample_reg::type_id::create("axi4lite_to_apb4_sample");
-         axi4lite_to_apb4_sample.configure(this);
+         axi4lite_to_apb4_sample.configure(this, null, "");
+         axi4lite_to_apb4_sample.add_hdl_path_slice("data_axi4lite_to_apb4_sample", 0, 32);
          axi4lite_to_apb4_sample.build();
 
          axi4lite_to_apb4_register_map = create_map("axi4lite_to_apb4_register_map", 'h0, 4, UVM_LITTLE_ENDIAN, 1);
          default_map = axi4lite_to_apb4_register_map;
 
-         axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_axi_stat, 'h0, "RW");
-         axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_apb_stat, 'h4, "RW");
+         axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_axi_stat, 'h0, "RC");
+         axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_apb_stat, 'h4, "RC");
          axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_slv_config, 'h10, "RW");
          axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_mst_config, 'h20, "RW");
          axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_sample_config, 'hb60, "RW");
-         axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_sample, 'hbac, "RW");
+         axi4lite_to_apb4_register_map.add_reg(axi4lite_to_apb4_sample, 'hbac, "RO");
 
          lock_model();
       endfunction
