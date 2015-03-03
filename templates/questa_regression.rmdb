@@ -9,8 +9,8 @@
      # THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION WHICH IS THE PROPERTY OF
      # MENTOR GRAPHICS CORPORATION OR ITS LICENSORS AND IS SUBJECT TO LICENSE TERMS
      #
-     # bugs, enhancment requests to: Mikael_Andersson@mentor.com
-     # ******************************************************************************tc****-->
+     # bugs, enhancement requests to: Mikael_Andersson@mentor.com
+     # **********************************************************************************-->
 <rmdb loadtcl="mytcl" xmlns:xi="http://www.w3.org/2003/XInclude">
   <!-- Method definitions -->
   <!-- ========================================================== -->
@@ -55,7 +55,7 @@
       <parameter name="RERUN_FAILING_TESTS">0</parameter>
       <parameter name="TIMESTAMP">0</parameter>
       <parameter name="EXCEL_VPLAN">""</parameter>
-      <parameter name="DUT_SETUPS" type = "tcl">[get_all_setups (%TCSPEC%)]</parameter>
+      <parameter name="DUT_SETUPS" type="tcl">[get_all_setups (%TCSPEC%)]</parameter>
       <parameter name="XML2UCDB_DATAFIELDS">-datafields "Section, Title, Description, Link, Type, Weight, Goal, Drop"</parameter>
       <parameter name="BITS">64</parameter>
       <parameter name="SANITY">0</parameter>
@@ -123,7 +123,6 @@
       <parameter name="RERUN_TESTS" type="tcl">[generate_rerun_info (%TIMESTAMP%) (%DATADIR%)]</parameter>
       <parameter name="TRIAGE_CMD" type="tcl">[generate_triage_cmd (%TIMESTAMP%) (%DATADIR%)]</parameter>
     </parameters>
-
     <execScript launch="/bin/bash" mintimeout="300">
       <command>echo 'DEBUG:(%HTML%) '                                                                               </command>
       <command>echo "(%BLOCKNAME%)"                                                                                 </command>
@@ -183,7 +182,6 @@
   <!-- == All setups run in parallel   ================ -->
   <!-- ================================================ -->
   <runnable name="all_setups" type="group" sequential="no" >
-
     <parameters>
     </parameters>
     <members>
@@ -194,7 +192,6 @@
   <!-- ================================================ -->
   <!-- == Put all ranked simulations as part of a new tc spec  ================ -->
   <!-- ================================================ -->
-
   <runnable name="finalize_ranking" type="task"  if="(%RANKING%) eq {1}">
     <execScript launch="/bin/csh -f">
       <command>cat (%SCRATCH%)/*(%TIMESTAMP%)_ranked_tc_spec.list >> (%SCRATCH%)/(%TIMESTAMP%)_ranked_tc_spec.txt</command>
@@ -204,18 +201,17 @@
   <!-- ================================================ -->
   <!-- == Create ranking if necessary                   -->
   <!-- ================================================ -->
-
   <runnable name="create_rankfile" type="task" if="(%RANKING%) eq {1}" >
     <parameters>
       <parameter name="mymergefile" >(%MERGE_HOME%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.ucdb</parameter>
     </parameters>
     <execScript>
-      <command>if [catch {open (%SCRATCH%)/(%ACTUAL_SETUP%)_(%TIMESTAMP%)_ranked_tc_spec.list w} ranked_spec_file] { </command>
+      <command> if [catch {open (%SCRATCH%)/(%ACTUAL_SETUP%)_(%TIMESTAMP%)_ranked_tc_spec.list w} ranked_spec_file] { </command>
       <command>  puts stderr "Cannot create file (%SCRATCH%)/(%ACTUAL_SETUP%)_(%TIMESTAMP%)_ranked_tc_spec.list\n"  </command>
       <command>  exit                                                            </command>
-      <command>}                                                                 </command>
-      <command>set f (%mymergefile%)                                               </command>
-      <command> echo "Ranking: $f"                                                </command>
+      <command> }                                                                </command>
+      <command> set f (%mymergefile%)                                            </command>
+      <command> echo "Ranking: $f"                                               </command>
       <command> set test [lindex [split [file rootname [file tail $f]] "."] 0 ]  </command>
       <command> set t [lindex [split $test _] 0]                                 </command>
       <command> vcover ranktest -concise -rankfile (%SCRATCH%)/$t.rank $f        </command>
@@ -234,7 +230,7 @@
                 #     SEED                = 996513213                       -->
       <command>      set tmp [split [vcover attribute -seed $line]]              </command>
       <command>      set testname [lindex [ split [lindex $tmp 2 ] : ] 0 ]       </command>
-       <command>      set testname [string map {(%ACTUAL_SETUP%)_ ""} $testname] </command>
+      <command>      set testname [string map {(%ACTUAL_SETUP%)_ ""} $testname]  </command>
       <command>      set seed [lindex $tmp [expr [llength $tmp] - 2] ]           </command>
       <command>      lappend test_seed($testname) $seed                          </command>
       <command>    }                                                             </command>
@@ -246,14 +242,13 @@
       <command>    set nr_of_runs [llength $test_seed($testname)]                </command>
       <command>    puts $ranked_spec_file "(%ACTUAL_SETUP%) $testname  $nr_of_runs $test_seed($testname)"</command>
       <command>  }                                                               </command>
-      <command>close $ranked_spec_file                                           </command>
+      <command> close $ranked_spec_file                                          </command>
     </execScript>
   </runnable>
 
   <!-- ================================================ -->
   <!-- == Run CDC static - NOT IMPLEMENTED YET          -->
   <!-- ================================================ -->
-
   <runnable name="cdc_static" type="task"  if="(%CDC_STATIC%) eq {1}">
     <execScript launch="/bin/csh -f">
       <command> echo "Static CDC in regression not yet implemented" </command>
@@ -263,7 +258,6 @@
   <!-- ================================================ -->
   <!-- == Run For each setup, compile,simulate and gather data          -->
   <!-- ================================================ -->
-
   <runnable name="setup" type="group" foreach="(%DUT_SETUPS%)" sequential="yes" >
     <parameters>
       <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>      
@@ -431,7 +425,7 @@
 
 
   <!-- ================================================ -->
-  <!-- == Reporting Runables  ========================= -->
+  <!-- == Reporting Runnables  ======================== -->
   <!-- == This section merges all the UCDB files and == -->
   <!-- == generates HTML reports + creates the       == -->
   <!-- == triage file                                == -->
@@ -581,6 +575,7 @@
       <command> vcover report -html -nosource -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_coverage_report (%mymergefile%)</command>
     </execScript>
   </runnable>
+
 
   <runnable name="regression_summary" type="task" >
     <execScript launch="/bin/csh -f">
