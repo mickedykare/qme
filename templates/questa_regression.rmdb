@@ -97,7 +97,6 @@
   <runnable name="my_run" type="group" sequential="yes" base="testsetup">
     <method base="compute_grid"/>
     <members>
-      <member>convert_vplans_to_ucdb</member>
       <member>all_setups</member>
       <member>finalize_ranking</member>
       <member>regression_summary</member>
@@ -257,7 +256,7 @@
   <!-- == Run CDC static - NOT IMPLEMENTED YET          -->
   <!-- ================================================ -->
 
-  <runnable name="cdc_static" type="task" base="setup" if="(%CDC_STATIC%) eq {1}">
+  <runnable name="cdc_static" type="task" base="testsetup" if="(%CDC_STATIC%) eq {1}">
     <execScript launch="/bin/csh -f">
       <command> echo "Static CDC in regression not yet implemented" </command>
     </execScript>
@@ -275,6 +274,7 @@
       <parameter name="TRIAGECOMMAND">"vrun -vrmdata regression_data -gui -do triage view (%triagefile%) -question all"</parameter>
     </parameters>
     <members>
+      <member>convert_vplan_to_ucdb</member>
       <member>compile_all</member>
       <member>cdc_static</member>
       <member>tests</member>
@@ -357,7 +357,7 @@
     </members>
   </runnable>
 
-  <runnable name="autocheck" type="task" base="setup" if="(%AUTOCHECK%) eq {1}">
+  <runnable name="autocheck" type="task" base="testsetup" if="(%AUTOCHECK%) eq {1}">
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
     </parameters>
@@ -371,7 +371,7 @@
     </execScript>
   </runnable>
 
-  <runnable name="formal" type="task" base="setup" if="(%FORMAL%) eq {1}">
+  <runnable name="formal" type="task" base="testsetup" if="(%FORMAL%) eq {1}">
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
     </parameters>
@@ -381,7 +381,7 @@
     </execScript>
   </runnable>
 
-  <runnable name="xprop" type="task" base="setup" if="(%XPROP%) eq {1}">
+  <runnable name="xprop" type="task" base="testsetup" if="(%XPROP%) eq {1}">
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
     </parameters>
@@ -461,7 +461,7 @@
     </execScript>
   </runnable>
 
-  <runnable name="merge_ucdb_files" type="task" base="setup">
+  <runnable name="merge_ucdb_files" type="task" base="testsetup">
     <parameters>
        <parameter name="CURRENT_SETUP">(%setup.ITERATION%)</parameter>    
        <parameter name="VPLAN_UCDB">(%DATADIR%)/(%CURRENT_SETUP%).testplan.ucdb</parameter>    
@@ -502,7 +502,7 @@
   </runnable>
 
 
-  <runnable name="covercheck" type="task" base="setup" if="(%COVERCHECK%) eq {1}">
+  <runnable name="covercheck" type="task" base="testsetup" if="(%COVERCHECK%) eq {1}">
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
     </parameters>
@@ -548,19 +548,6 @@
     </members>
   </runnable>
 
-  <runnable name="convert_vplans_to_ucdb" type="group" sequential="no" if="(%REQUIRE_VPLAN%) eq {1}">
-      <method>
-      </method>
-    <preScript launch="/bin/csh -f">
-      <command> if  ("(%DUT_SETUPS%)" == "") then  </command>
-      <command> echo "Check your (%TCSPEC%), did not find any setups"</command> 
-      <command> exit 1 </command>
-      <command> endif </command>
-    </preScript>
-    <members>
-      <member>convert_vplan_to_ucdb</member>
-    </members>
-  </runnable>
 
   <runnable name="convert_vplan_to_ucdb"  foreach="(%DUT_SETUPS%)" base="testsetup"  type="task"  if="(%REQUIRE_VPLAN%) eq {1}">
     <parameters>
@@ -597,6 +584,9 @@
       <command>  echo "converting xml to ucdb" </command>  
       <command>  xml2ucdb -format Excel -datafields (%XML2UCDB_DATAFIELDS%) *.xml (%VPLAN_UCDB%) </command>
       <command>  if ($status != 0) exit 1          </command>    
+      <command> else </command>
+      <command>  echo "(%VPLAN_EXCEL_TS%) not found"</command> 
+      <command>  exit 1 </command>
       <command>endif</command>    
     </execScript>
   </runnable>

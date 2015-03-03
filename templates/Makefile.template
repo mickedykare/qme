@@ -559,6 +559,19 @@ regression_kill:
 
 
 
+view_trend:
+	firefox ${HTML_REPORTS_HOME}/${SETUP}_trend_report/index.html &
+
+view_coverage:
+	firefox ${HTML_REPORTS_HOME}/${SETUP}_coverage_report/index.html &
+
+view_backannotated_vplan:	
+	firefox ${HTML_REPORTS_HOME}/${SETUP}_coverage_report/testplan.html &
+
+
+
+
+
 ############# Formal tools ##############################
 #########################################################
 # Extract generics for a design. TB can override generics
