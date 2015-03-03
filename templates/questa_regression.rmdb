@@ -108,7 +108,7 @@
   <!-- ================================================ -->
   <!-- == Email report at the end   =================== -->
   <!-- ================================================ -->
-  <runnable name="send_email" type="task" base="testsetup" if="(%SEND_EMAIL%)">
+  <runnable name="send_email" type="task" if="(%SEND_EMAIL%)">
     <!-- No need to run this on queu -->
     <method>
     </method>
@@ -183,7 +183,7 @@
   <!-- == Handle each setup as it own  ================ -->
   <!-- == All setups run in parallel   ================ -->
   <!-- ================================================ -->
-  <runnable name="all_setups" type="group" sequential="no" base="testsetup">
+  <runnable name="all_setups" type="group" sequential="no" >
 
     <parameters>
     </parameters>
@@ -196,7 +196,7 @@
   <!-- == Put all ranked simulations as part of a new tc spec  ================ -->
   <!-- ================================================ -->
 
-  <runnable name="finalize_ranking" type="task" base = "testsetup" if="(%RANKING%) eq {1}">
+  <runnable name="finalize_ranking" type="task"  if="(%RANKING%) eq {1}">
     <execScript launch="/bin/csh -f">
       <command>cat (%SCRATCH%)/*(%TIMESTAMP%)_ranked_tc_spec.list >> (%SCRATCH%)/(%TIMESTAMP%)_ranked_tc_spec.txt</command>
     </execScript>
@@ -256,7 +256,7 @@
   <!-- == Run CDC static - NOT IMPLEMENTED YET          -->
   <!-- ================================================ -->
 
-  <runnable name="cdc_static" type="task" base="testsetup" if="(%CDC_STATIC%) eq {1}">
+  <runnable name="cdc_static" type="task"  if="(%CDC_STATIC%) eq {1}">
     <execScript launch="/bin/csh -f">
       <command> echo "Static CDC in regression not yet implemented" </command>
     </execScript>
@@ -266,7 +266,7 @@
   <!-- == Run For each setup, compile,simulate and gather data          -->
   <!-- ================================================ -->
 
-  <runnable name="setup" type="group" foreach="(%DUT_SETUPS%)" sequential="yes" base="testsetup">
+  <runnable name="setup" type="group" foreach="(%DUT_SETUPS%)" sequential="yes" >
     <parameters>
       <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>      
       <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
@@ -283,7 +283,7 @@
   </runnable>
 
   <!-- == test: Running all simulations and formal apps in parallell  ============== -->
-  <runnable name="tests" type="group" sequential="no" base="testsetup">
+  <runnable name="tests" type="group" sequential="no">
     <members>
       <member>test</member>
     </members>
@@ -291,7 +291,7 @@
 
 
   <!-- == test: Running all simulations and formal apps in parallell  ============== -->
-  <runnable name="test" type="group" sequential="no" base="testsetup" foreach="(%VALID_TESTS%)">
+  <runnable name="test" type="group" sequential="no" foreach="(%VALID_TESTS%)">
     <parameters>
       <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>      
       <parameter name="VALID_TESTS" type="tcl">[get_tests_for_setup (%TCSPEC%) (%ACTUAL_SETUP%)]</parameter>
@@ -310,7 +310,7 @@
   <!-- == for more control over specification of     == -->
   <!-- == dependencies                               == -->  
   <!-- ================================================ -->
-  <runnable name="compile_all" type="task" base = "testsetup" >
+  <runnable name="compile_all" type="task"  >
     <parameters>
       <!--parameter name="ACTUAL_SETUP" type="tcl">[lindex [split [lindex [split (%CONTEXT%) "/"] end-1] "~"] 1]</parameter-->
       <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>      
@@ -343,7 +343,7 @@
   <!-- == of parallell jobs are controlled by the    == -->
   <!-- == switch -j <nbr>                            == -->
   <!-- ================================================ -->
-  <runnable name="all_sims" type="group" sequential="no" base="testsetup">
+  <runnable name="all_sims" type="group" sequential="no" >
     <parameters>
       <parameter name="ACTUAL_SETUP">(%setup.ITERATION%)</parameter>      
       <parameter name="TEST_SEEDS" type="tcl">[get_test_seeds (%TCSPEC%) (%ACTUAL_SETUP%) (%test.ITERATION%) (%SANITY%)]</parameter>
@@ -357,7 +357,7 @@
     </members>
   </runnable>
 
-  <runnable name="autocheck" type="task" base="testsetup" if="(%AUTOCHECK%) eq {1}">
+  <runnable name="autocheck" type="task"  if="(%AUTOCHECK%) eq {1}">
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
     </parameters>
@@ -381,7 +381,7 @@
     </execScript>
   </runnable>
 
-  <runnable name="xprop" type="task" base="testsetup" if="(%XPROP%) eq {1}">
+  <runnable name="xprop" type="task"  if="(%XPROP%) eq {1}">
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
     </parameters>
@@ -392,7 +392,7 @@
   </runnable>
 
       
-  <runnable name="Simulate"  type="task"  foreach="(%TEST_SEEDS%)" base="testsetup">
+  <runnable name="Simulate"  type="task"  foreach="(%TEST_SEEDS%)" >
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
       <parameter name="TESTNAME" type="tcl">[lindex [split [lindex [split [file tail (%CONTEXT%)] ":"] 0] "~"] 1]</parameter>
@@ -447,57 +447,60 @@
   <!-- == generates HTML reports + creates the       == -->
   <!-- == triage file                                == -->
   <!-- ================================================ -->
-  <runnable name="coverage_trend_report_csv" type="task" base = "testsetup">
+  <runnable name="coverage_trend_report_csv" type="task" >
     <execScript launch="/bin/csh -f">
       <command>vcover report -trend -csv (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb -file (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend_report.csv -bydu  </command>
       <command> if ($status != 0) exit 1 </command>
     </execScript>
   </runnable>
 
-  <runnable name="coverage_trend_report_html" type="task" base = "testsetup">
+  <runnable name="coverage_trend_report_html" type="task">
     <execScript launch="/bin/csh -f">
       <command>vcover report -trend -html (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb -nodetails -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend_report  </command>
       <command> if ($status != 0) exit 1 </command>
     </execScript>
   </runnable>
 
-  <runnable name="merge_ucdb_files" type="task" base="testsetup">
+  <runnable name="merge_ucdb_files" type="task">
     <parameters>
-       <parameter name="CURRENT_SETUP">(%setup.ITERATION%)</parameter>    
-       <parameter name="VPLAN_UCDB">(%DATADIR%)/(%CURRENT_SETUP%).testplan.ucdb</parameter>    
+       <parameter name="VPLAN_UCDB">(%DATADIR%)/(%ACTUAL_SETUP%).testplan.ucdb</parameter>    
     </parameters>
     <execScript launch="/bin/csh -f">
-      <command> echo (%CURRENT_SETUP%) and (%mymergefile%) and (%mymergefile_noplan%) and (%mergelist%) </command>
-      <command>ln -s (%MERGE_HOME%) (%DATADIR%)/merged_ucdbfiles </command>
+      <command> echo "--------------------------------------------------------------------------------" </command>
+      <command> echo DEBUG: ACTUAL_SETUP      =(%ACTUAL_SETUP%) </command>
+      <command> echo DEBUG: mymergefile       =(%mymergefile%)</command>
+      <command> echo DEBUG: mymergefile_noplan=(%mymergefile_noplan%)</command>
+      <command> echo DEBUG: mergelist         =(%mergelist%)</command>
+      <command> echo DEBUG: VPLAN_UCDB        =(%VPLAN_UCDB%)</command>
+      <command> echo "--------------------------------------------------------------------------------" </command>
+      <command> ln -s (%MERGE_HOME%) (%DATADIR%)/merged_ucdbfiles </command>
       <command> unsetenv MODELSIM</command>
       <command> if (-e (%mergelist%)) then </command>
+      <command>   vcover merge (%VCOVER_OPTIONS%) -out (%mymergefile_noplan%) -inputs (%mergelist%) (%mergeoptions%)</command>
+      <command>   if ($status != 0) exit 1     </command>      
       <command>   if (-e (%VPLAN_UCDB%)) then </command>
-      <command>     vcover merge (%VCOVER_OPTIONS%) -out (%mymergefile_noplan%) -inputs (%mergelist%) (%mergeoptions%)</command>
       <command>     vcover merge (%VCOVER_OPTIONS%) -out (%mymergefile%) (%mergeoptions%)  (%mymergefile_noplan%) (%VPLAN_UCDB%) </command>
-      <command>     if ($status != 0) exit 1     </command>      
-      <command>   else </command>
-      <command>     vcover merge  (%VCOVER_OPTIONS%) -out (%mymergefile_noplan%) -inputs (%mergelist%) (%mergeoptions%)</command>
       <command>     if ($status != 0) exit 1     </command>      
       <command>   endif </command>
 
-      <command> if ( (%REQUIRE_VPLAN%) != 0) then </command>
-      <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.ucdb</command>
-      <command> if ($status != 0) exit 1 </command>
+      <command>   if ( (%REQUIRE_VPLAN%) != 0) then </command>
+      <command>     vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.ucdb</command>
+      <command>     if ($status != 0) exit 1 </command>
+      <command>   else </command>
+      <command>     vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.noplan.ucdb</command>
+      <command>     if ($status != 0) exit 1 </command>
+      <command>   endif </command>
       <command> else </command>
-      <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.noplan.ucdb</command>
-      <command> if ($status != 0) exit 1 </command>
-      <command> endif </command>
-      <command>  else </command>
       <command>   echo "No (%mergelist%) was found. Could be because no simulation passed -no idea to do anything more..." </command>
-      <command>  exit 1 </command>
-      <command> rm -f (%MERGE_HOME%)</command>
-      <command>     if ($status != 0) exit 1     </command>      
+      <command>   exit 1 </command>
+      <command>   rm -f (%MERGE_HOME%)</command>
+      <command>   if ($status != 0) exit 1     </command>      
       <command> endif </command>
     </execScript>
   </runnable>
 
 
-  <runnable name="covercheck" type="task" base="testsetup" if="(%COVERCHECK%) eq {1}">
+  <runnable name="covercheck" type="task" if="(%COVERCHECK%) eq {1}">
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
     </parameters>
@@ -546,7 +549,7 @@
 
   <runnable name="convert_vplan_to_ucdb"  type="task"  if="(%REQUIRE_VPLAN%) eq {1}">
     <parameters>
-      <parameter name="VPLAN_UCDB">(%DATADIR%)/(%CURRENT_SETUP%).testplan.ucdb</parameter>    
+      <parameter name="VPLAN_UCDB">(%DATADIR%)/(%ACTUAL_SETUP%).testplan.ucdb</parameter>    
       <parameter name="VPLAN_EXCEL_TS" type="tcl">[get_extra_args (%TCSPEC%) (%ACTUAL_SETUP%) VPLAN_EXCEL]</parameter>
     </parameters>
   <!-- Need to execute locally due to openoffice -->
@@ -586,14 +589,14 @@
   </runnable>
 
 
-  <runnable name="coverage_html_report" type="task" base="testsetup">
+  <runnable name="coverage_html_report" type="task" >
     <execScript>
       <command> echo "Creating HTML report for (%mymergefile%)"                               </command>
       <command> vcover report -html -nosource -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_coverage_report (%mymergefile%)</command>
     </execScript>
   </runnable>
 
-  <runnable name="regression_summary" type="task" base="testsetup">
+  <runnable name="regression_summary" type="task" >
     <execScript launch="/bin/csh -f">
       <command>test -e (%DATADIR%)/merged_ucdbfiles||ln -s (%MERGE_HOME%) (%DATADIR%)/merged_ucdbfiles </command>
       <command>if ($status != 0) exit 1     </command>      
@@ -611,7 +614,7 @@
   <!-- ============================================================================= -->
   <!-- == user_report: Call a user provided makefile target if provided              == -->
   <!-- ============================================================================= -->
-  <runnable name="user_report" type="task" base="testsetup" if="{(%USER_REPORT_TARGET%)} ne &quot;&quot;">
+  <runnable name="user_report" type="task"  if="{(%USER_REPORT_TARGET%)} ne &quot;&quot;">
     <execScript launch="/bin/csh -f">
       <command> echo "Calling user provided target (%USER_REPORT_TARGET%)" </command>
       <command> make -f (%MAKEFILE%) (%USER_REPORT_TARGET%) TIMESTAMP=(%TIMESTAMP%)        </command>
