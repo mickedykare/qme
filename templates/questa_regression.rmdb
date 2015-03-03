@@ -487,11 +487,6 @@
       <command>   vcover merge  (%VCOVER_OPTIONS%) -trend (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb (%MERGE_HOME%)/(%ACTUAL_SETUP%)*merge.noplan.ucdb</command>
       <command> if ($status != 0) exit 1 </command>
       <command> endif </command>
-
-
-
-
-
       <command>  else </command>
       <command>   echo "No (%mergelist%) was found. Could be because no simulation passed -no idea to do anything more..." </command>
       <command>  exit 1 </command>
