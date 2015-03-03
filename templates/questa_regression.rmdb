@@ -544,11 +544,10 @@
   </runnable>
 
 
-  <runnable name="convert_vplan_to_ucdb"  foreach="(%DUT_SETUPS%)" base="testsetup"  type="task"  if="(%REQUIRE_VPLAN%) eq {1}">
+  <runnable name="convert_vplan_to_ucdb"  type="task"  if="(%REQUIRE_VPLAN%) eq {1}">
     <parameters>
-      <parameter name="CURRENT_SETUP">(%convert_vplan_to_ucdb.ITERATION%)</parameter>    
       <parameter name="VPLAN_UCDB">(%DATADIR%)/(%CURRENT_SETUP%).testplan.ucdb</parameter>    
-      <parameter name="VPLAN_EXCEL_TS" type="tcl">[get_extra_args (%TCSPEC%) (%CURRENT_SETUP%) VPLAN_EXCEL]</parameter>
+      <parameter name="VPLAN_EXCEL_TS" type="tcl">[get_extra_args (%TCSPEC%) (%ACTUAL_SETUP%) VPLAN_EXCEL]</parameter>
     </parameters>
   <!-- Need to execute locally due to openoffice -->
       <method>
@@ -556,7 +555,7 @@
     <execScript launch="/bin/csh -f">
       <command>unsetenv MODELSIM </command>
       <command>echo DBG: ---------------------------------------</command>
-      <command>echo DBG: CURRENT_SETUP  =(%CURRENT_SETUP%)</command>
+      <command>echo DBG: CURRENT_SETUP  =(%ACTUAL_SETUP%)</command>
       <command>echo DBG: TCSPEC         =(%TCSPEC%)</command>
       <command>echo DBG: VPLAN_UCDB     =(%VPLAN_UCDB%)</command>
       <command>echo DBG: VPLAN_EXCEL_TS =(%VPLAN_EXCEL_TS%)</command>
