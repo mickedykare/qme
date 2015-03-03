@@ -568,6 +568,8 @@ view_coverage:
 view_backannotated_vplan:	
 	firefox ${HTML_REPORTS_HOME}/${SETUP}_coverage_report/testplan.html &
 
+view_email:
+	firefox ${SCRATCHDIR}/my_run/send_email/email_message.htm &
 
 
 
