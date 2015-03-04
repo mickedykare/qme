@@ -96,6 +96,26 @@
   <!-- ================================================ -->
   <runnable name="my_run" type="group" sequential="yes" base="testsetup">
     <method base="compute_grid"/>
+    <parameters>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
+    </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <members>
       <member>all_setups</member>
       <member>finalize_ranking</member>
@@ -122,7 +142,25 @@
       <parameter name="REMOVE_TXT2">"regression may still be running or may have terminated abnormally"</parameter>
       <parameter name="RERUN_TESTS" type="tcl">[generate_rerun_info (%TIMESTAMP%) (%DATADIR%)]</parameter>
       <parameter name="TRIAGE_CMD" type="tcl">[generate_triage_cmd (%TIMESTAMP%) (%DATADIR%)]</parameter>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <execScript launch="/bin/bash" mintimeout="300">
       <command>echo 'DEBUG:(%HTML%) '                                                                               </command>
       <command>echo "(%BLOCKNAME%)"                                                                                 </command>
@@ -183,7 +221,25 @@
   <!-- ================================================ -->
   <runnable name="all_setups" type="group" sequential="no" >
     <parameters>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <members>
       <member>setup</member>
     </members>
@@ -193,6 +249,26 @@
   <!-- == Put all ranked simulations as part of a new tc spec  ================ -->
   <!-- ================================================ -->
   <runnable name="finalize_ranking" type="task"  if="(%RANKING%) eq {1}">
+    <parameters>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
+    </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <execScript launch="/bin/csh -f">
       <command>cat (%SCRATCH%)/*(%TIMESTAMP%)_ranked_tc_spec.list >> (%SCRATCH%)/(%TIMESTAMP%)_ranked_tc_spec.txt</command>
     </execScript>
@@ -204,8 +280,26 @@
   <runnable name="create_rankfile" type="task" if="(%RANKING%) eq {1}" >
     <parameters>
       <parameter name="mymergefile" >(%MERGE_HOME%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.ucdb</parameter>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
-    <execScript>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
+   <execScript>
       <command> if [catch {open (%SCRATCH%)/(%ACTUAL_SETUP%)_(%TIMESTAMP%)_ranked_tc_spec.list w} ranked_spec_file] { </command>
       <command>  puts stderr "Cannot create file (%SCRATCH%)/(%ACTUAL_SETUP%)_(%TIMESTAMP%)_ranked_tc_spec.list\n"  </command>
       <command>  exit                                                            </command>
@@ -250,7 +344,27 @@
   <!-- == Run CDC static - NOT IMPLEMENTED YET          -->
   <!-- ================================================ -->
   <runnable name="cdc_static" type="task"  if="(%CDC_STATIC%) eq {1}">
-    <execScript launch="/bin/csh -f">
+     <parameters>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
+    </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
+   <execScript launch="/bin/csh -f">
       <command> echo "Static CDC in regression not yet implemented" </command>
     </execScript>
   </runnable>
@@ -264,7 +378,25 @@
       <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
       <parameter name="triagefile">(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).tdb</parameter>
       <parameter name="TRIAGECOMMAND">"vrun -vrmdata regression_data -gui -do triage view (%triagefile%) -question all"</parameter>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <members>
       <member>convert_vplan_to_ucdb</member>
       <member>compile_all</member>
@@ -285,8 +417,26 @@
   <!-- == test: Running all simulations and formal apps in parallell  ============== -->
   <runnable name="test" type="group" sequential="no" foreach="(%VALID_TESTS%)">
     <parameters>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
       <parameter name="VALID_TESTS" type="tcl">[get_tests_for_setup (%TCSPEC%) (%ACTUAL_SETUP%)]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <members>
       <member>all_sims</member>
     </members>
@@ -309,7 +459,25 @@
       <parameter name="EXTRA_X_COMP_ARGS" type="tcl">[get_extra_args (%TCSPEC%) (%ACTUAL_SETUP%) X_COMP_ARGS]</parameter>
       <parameter name="EXTRA_SC_ARGS"    type="tcl">[get_extra_args (%TCSPEC%) (%ACTUAL_SETUP%) SC_ARGS]</parameter>
       <parameter name="ALL_COMPILE_ARGS">X_COMP_ARGS=&quot; (%EXTRA_X_COMP_ARGS%) --define FLTVAR_COMPILE_SETUP=(%ACTUAL_SETUP%) (%EXTRA_VLOG_ARGS%) (%EXTRA_VCOM_ARGS%)&quot; SC_ARGS=(%EXTRA_SC_ARGS%)</parameter>
+   	<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
 
     <execScript launch="/bin/csh -f">
       <command>unsetenv MODELSIM                                                                                                           </command>
@@ -336,7 +504,25 @@
     <parameters>
       <parameter name="TEST_SEEDS" type="tcl">[get_test_seeds (%TCSPEC%) (%ACTUAL_SETUP%) (%test.ITERATION%) (%SANITY%)]</parameter>
       <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <members>
       <member>Simulate</member>
       <member>formal</member>
@@ -348,7 +534,25 @@
   <runnable name="autocheck" type="task"  if="(%AUTOCHECK%) eq {1}">
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <execScript launch="/bin/csh -f">
       <command>unsetenv MODELSIM                                                               </command>
       <command>ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini                                        </command>
@@ -362,7 +566,25 @@
   <runnable name="formal" type="task" base="testsetup" if="(%FORMAL%) eq {1}">
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <execScript launch="/bin/csh -f">
       <command> echo "formal in regression not yet implemented" </command>
       <command> ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini        </command>
@@ -372,7 +594,25 @@
   <runnable name="xprop" type="task"  if="(%XPROP%) eq {1}">
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <execScript launch="/bin/csh -f">
       <command> echo "xprop in regression not yet implemented" </command>
       <command> ln -s (%PATH_TO_COMPDIR%)/modelsim.ini         </command>
@@ -389,7 +629,25 @@
       <parameter name="ucdbfile">(%ACTUAL_SETUP%)_(%ITERATION%).ucdb</parameter>
       <parameter name="ucdbtestname">(%ACTUAL_SETUP%)_(%ITERATION%)</parameter>
       <parameter name="UCDBFILE" export="yes">(%ucdbfile%)</parameter>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <execScript launch="/bin/csh -f">
       <command> echo mergelist=(%mergelist%)                                                        </command>
       <command> unsetenv MODELSIM                                                                   </command>
@@ -431,6 +689,26 @@
   <!-- == triage file                                == -->
   <!-- ================================================ -->
   <runnable name="coverage_trend_report_csv" type="task" >
+    <parameters>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
+    </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <execScript launch="/bin/csh -f">
       <command>vcover report -trend -csv (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb -file (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend_report.csv -bydu  </command>
       <command> if ($status != 0) exit 1 </command>
@@ -438,6 +716,26 @@
   </runnable>
 
   <runnable name="coverage_trend_report_html" type="task">
+    <parameters>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
+    </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <execScript launch="/bin/csh -f">
       <command>vcover report -trend -html (%MERGE_HOME%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend.ucdb -nodetails -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_(%BLOCKNAME%)_trend_report  </command>
       <command> if ($status != 0) exit 1 </command>
@@ -446,8 +744,26 @@
 
   <runnable name="merge_ucdb_files" type="task">
     <parameters>
-       <parameter name="VPLAN_UCDB">(%DATADIR%)/(%ACTUAL_SETUP%).testplan.ucdb</parameter>    
+      <parameter name="VPLAN_UCDB">(%DATADIR%)/(%ACTUAL_SETUP%).testplan.ucdb</parameter>    
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <execScript launch="/bin/csh -f">
       <command> echo DEBUG: --------------------------------------------------------------------------------</command>
       <command> echo DEBUG: ACTUAL_SETUP      =(%ACTUAL_SETUP%)                                             </command>
@@ -486,7 +802,25 @@
   <runnable name="covercheck" type="task" if="(%COVERCHECK%) eq {1}">
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <execScript launch="/bin/csh -f">
       <command>unsetenv MODELSIM                                                                                  </command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini                                                        </command>
@@ -503,8 +837,26 @@
       <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
       <parameter name="mymergefile" >(%MERGE_HOME%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.ucdb</parameter>
       <parameter name="triagefile">(%DATADIR%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).tdb</parameter>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
-    <members>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
+   <members>
       <member>coverage_html_report</member>
       <member>coverage_trend_report_csv</member>
       <member>coverage_trend_report_html</member>
@@ -519,7 +871,25 @@
       <parameter name="mymergefile" >(%MERGE_HOME%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.ucdb</parameter>
       <parameter name="mymergefile_noplan" >(%MERGE_HOME%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.noplan.ucdb</parameter>
       <parameter name="triagefile">(%DATADIR%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).tdb</parameter>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <members>
       <member>merge_ucdb_files</member>
       <member>covercheck</member>
@@ -532,7 +902,26 @@
     <parameters>
       <parameter name="VPLAN_UCDB">(%DATADIR%)/(%ACTUAL_SETUP%).testplan.ucdb</parameter>    
       <parameter name="VPLAN_EXCEL_TS" type="tcl">[get_extra_args (%TCSPEC%) (%ACTUAL_SETUP%) VPLAN_EXCEL]</parameter>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
+
   <!-- Execute locally -->
       <method>
       </method>
@@ -570,6 +959,26 @@
 
 
   <runnable name="coverage_html_report" type="task" >
+    <parameters>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
+    </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <execScript>
       <command> echo "Creating HTML report for (%mymergefile%)"                                                           </command>
       <command> vcover report -html -nosource -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_coverage_report (%mymergefile%)</command>
@@ -578,6 +987,26 @@
 
 
   <runnable name="regression_summary" type="task" >
+    <parameters>
+		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
+		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
+    </parameters>
+	 <preScript launch="/bin/csh -f">
+	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo PRESCRIPT_TARGET=(%PRESCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif </command>
+	 </preScript>
+	 <postScript launch="/bin/csh -f">
+	   <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then  </command>
+	   <command>   echo POSTSCRIPT_TARGET=(%POSTSCRIPT_TARGET%)</command>
+	   <command>   echo "Executing target (%RUNNABLE%)_(%SCRIPT%)"</command>
+	 	<command>   make -f (%MAKEFILE%) (%RUNNABLE%)_(%SCRIPT%) REGRESSION=1</command>
+      <command>   if ($status != 0) exit 1          </command>    
+		<command> endif</command>
+	 </postScript>
     <execScript launch="/bin/csh -f">
       <command>test -e (%DATADIR%)/merged_ucdbfiles||ln -s (%MERGE_HOME%) (%DATADIR%)/merged_ucdbfiles </command>
       <command>if ($status != 0) exit 1                                                                </command>      

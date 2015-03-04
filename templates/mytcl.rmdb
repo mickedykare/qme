@@ -567,6 +567,14 @@ proc generate_triage_cmd {timestamp location} {
 
 }
 
+proc check_if_target_exists { target } {
+	catch { [eval exec make -n $target] } msg 
+	if {[regexp {No rule to make target} $msg all]} {
+		## Target doesn't exist
+		return 0
+		} 
+	return 1
+}
 
 
   </usertcl>
