@@ -240,9 +240,6 @@
   <!-- == Create ranking if necessary                   -->
   <!-- ================================================ -->
   <runnable name="create_rankfile" type="task" if="(%RANKING%) eq {1}" >
-    <parameters>
-      <parameter name="mymergefile" >(%MERGE_HOME%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.ucdb</parameter>
-    </parameters>
    <execScript>
       <command> if [catch {open (%SCRATCH%)/(%ACTUAL_SETUP%)_(%TIMESTAMP%)_ranked_tc_spec.list w} ranked_spec_file] { </command>
       <command>  puts stderr "Cannot create file (%SCRATCH%)/(%ACTUAL_SETUP%)_(%TIMESTAMP%)_ranked_tc_spec.list\n"  </command>
