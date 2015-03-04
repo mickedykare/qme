@@ -87,7 +87,7 @@
       <!-- == Parameters to control the running of the regressions == -->
       <parameter name="triageoptions">-severity IFEW -rulesfile (%VRUNDIR%)/transformrule.txt -verbose</parameter>
       <parameter name="tplanoptions">-format Excel -autoweight -verbose -startstoring 1 (%XML2UCDB_DATAFIELDS%)</parameter>
-      <parameter name="mergeoptions">-testassociated</parameter>
+      <parameter name="mergeoptions">-testassociated -64</parameter>
     </parameters>
   </runnable>
 
@@ -366,6 +366,7 @@
 		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
 		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
       <parameter name="VALID_TESTS" type="tcl">[get_tests_for_setup (%TCSPEC%) (%ACTUAL_SETUP%)]</parameter>
+      <parameter name="TESTNAME">(%test.ITERATION%)</parameter>
     </parameters>
 	 <preScript launch="/bin/csh -f">
 	   <command> if  ("(%PRESCRIPT_TARGET%)" == "1") then                                          </command>
@@ -508,11 +509,10 @@
   <runnable name="Simulate"  type="task"  foreach="(%TEST_SEEDS%)" >
     <parameters>
       <parameter name="PATH_TO_COMPDIR" type="tcl">[get_rel_path_between (%TASKDIR%) setup compile_all]</parameter>      
-      <parameter name="TESTNAME" type="tcl">[lindex [split [lindex [split [file tail (%CONTEXT%)] ":"] 0] "~"] 1]</parameter>
       <parameter name="EXTRA_VSIM_ARGS" type="tcl">[get_extra_args (%TCSPEC%) (%ACTUAL_SETUP%) vsim] </parameter>
       <parameter name="seed" type="tcl">[lindex [split [file tail  (%CONTEXT%)] ":"] 1]</parameter>
       <parameter name="ucdbfile">(%ACTUAL_SETUP%)_(%ITERATION%).ucdb</parameter>
-      <parameter name="ucdbtestname">(%ACTUAL_SETUP%)_(%ITERATION%)</parameter>
+      <parameter name="testname">(%ACTUAL_SETUP%)_(%ITERATION%)</parameter>
       <parameter name="UCDBFILE" export="yes">(%ucdbfile%)</parameter>
 		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
 		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
@@ -531,7 +531,7 @@
       <command>   echo "Running the simulation only once since we did not activate rerun failing tests"</command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini                                          </command>
       <command>   ln -s   (%PATH_TO_COMPDIR%)/questa_libs                                           </command>
-      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  COVER=1  BITS=(%BITS%) SETUP=(%ACTUAL_SETUP%)</command>
+      <command>   make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%testname%)  COVER=1  BITS=(%BITS%) SETUP=(%ACTUAL_SETUP%)</command>
       <command>   if ($status != 0)   exit 1                                                        </command>
       <command> else                                                                                </command>
       <!--Local rerun  first attempt-->
@@ -540,7 +540,7 @@
       <command>     touch ~/one.txt                                                                 </command>
       <command>     ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini                                        </command>
       <command>     ln -s   (%PATH_TO_COMPDIR%)/questa_libs                                         </command>
-      <command>     make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%)  COVER=1  BITS=(%BITS%) SETUP=(%ACTUAL_SETUP%)</command>
+      <command>     make batch_regression  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%testname%)  COVER=1  BITS=(%BITS%) SETUP=(%ACTUAL_SETUP%)</command>
       <command>     if ($status != 0)   exit 1                                                      </command>
       <command>   else                                                                              </command>
       <command>     echo "Running the simulation for the second time,with full vis, DEBUG_MODE=(%DEBUGMODE:0%)"</command>
@@ -548,7 +548,7 @@
       <command>     ln -s   (%PATH_TO_COMPDIR%)/modelsim.ini                                        </command>
       <command>     ln -s   (%PATH_TO_COMPDIR%)/questa_libs                                         </command>
       <command>     ln -s   (%PATH_TO_COMPDIR%)/vsim.dbg                                            </command>
-      <command>     make batch_regression_dbg  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%ucdbtestname%) COVER=1  BITS=(%BITS%)</command>
+      <command>     make batch_regression_dbg  -f (%MAKEFILE%) TEST=(%TESTNAME%) SEED=(%seed%) UCDBFILE=(%ucdbfile%) UCDBTESTNAME=(%testname%) COVER=1  BITS=(%BITS%)</command>
       <command>     if ($status != 0) exit 1                                                        </command>
       <command>   endif                                                                             </command>
       <command> endif                                                                               </command>
@@ -637,9 +637,6 @@
 
   <runnable name="generate_reports" type="group" sequential="no">
     <parameters>
-      <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
-      <parameter name="mymergefile" >(%MERGE_HOME%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.ucdb</parameter>
-      <parameter name="triagefile">(%DATADIR%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).tdb</parameter>
 		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
 		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
