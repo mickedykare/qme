@@ -443,7 +443,6 @@
   <runnable name="all_sims" type="group" sequential="no" >
     <parameters>
       <parameter name="TEST_SEEDS" type="tcl">[get_test_seeds (%TCSPEC%) (%ACTUAL_SETUP%) (%test.ITERATION%) (%SANITY%)]</parameter>
-      <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
 		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
 		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
@@ -667,10 +666,8 @@
 
   <runnable name="data_collection" type="group" sequential="yes">
     <parameters>
-      <parameter name="mergelist">(%DATADIR%)/(%ACTUAL_SETUP%).mergelist</parameter>
       <parameter name="mymergefile" >(%MERGE_HOME%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.ucdb</parameter>
       <parameter name="mymergefile_noplan" >(%MERGE_HOME%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).merge.noplan.ucdb</parameter>
-      <parameter name="triagefile">(%DATADIR%)/(%ACTUAL_SETUP%).(%BLOCKNAME%).(%TIMESTAMP%).tdb</parameter>
 		<parameter name="PRESCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_preScript]</parameter>
 		<parameter name="POSTSCRIPT_TARGET" type="tcl">[check_if_target_exists (%RUNNABLE%)_postScript]</parameter>
     </parameters>
