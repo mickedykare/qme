@@ -87,12 +87,12 @@ sub compile{
 
     my $cmd;
     if ($t eq "verilog") {	
-	$cmd="vlog -work $l $files $args $ml";
+	$cmd="vlog -work $l $files $args $ml $vlogargs";
 	&infomsg("Launching: $cmd",$nocolor);
 	&system_cmd_hl($cmd);
 
     } elsif ($t eq "vhdl") {
-	$cmd="vcom -work $l $files $args";
+	$cmd="vcom -work $l $files $args $vcomargs";
 	&infomsg("Launching: $cmd",$nocolor);
 	&system_cmd_hl($cmd);
 	
