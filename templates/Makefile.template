@@ -541,7 +541,7 @@ check_prereq::
 #########################################################
 
 regression:: check_prereq preregression create_project_file
-	vrun -project default.vrm -rmdb ${RMDBFILE} ${REGRESSION_ARGS} ${RUNNABLE} -checkrmdb -config  ${BLOCKNAME}_regression&
+	vrun -project default.vrm -rmdb ${RMDBFILE} ${REGRESSION_ARGS} ${RUNNABLE} -config  ${BLOCKNAME}_regression&
 
 #########################################################
 # Check status of regression directory
