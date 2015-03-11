@@ -30,6 +30,7 @@ my $fltfile="";
 my $verbose=0;
 my $vlogargs="";
 my $vcomargs="";
+my $setup="";
 my $default_lib="";
 my $library_home="questa_libs";
 my $arch="32";
@@ -87,7 +88,7 @@ sub compile{
 
     my $cmd;
     if ($t eq "verilog") {	
-	$cmd="vlog -work $l $files $args $ml $vlogargs";
+	$cmd="vlog -work $l $files $args $ml $vlogargs $setup";
 	&infomsg("Launching: $cmd",$nocolor);
 	&system_cmd_hl($cmd);
 
@@ -123,6 +124,7 @@ sub compile{
 
 GetOptions ("cflags=s" => \$cflags,    # numeric
 	    "file=s"   => \$fltfile,      # string
+	    "setup=s" => \$setup,
 	    "vlogargs=s" => \$vlogargs,
 	    "vcomargs=s" => \$vcomargs,
 	    "default_lib=s" => \$default_lib,

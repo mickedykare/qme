@@ -148,7 +148,7 @@ endif
 ifeq ($(SETUP),____DEFAULT_SETUP)
 SETUPARGS=
 else
-SETUPARGS=-vlogargs=+define+${SETUP}
+SETUPARGS=-setup=+define+${SETUP}
 endif
 
 ifeq ($(AUTOSTART),0)

@@ -113,7 +113,7 @@ compile_rtl::remove_remake precompile_rtl check_filelist_rtl compile_rtl_script 
 compile_rtl_script::
 	@test -d ${QUESTALIBS_DIR}||mkdir ${QUESTALIBS_DIR}
 	@test -d ${QUESTACLIBS_DIR}||mkdir ${QUESTACLIBS_DIR}
-	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS} ${NOCOLOR}
+	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${DUT_FILELIST} ${DUT_COMPILE_SCRIPT_ARGUMENTS} ${X_VLOG_ARGS} ${X_VCOM_ARGS} ${NOCOLOR} ${DEFINE_SETUP}
 	mv  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/rtl_liborder.txt
 
 # This is used for formal verification applications
@@ -133,7 +133,7 @@ compile_rtl_fv_script::
 compile_tb::remove_opts remove_remake precompile_tb compile_qvips check_filelist_tb compile_tb_script postcompile_tb
 
 compile_tb_script::
-	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS} ${X_VLOG_ARGS} ${X_VCOM_ARGS} ${NOCOLOR}
+	${DISABLE_VERDI_PLI};${COMPILE_SCRIPT} -file ${TB_FILELIST} ${TB_COMPILE_SCRIPT_ARGUMENTS} -vlogargs=${UVM_INC_DIR} ${SETUPARGS} ${X_VLOG_ARGS} ${X_VCOM_ARGS} ${NOCOLOR} 
 	@cp  ${QUESTALIBS_DIR}/liborder.txt ${QUESTALIBS_DIR}/tb_liborder.txt
 	@cp ${QUESTALIBS_DIR}/rtl_liborder.txt ${QUESTALIBS_DIR}/liborder.txt
 	@cat ${QUESTALIBS_DIR}/tb_liborder.txt >> ${QUESTALIBS_DIR}/liborder.txt
