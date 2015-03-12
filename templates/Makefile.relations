@@ -81,7 +81,6 @@ DEBUG=
 POSTSIMDEBUG=
 CLASSDEBUG=
 SOLVEFAILDEBUG=0
-UVMCONTROL=-uvmcontrol=all
 ASSERTION_DBG=-assertcover
 FSMDEBUG=
 endif
@@ -102,7 +101,6 @@ DEBUG=
 POSTSIMDEBUG=
 CLASSDEBUG=-classdebug
 SOLVEFAILDEBUG=0
-UVMCONTROL=-uvmcontrol=all
 ASSERTION_DBG=-assertdebug
 FSMDEBUG=-fsmdebug
 endif
@@ -123,7 +121,6 @@ DEBUG=-debugdb
 POSTSIMDEBUG=-postsimdataflow
 CLASSDEBUG=-classdebug
 SOLVEFAILDEBUG=1
-UVMCONTROL=-uvmcontrol=all
 ASSERTION_DBG=-assertdebug
 FSMDEBUG=-fsmdebug
 endif
