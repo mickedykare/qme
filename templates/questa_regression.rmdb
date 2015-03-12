@@ -121,6 +121,7 @@
       <member>finalize_ranking</member>
       <member>regression_summary</member>
       <member>user_report</member>
+      <member>create_attachements</member>
       <member>send_email</member>
     </members>
   </runnable>
@@ -128,8 +129,32 @@
   <!-- ================================================ -->
   <!-- == Email report at the end   =================== -->
   <!-- ================================================ -->
+  <runnable name="create_attachements" type="task" if="(%SEND_EMAIL%)">
+    <!-- No need to run this on queue -->
+    <method>
+    </method>
+    <parameters>
+    </parameters>
+    <execScript launch="/bin/csh -f" mintimeout="300">
+      <command> echo "Creating an email attachement for each setup"                                               </command>
+      <command> echo " " &gt; (%DATADIR%)/emailattachements.txt                                                   </command>
+      <command> foreach x (`ls (%DATADIR%)/*_backannotated_testplan.(%TIMESTAMP%).xlsx`)                          </command>
+		<command>   echo "Found $x"                                                                                 </command>
+      <command>   echo '---qqwweerrttyyuuiioopp' &gt;&gt; (%DATADIR%)/emailattachements.txt                       </command>;
+		<command>   echo 'Content-Type: application; name="'`basename $x`'"' &gt;&gt;(%DATADIR%)/emailattachements.txt         </command>
+		<command>   echo 'Content-Transfer-Encoding: base64' &gt;&gt;(%DATADIR%)/emailattachements.txt              </command>
+		<command>   echo 'Content-Disposition: attachement; filename="'`basename $x`'"' &gt;&gt;(%DATADIR%)/emailattachements.txt  </command>
+		<command>   cat $x &gt;&gt;(%DATADIR%)/emailattachements.txt                                                </command>
+		<command> end</command>
+
+    </execScript>
+  </runnable>
+
+  <!-- ================================================ -->
+  <!-- == Email report at the end   =================== -->
+  <!-- ================================================ -->
   <runnable name="send_email" type="task" if="(%SEND_EMAIL%)">
-    <!-- No need to run this on queu -->
+    <!-- No need to run this on queue -->
     <method>
     </method>
     <parameters>
@@ -158,6 +183,9 @@
       <command>echo 'Subject: (%EMAIL_SUBJECT%)' &gt;&gt; (%MESSAGE_FILE%)                                          </command>;
       
       <command>echo 'MIME-Version: 1.0' &gt;&gt; (%MESSAGE_FILE%)                                                   </command>;
+
+      <command>echo 'Content-Type:multipart/mixed;boundary="-qqwweerrttyyuuiioopp"' &gt;&gt; (%MESSAGE_FILE%)       </command>;
+      <command>echo '---qqwweerrttyyuuiioopp' &gt;&gt; (%MESSAGE_FILE%)                                             </command>;
       <command>echo 'Content-Type: text/html; charset='us-ascii'' &gt;&gt; (%MESSAGE_FILE%)                         </command>;
       <command>echo 'Content-Disposition: inline' &gt;&gt; (%MESSAGE_FILE%)                                         </command>;
       <!--BODY -->
@@ -190,7 +218,8 @@
       <command>echo "&lt;/pre&gt;" &gt;&gt; (%MESSAGE_FILE%)                                                        </command>
       <command>echo "&lt;/body&gt;" &gt;&gt; (%MESSAGE_FILE%)                                                       </command>
       <command>echo "&lt;/HTML&gt;" &gt;&gt; (%MESSAGE_FILE%)                                                       </command>
-      
+
+      <command>cat (%DATADIR%)/emailattachements.txt &gt;&gt;(%MESSAGE_FILE%)                                       </command>
       <command>/usr/lib/sendmail  (%EMAIL_RECIPIENT%) &lt; $EMAILMESSAGE                                            </command>
 
       <command>echo "Regression complete and email report sent to (%EMAIL_RECIPIENT%)"                              </command>
@@ -734,9 +763,14 @@
 
 
   <runnable name="coverage_html_report" type="task" >
-    <execScript>
+    <execScript launch="/bin/csh -f">
       <command> echo "Creating HTML report for (%mymergefile%)"                                                           </command>
       <command> vcover report -html -nosource -htmldir (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_coverage_report (%mymergefile%)</command>
+		<command> if ( -e (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_coverage_report/testplan.html ) then</command>
+		<command>   convert_htmltestplan.pl -f (%HTML_REPORTDIR%)/(%ACTUAL_SETUP%)_coverage_report/testplan.html --xls </command>
+		<command>   mv backannotated_testplan.xlsx (%DATADIR%)/(%ACTUAL_SETUP%)_backannotated_testplan.xlsx</command>
+		<command>   openssl base64 &lt; (%DATADIR%)/(%ACTUAL_SETUP%)_backannotated_testplan.xlsx &gt;&gt;(%DATADIR%)/(%ACTUAL_SETUP%)_backannotated_testplan.(%TIMESTAMP%).xlsx</command>
+		<command> endif </command>
     </execScript>
   </runnable>
 
