@@ -416,10 +416,10 @@
       <command> make compile -f (%MAKEFILE%)  VERIFICATION_LEVEL=(%VERIFICATION_LEVEL%) (%ALL_COMPILE_ARGS%) NOCOLOR=--nocolor BITS=(%BITS%) SETUP=(%ACTUAL_SETUP%)</command> 
       <command> if ($status != 0) exit 1                                                                                                    </command>
       <command> echo "Starting to optimize"                                                                                                 </command>
-      <command> make opt_fast -f (%MAKEFILE%) VERIFICATION_LEVEL=(%VERIFICATION_LEVEL%) X_OPT_ARGS=(%EXTRA_OPT_ARGS%)  BITS=(%BITS%) SETUP=(%ACTUAL_SETUP%)       </command>
+      <command> make opt_fast -f (%MAKEFILE%) VERIFICATION_LEVEL=(%VERIFICATION_LEVEL%) X_OPT_ARGS=(%EXTRA_OPT_ARGS%)  BITS=(%BITS%) SETUP=(%ACTUAL_SETUP%) COVER=1       </command>
       <command> if ($status != 0) exit 1                                                                                                    </command>
       <command> if ((%RERUN_FAILING_TESTS%) == 1) then                                                                                      </command>
-      <command>   make opt_dbg -f (%MAKEFILE%) VERIFICATION_LEVEL=(%VERIFICATION_LEVEL%) X_OPT_ARGS=(%EXTRA_OPT_ARGS%)  BITS=(%BITS%) SETUP=(%ACTUAL_SETUP%)       </command>
+      <command>   make opt_dbg -f (%MAKEFILE%) VERIFICATION_LEVEL=(%VERIFICATION_LEVEL%) X_OPT_ARGS=(%EXTRA_OPT_ARGS%)  BITS=(%BITS%) SETUP=(%ACTUAL_SETUP%) CCOVER=1      </command>
       <command>   if ($status != 0) exit 1                                                                                                  </command>
       <command> endif                                                                                                                       </command>
       <command> if  ("(%POSTSCRIPT_TARGET%)" == "1") then                                                                                   </command>
