@@ -689,4 +689,24 @@ cdc_compile_assertions:
 	then vcom -work  ${TB_LIB_NAME} -f ${CDC_VCOM_ARGS} ; fi
 
 
+#########################################################
+# JOBSPY
+#
+#########################################################
+FREE_PORTNR=$(shell netstat -atn | awk ' /tcp/ {printf("%s\n",substr($$4,index($$4,":")+1,length($$4) )) }' | sed -e "s/://g" | sort -rnu | awk '{array [$$1] = $$1} END {i=32768; again=1; while (again == 1) {if (array[i] == i) {i=i+1} else {print i; again=0}}}')
+HOSTNAME=$(shell hostname)
+jobspy_help:
+	@echo "======================================================================="
+	@echo "A useful tool to run if you want to get see the current simulationtime "
+	@echo "in the running simulations is the jobspy utility"
+	@echo "To use that utility you need to have a free TCP port"
+	@echo "and my scan shows that you can use this: ${FREE_PORTNR}"
+	@echo "You need to set the environment variable JOBSPY_DAEMON to <portnumber>@<hostname>"
+	@echo "setenv JOBSPY_DAEMON ${FREE_PORTNR}@${HOSTNAME}"
+	@echo "Next is to start the jobspy daemon: jobspy -startd &"
+	@echo "Next start the jobspy gui:          jobspy -gui &"
+	@echo "To stop the daemon use:             jobspy -killd "
+	@echo "======================================================================="
+
+
 
