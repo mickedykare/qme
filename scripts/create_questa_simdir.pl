@@ -200,6 +200,11 @@ if (-e $ENV{'HOME_0IN'}) {
     &print_warning("Please set HOME_0IN to point to the location of Questa Formal tools if you intend to use any of that technology");
 }
 
+if ($qme_version =~/QME_/) {
+    &print_note("Looks like git is installed (OK)");
+} else {
+    &print_warning("Unable to detect version of QME /$qme_version). Please check that git is installed");
+}
 
 
 
