@@ -28,8 +28,8 @@ my $usegcc=0;
 my $cflags="";
 my $fltfile="";
 my $verbose=0;
-my $vlogargs="";
-my $vcomargs="";
+my @vlogargs="";
+my @vcomargs="";
 my $setup="";
 my $default_lib="";
 my $library_home="questa_libs";
@@ -85,15 +85,16 @@ sub compile{
     my $t=pop;
     my $args=pop;
     my $files = pop;
-
+    my $vlargs = join " " ,@vlogargs;
+    my $vcargs = join " " ,@vcomargs;
     my $cmd;
     if ($t eq "verilog") {	
-	$cmd="vlog -work $l $files $args $ml $vlogargs $setup";
+	$cmd="vlog -work $l $files $args $ml $vlargs $setup";
 	&infomsg("Launching: $cmd",$nocolor);
 	&system_cmd_hl($cmd);
 
     } elsif ($t eq "vhdl") {
-	$cmd="vcom -work $l $files $args $vcomargs";
+	$cmd="vcom -work $l $files $args $vcargs";
 	&infomsg("Launching: $cmd",$nocolor);
 	&system_cmd_hl($cmd);
 	
@@ -125,8 +126,8 @@ sub compile{
 GetOptions ("cflags=s" => \$cflags,    # numeric
 	    "file=s"   => \$fltfile,      # string
 	    "setup=s" => \$setup,
-	    "vlogargs=s" => \$vlogargs,
-	    "vcomargs=s" => \$vcomargs,
+	    "vlogargs=s" => \@vlogargs,
+	    "vcomargs=s" => \@vcomargs,
 	    "default_lib=s" => \$default_lib,
 	    "arch=s"  => \$arch,
 	    "usegcc"  => \$usegcc,
@@ -304,7 +305,7 @@ for my $library (@liborder) {
 
 
 if ($command_files ne "") {
-    print "DBG:Compile outstanding files: $prev_lib $command_files $prev_args\n";		    
+#    print "DBG:Compile outstanding files: $prev_lib $command_files $prev_args\n";		    
     &compile($command_files,$prev_args,$prev_type,$prev_lib,$mapped_libs);
 
 }
