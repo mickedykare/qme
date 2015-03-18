@@ -39,6 +39,11 @@ my $nocolor=0;
 my $prev_lib="";
 my $prev_args="__NOARGS__";
 my $prev_type="unknown";
+my $generic_vlog_args="";
+my $generic_vcom_args="";
+
+
+
 
 # Let's find out the path to vmap
 # Since we can use any variable for questa we do the following
@@ -52,6 +57,9 @@ my $id;
 
 
 #@library x_lib
+#@vlogargs:+define+xyz 
+#@vcomargs:+define+xyz 
+
 #file1.v
 #file2.v
 #
@@ -89,12 +97,12 @@ sub compile{
     my $vcargs = join " " ,@vcomargs;
     my $cmd;
     if ($t eq "verilog") {	
-	$cmd="vlog -work $l $files $args $ml $vlargs $setup";
+	$cmd="vlog -work $l $files $args $ml $vlargs $setup $generic_vlog_args";
 	&infomsg("Launching: $cmd",$nocolor);
 	&system_cmd_hl($cmd);
 
     } elsif ($t eq "vhdl") {
-	$cmd="vcom -work $l $files $args $vcargs";
+	$cmd="vcom -work $l $files $args $vcargs $generic_vcom_args";
 	&infomsg("Launching: $cmd",$nocolor);
 	&system_cmd_hl($cmd);
 	
@@ -180,6 +188,8 @@ $cmd="test -e $library_home||mkdir -p $library_home";
 foreach my $f (@indata) {
  #   &infomsg("LINE: $f",$nocolor);
     if ($f =~ /^\@library/ ) {
+	$generic_vlog_args="";
+	$generic_vcom_args="";
 	my @line=split " ",$f;
 	$lib=pop @line;
 	push @liborder,$lib;
@@ -192,6 +202,14 @@ foreach my $f (@indata) {
 	&system_cmd_hl($cmd);
 	$cmd = "echo $lib >> $library_home/liborder.txt";
 	&system_cmd_hl($cmd);
+    } elsif ($f =~ /^\@vlogargs:/ ) {
+	my @line=split ":",$f;
+	my $tmp=pop @line;
+	$generic_vlog_args=join " ", $generic_vlog_args,$tmp;
+    } elsif ($f =~ /^\@vcomargs:/ ) {
+	my @line=split ":",$f;
+	my $tmp=pop @line;
+	$generic_vcom_args=join " ", $generic_vcom_args,$tmp;
     } else {
 	if ($f =~ /:/) {
 	    my @line=split ":",$f;
