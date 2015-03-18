@@ -195,7 +195,7 @@ foreach my $f (@indata) {
 	push @liborder,$lib;
 	$file="";
 	$args="";
-	$i = 1;
+	$i = 0;
 	$cmd="test -e $library_home/$lib||vlib $library_home/$lib"; 
 	&system_cmd_hl($cmd);
 	$cmd="vmap $lib $ENV{PWD}/$library_home/$lib"; 
@@ -221,7 +221,7 @@ foreach my $f (@indata) {
 	}
 
 	################################################################
-
+	$i++;
 	if (($file =~ /\.vhd$/)|($file =~ /\.vhdl$/)) {
 	    $type="vhdl";
 	} elsif (($file =~ /\.sv$/)|($file =~ /\.v$/)|($file =~ /\.svh$/)) {
@@ -232,12 +232,12 @@ foreach my $f (@indata) {
 	    &infomsg("Unknown filetype:$file",$nocolor);
 	    exit(1);
 	}
-#	print "DBG:$lib $i $file\n";
+	print "DBG:$lib $i $file $type $args \n";
 	$db->{$lib}->{"$i"}->{'filename'}=$file;
 	$db->{$lib}->{"$i"}->{'type'}=$type;
 	$db->{$lib}->{"$i"}->{'args'}=$args;
 	$db->{$lib}->{'no_of_files'}=$i;
-    $i++;
+
 
     }
 
