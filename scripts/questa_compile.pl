@@ -232,7 +232,7 @@ foreach my $f (@indata) {
 	    &infomsg("Unknown filetype:$file",$nocolor);
 	    exit(1);
 	}
-	print "DBG:$lib $i $file $type $args \n";
+#	print "DBG:$lib $i $file $type $args \n";
 	$db->{$lib}->{"$i"}->{'filename'}=$file;
 	$db->{$lib}->{"$i"}->{'type'}=$type;
 	$db->{$lib}->{"$i"}->{'args'}=$args;
