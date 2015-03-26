@@ -229,6 +229,7 @@ VOPTSWITCHES_CHIP=+acc=npr ${VLOG_TIMESCALE}
 VOPTSWITCHES_BLOCK=+acc ${VLOG_TIMESCALE}
 VOPTSWITCHES_FAST_BLOCK=+acc=rn +acc+mgc_* ${VLOG_TIMESCALE}
 CODECOVERAGE=+cover=fbecst
+NOCOVER=
 
 ###################################################################
 # SCRIPTS and Executables
