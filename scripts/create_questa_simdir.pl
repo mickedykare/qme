@@ -28,6 +28,9 @@ my $version=0;
 my $scratchdir=$ENV{'QME_SCRATCH_HOME'};
 my $simsettingsdir=$ENV{'QME_SIM_SETTINGS_DIR'};
 my $makefile = $ENV{'QME_HOME'}."/"."templates/Makefile.template";
+my $rmdb_file=$ENV{'QME_HOME'}."/"."templates/questa_regression.rmdb";
+my $rmdb_tcl=$ENV{'QME_HOME'}."/"."templates/mytcl.rmdb";
+
 my $block_overrides;
 my $simdir_fp;
 my $srchome=$ENV{'QME_PROJECT_HOME'}."/";
@@ -265,5 +268,10 @@ if (-e $simdir_fp) {
 my $destination= $simdir_fp."/"."Makefile";
 &print_note("Creating $destination");
 &update_makefile($makefile,$destination);
+$destination= $simdir_fp."/"."default.rmdb";
+&copy_to($rmdb_file,$destination);
+$destination= $simdir_fp."/"."mytcl.rmdb";
+&copy_to($rmdb_tcl,$destination);
+
 print "cd $simdir_fp\n";
 

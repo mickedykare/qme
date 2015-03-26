@@ -31,8 +31,6 @@
       <parameter name="HTML_REPORTDIR">(%DATADIR%)/../html_reports</parameter>
       <!-- BEHAVIOUR CONTROL -->
       <!-- GRID can be LOCAL,LSF or SGE -->
-      <parameter name="GRID">LOCAL</parameter>
-      <parameter name="GRIDQUEUE">asic_batch</parameter>
       <parameter name="VERIFICATION_LEVEL">BLOCK</parameter>
       <parameter name="DEBUG_LEVEL">LOW</parameter>
       <parameter name="SEND_EMAIL">1</parameter>
@@ -60,36 +58,34 @@
       <parameter name="BITS">64</parameter>
       <parameter name="SANITY">0</parameter>
       <parameter name="USER_REPORT_TARGET"></parameter>
-
+      <parameter name="triageoptions">-severity IFEW -rulesfile (%VRUNDIR%)/transformrule.txt -verbose</parameter>
+      <parameter name="tplanoptions">-format Excel -autoweight -verbose -startstoring 1 (%XML2UCDB_DATAFIELDS%)</parameter>
+      <parameter name="mergeoptions">-testassociated -64</parameter>
+ 
     </parameters>
 
     <!-- NOTE! Not tested -->
-    <method name="compute_grid" gridtype="lsf" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LSF}">
-      <command>bsub -q (%GRIDQUEUE%) -J (%RUNNABLE%) -oo (%TASKDIR%)/(%SCRIPT%).bat.o%J -eo (%TASKDIR%)/(%SCRIPT%).bat.e%J \
+
+
+    <!--method name="compute_grid" gridtype="lsf" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LSF}">
+      <command>bsub -q (%LSFQUEUE%) -J (%RUNNABLE%) -oo (%TASKDIR%)/(%SCRIPT%).bat.o%J -eo (%TASKDIR%)/(%SCRIPT%).bat.e%J \
 	(%LSFARGS%) (%WRAPPER%)    </command>
-    </method>   
+    </method-->   
     
     <!-- NOTE! Not tested -->
-    <method name="compute_grid" gridtype="sge" action="execScript" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {SGE}">
+    <!--method name="compute_grid" gridtype="sge" action="execScript" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {SGE}">
       <command>qsub (%SGEARGS%) -N (%INSTANCE%) (%WRAPPER%)</command> 
-    </method>
+    </method-->
 
-    <method  name="compute_grid" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LOCAL}">
-    </method>   
+    <!--method  name="compute_grid" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LOCAL}">
+    </method-->   
 
   </runnable>
 
   <!-- ========================================================== -->
   <!-- BASE RUNNABLE that should not be necessary to edit -->
   <!-- ========================================================== -->
-  <runnable name="testsetup" type="base" base="projectsetup" >
-    <parameters>
-      <!-- == Parameters to control the running of the regressions == -->
-      <parameter name="triageoptions">-severity IFEW -rulesfile (%VRUNDIR%)/transformrule.txt -verbose</parameter>
-      <parameter name="tplanoptions">-format Excel -autoweight -verbose -startstoring 1 (%XML2UCDB_DATAFIELDS%)</parameter>
-      <parameter name="mergeoptions">-testassociated -64</parameter>
-    </parameters>
-  </runnable>
+  <xi:include href="grids.rmdb"/>
 
   <!-- ================================================ -->
   <!-- == Top Level Group Runnable  =================== -->

@@ -499,8 +499,6 @@ create_project_file::
 	-GMERGE_HOME=${MERGED_UCDB_HOME} \
 	-GREPORTS_HOME=${HTML_REPORTS_HOME} \
 	-GHTML_REPORTDIR=${HTML_REPORTS_HOME} \
-	-GGRID=${GRID_ENGINE} \
-	-GGRIDQUEUE=${GRID_QUEUE} \
 	-GRANKING=${RANKING} \
 	-GCOVERCHECK=${COVERCHECK} \
 	-GAUTOCHECK=${AUTOCHECK} \
@@ -514,6 +512,7 @@ create_project_file::
 	-GRERUN_FAILING_TESTS=${RERUN_FAILING_TESTS} \
 	-GVERIFICATION_LEVEL=${VERIFICATION_LEVEL} \
 	-GSANITY=${SANITY} \
+	-GGRID=${GRID_ENGINE} \
 	-GUSER_REPORT_TARGET=${USER_REPORT_TARGET} \
 	-vrmdata ${SCRATCHDIR}}" >> default.vrm.tmp 
 	@echo "VRMEND" >> default.vrm.tmp;
@@ -539,9 +538,13 @@ check_prereq::
 #########################################################
 # Launch GUI for controlling regressions
 #########################################################
+copy_grid_control::
+	@echo "INFO: Copying GRID_CONTROL_FILE=${GRID_CONTROL_FILE}"
+	@cp -f ${GRID_CONTROL_FILE} ./grids.rmdb
 
-regression:: check_prereq preregression create_project_file
-	vrun -project default.vrm -rmdb ${RMDBFILE} ${REGRESSION_ARGS} ${RUNNABLE} -config  ${BLOCKNAME}_regression&
+
+regression:: check_prereq copy_grid_control preregression create_project_file
+	vrun -project default.vrm -rmdb ${RMDBFILE} ${REGRESSION_ARGS} ${RUNNABLE} -config  ${BLOCKNAME}_regression -checkrmdb&
 
 #########################################################
 # Check status of regression directory

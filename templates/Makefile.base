@@ -17,7 +17,8 @@
 ###################################################################
 # Default Scripts
 ###################################################################
-RMDBFILE=${QME_HOME}/templates/questa_regression.rmdb
+#RMDBFILE=${QME_HOME}/templates/questa_regression.rmdb
+RMDBFILE=default.rmdb
 RECOMPILE_ANALYZE_SCRIPT=
 ###################################################################
 # Default settings
@@ -201,7 +202,8 @@ FORMAL_BIND_MODULE=
 # Supports SGE or LSF or LOCAL:
 SANITY=0
 GRID_ENGINE=LOCAL   
-GRID_QUEUE=define_queue_name   
+GRID_CONTROL_FILE=${QME_HOME}/templates/grids.rmdb
+LSFQUEUE=define_queue_name   
 AUTOSTART=0
 MAX_PARALLEL_JOBS=20
 MAX_EXECUTION_TIME=600
@@ -215,9 +217,10 @@ NOREUSESEEDS=-noreuseseeds
 #NOREUSESEEDS=
 
 #LSF STANDARD SETTINGS
-LSFARGS="-q asic -I" 
+LSFARGS="\"-q ${LSFQUEUE} -I\"" 
+#LSFARGS=
 # SGE STANDARD SETTINGS
-#SGEARGS="-V -cwd -b yes -e /dev/null -o /dev/null"
+#SGEARGS="\"-V -cwd -b yes -e /dev/null -o /dev/null\""
 SGEARGS=
 SCRATCHDIR=regression_data
 

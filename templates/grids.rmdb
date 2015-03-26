@@ -1,0 +1,40 @@
+<rmdb>
+<!--**********************************************************************************
+# grids.rmdb
+# Questa Makefile Environment
+#
+# Copyright 2015 Mentor Graphics Corporation
+# All Rights Reserved
+#
+# THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION WHICH IS THE PROPERTY OF
+# MENTOR GRAPHICS CORPORATION OR ITS LICENSORS AND IS SUBJECT TO LICENSE TERMS
+#
+# bugs, enhancment requests to: Mikael_Andersson@mentor.com
+# **********************************************************************************-->
+  <runnable name="testsetup" type="base" base="projectsetup" >
+    <parameters>
+      <!-- GRID can be LOCAL,LSF or SGE -->
+      <parameter name="GRID">LOCAL</parameter>
+      <parameter name="LSFQUEUE">asic_batch</parameter>
+      <parameter name="LSFARGS">-q (%LSFQUEUE%) -I ></parameter>
+  </parameters>
+    
+    
+    <!-- NOTE! Not tested -->
+    <method name="compute_grid" gridtype="lsf" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LSF}">
+      <command>bsub -q (%LSFQUEUE%) -J (%RUNNABLE%) -oo (%TASKDIR%)/(%SCRIPT%).bat.o%J -eo (%TASKDIR%)/(%SCRIPT%).bat.e%J \
+	(%LSFARGS%) (%WRAPPER%)    </command>
+    </method>   
+    
+    <!-- NOTE! Not tested -->
+    <method name="compute_grid" gridtype="sge" action="execScript" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {SGE}">
+      <command>qsub (%SGEARGS%) -N (%INSTANCE%) (%WRAPPER%)</command> 
+    </method>
+
+    <method  name="compute_grid" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LOCAL}">
+    </method>   
+
+  </runnable>
+
+
+</rmdb>
