@@ -202,7 +202,13 @@ FORMAL_BIND_MODULE=
 # Supports SGE or LSF or LOCAL:
 SANITY=0
 GRID_ENGINE=LOCAL   
-GRID_CONTROL_FILE=${QME_HOME}/templates/grids.rmdb
+ifeq ($(GRID_ENGINE),LSF) 
+GRID_CONTROL_FILE=${QME_HOME}/templates/grids.lsf.rmdb
+else ifeq ($(GRID_ENGINE),SGE) 
+GRID_CONTROL_FILE=${QME_HOME}/templates/grids.sge.rmdb
+else 
+GRID_CONTROL_FILE=${QME_HOME}/templates/grids.local.rmdb
+endif
 LSFQUEUE=define_queue_name   
 AUTOSTART=0
 MAX_PARALLEL_JOBS=20
