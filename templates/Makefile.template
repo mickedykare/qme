@@ -494,6 +494,7 @@ create_project_file::
 	@sed s/VRMEND//g default.vrm > default.vrm.tmp
 	@echo "VRM::AddConfiguration ${RMDBFILE} {${BLOCKNAME}_regression} {{I my_run}} {-j ${MAX_PARALLEL_JOBS} -clean -GBLOCKNAME=${BLOCKNAME} \
 	${TIMEOUTARGS} ${NOREUSESEEDS} \
+	-GMAX_PARALLEL_JOBS=${MAX_PARALLEL_JOBS} \
 	-GBITS=${ARCH} \
 	-GTCSPEC=${TC_SPEC} \
 	-GMERGE_HOME=${MERGED_UCDB_HOME} \

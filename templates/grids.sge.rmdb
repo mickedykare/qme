@@ -12,30 +12,17 @@
 # bugs, enhancment requests to: Mikael_Andersson@mentor.com
 # **********************************************************************************-->
     <!-- NOTE! Not tested -->
-    <method name="compute_grid" gridtype="lsf" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LSF}">
-      <command>bsub -q (%LSFQUEUE%) -J (%RUNNABLE%) -oo (%TASKDIR%)/(%SCRIPT%).bat.o%J -eo (%TASKDIR%)/(%SCRIPT%).bat.e%J \
-	(%LSFARGS%) (%WRAPPER%)    </command>
-    </method>   
-    
-    <!-- NOTE! Not tested -->
-    <method name="compute_grid" gridtype="sge" action="execScript" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {SGE}">
+    <method name="compute_grid" gridtype="sge" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)">
       <command>qsub (%SGEARGS%) -N (%INSTANCE%) (%WRAPPER%)</command> 
     </method>
 
-    <method  name="compute_grid" maxrunning="(%MAX_PARALLEL_JOBS%)" if="{(%GRID%)} eq {LOCAL}">
-    </method>   
-
   <runnable name="testsetup" type="base" base="projectsetup" >
+    <method base="compute_grid"/>
     <parameters>
       <!-- GRID can be LOCAL,LSF or SGE -->
-      <parameter name="GRID">LOCAL</parameter>
-      <parameter name="LSFQUEUE">asic_batch</parameter>
-      <parameter name="LSFARGS">-q (%LSFQUEUE%) -I ></parameter>
-  </parameters>
-    
-    
-
+      <parameter name="GRID">SGE</parameter>
+      <parameter name="SGEARGS">-oe (%TASKDIR%)</parameter>
+    </parameters>
   </runnable>
-
 
 </rmdb>
