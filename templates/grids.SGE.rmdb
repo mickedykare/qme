@@ -11,18 +11,20 @@
 #
 # bugs, enhancment requests to: Mikael_Andersson@mentor.com
 # **********************************************************************************-->
-    <!-- NOTE! Not tested -->
-    <method name="compute_grid" gridtype="sge" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)">
-      <command>qsub (%SGEARGS%) -N (%INSTANCE%) (%WRAPPER%)</command> 
-    </method>
+  <!-- NOTE! Not tested -->
+  <method name="compute_grid" gridtype="sge" mintimeout="600000" maxrunning="(%MAX_PARALLEL_JOBS%)">
+    <command>qsub -V (%SGEARGS%) -N (%SGE_JOB_NAME%) (%WRAPPER%)</command> 
+  </method>
 
-  <runnable name="testsetup" type="base" base="projectsetup" >
+  <runnable name="testsetup" type="base" base="projectsetup">
+    <parameters>
+      <parameter name="SGE_JOB_NAME" type="tcl">[regsub -all : (%INSTANCE%) _]</parameter>
+    </parameters>
     <method base="compute_grid"/>
     <parameters>
       <!-- GRID can be LOCAL,LSF or SGE -->
       <parameter name="GRID">SGE</parameter>
-      <parameter name="SGEARGS">-oe (%TASKDIR%)</parameter>
+      <parameter name="SGEARGS"></parameter>
     </parameters>
   </runnable>
-
 </rmdb>
