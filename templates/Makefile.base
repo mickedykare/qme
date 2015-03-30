@@ -201,7 +201,7 @@ FORMAL_BIND_MODULE=
 ###################################################################
 # Supports SGE or LSF or LOCAL:
 SANITY=0
-GRID_ENGINE=LOCAL   
+GRID_ENGINE=LOCAL
 GRID_CONTROL_FILE=${QME_HOME}/templates/grids.${GRID_ENGINE}.rmdb
 LSFQUEUE=define_queue_name   
 AUTOSTART=0
